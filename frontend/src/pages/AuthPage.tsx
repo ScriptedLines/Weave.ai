@@ -15,6 +15,7 @@ export default function AuthPage() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [nameError, setNameError] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function AuthPage() {
     e.preventDefault();
     setError('');
     setEmailError('');
+    setNameError('');
     setLoading(true);
     try {
       if (isLogin) {
@@ -52,11 +54,28 @@ export default function AuthPage() {
         if (error) throw error;
         navigate('/dashboard');
       } else {
+        // 1. Check if Username/Name is already taken in the profiles table
+        const { data: existingUser } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('username', name)
+          .maybeSingle();
+
+        if (existingUser) {
+          setNameError('This Curator name is already in the archives. Try another.');
+          throw new Error('Name collision detected.');
+        }
+
         const { error } = await signUp(email, password, name);
         if (error) {
-           if (error.message.toLowerCase().includes('already registered') || error.message.toLowerCase().includes('exists')) {
+           const errMsg = error.message.toLowerCase();
+           // Broaden check for various Supabase error formats
+           if (errMsg.includes('already registered') || 
+               errMsg.includes('exists') || 
+               (error as any).code === 'user_already_exists' ||
+               (error as any).status === 422) {
               setEmailError('This email is already registered to a Curator account.');
-              throw new Error('Please use a different email or log in.');
+              throw new Error('This email is already taken. Please log in or use another.');
            }
            throw error;
         }
@@ -130,7 +149,12 @@ export default function AuthPage() {
                 {!isLogin && (
                   <div className="flex flex-col gap-1.5">
                     <label className="font-unbounded text-[9px] font-black text-on-surface/60 tracking-wider">FULL NAME</label>
-                    <input value={name} onChange={e => setName(e.target.value)} className="bg-surface/50 border-b-[1.5px] border-on-surface outline-none py-3 px-1 italic font-fraunces text-lg placeholder:text-on-surface/20 focus:border-primary transition-all" placeholder="ALEXANDRA VOGUE" type="text" required/>
+                    <input value={name} onChange={e => { setName(e.target.value); setNameError(''); }} className={`bg-surface/50 border-b-[1.5px] ${nameError ? 'border-primary' : 'border-on-surface'} outline-none py-3 px-1 italic font-fraunces text-lg placeholder:text-on-surface/20 focus:border-primary transition-all`} placeholder="ALEXANDRA VOGUE" type="text" required/>
+                    {nameError && (
+                      <div className="text-primary text-[10px] uppercase font-mono font-bold tracking-widest mt-1">
+                        {nameError}
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="flex flex-col gap-1.5">
