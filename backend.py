@@ -8,9 +8,7 @@ import numpy as np
 import cv2 as cv
 from supabase import create_client
 import random
-from recommendation.Self_Correction_Human_Parsing.skin_hair_color import main
 from recommendation.skin_recom import rank_clothes
-from vton.vton_model import VTONRunner,SkinAnalyzer, FashionAnalyzer
 
 # Load secure environment variables from .env vault
 load_dotenv()
