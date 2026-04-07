@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700;1,9..144,900&amp;family=Unbounded:wght@400;700;900&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;family=Newsreader:ital,wght@0,400;0,700;1,400&amp;family=Space+Grotesk:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed": "#161f00",
+                        "on-tertiary-container": "#fffaf9",
+                        "surface-variant": "#e8e2d3",
+                        "on-error": "#ffffff",
+                        "surface": "#fff9ea",
+                        "on-primary-container": "#fffbff",
+                        "inverse-surface": "#333027",
+                        "surface-bright": "#fff9ea",
+                        "secondary-container": "#d4e899",
+                        "secondary": "#546524",
+                        "on-tertiary-fixed": "#281800",
+                        "primary-container": "#c84b2f",
+                        "on-primary-fixed-variant": "#891e05",
+                        "tertiary": "#7c5300",
+                        "primary-fixed": "#ffdad2",
+                        "surface-container-highest": "#e8e2d3",
+                        "inverse-primary": "#ffb4a3",
+                        "on-secondary-fixed-variant": "#3d4c0e",
+                        "secondary-fixed": "#d7eb9c",
+                        "tertiary-fixed-dim": "#ffba43",
+                        "on-tertiary-fixed-variant": "#614000",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#e0bfb8",
+                        "secondary-fixed-dim": "#bbcf82",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#f3edde",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#ffddaf",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#9c6a00",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#586928",
+                        "outline": "#8c716b",
+                        "on-surface-variant": "#58413c",
+                        "surface-container-low": "#f9f3e4",
+                        "surface-container-high": "#eee8d9",
+                        "primary": "#a63319",
+                        "surface-dim": "#dfdacb",
+                        "on-background": "#1d1c13",
+                        "inverse-on-surface": "#f6f0e1",
+                        "surface-tint": "#aa361c",
+                        "error": "#ba1a1a",
+                        "background": "#fff9ea",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#1d1c13",
+                        "primary-fixed-dim": "#ffb4a3",
+                        "on-primary-fixed": "#3d0600"
+                    },
+                    fontFamily: {
+                        "fraunces": ["Fraunces", "serif"],
+                        "unbounded": ["Unbounded", "sans-serif"],
+                        "mono": ["Space Mono", "monospace"],
+                        "headline": ["Newsreader", "serif"],
+                        "body": ["Newsreader", "serif"],
+                        "label": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            cursor: none;
+        }
+        .custom-cursor {
+            width: 12px;
+            height: 12px;
+            background-color: #a63319;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
+        }
+        .grain-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.04;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        .ink-underline {
+            position: relative;
+        }
+        .ink-underline::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: currentColor;
+            transition: width 0.3s ease;
+            mask-image: url("data:image/svg+xml,%3Csvg width='100' height='10' viewBox='0 0 100 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 Q 25 0, 50 5 T 100 5' stroke='black' fill='transparent'/%3E%3C/svg%3E");
+        }
+        .group:hover .ink-underline::after {
+            width: 100%;
+        }
+        .card-tilt {
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+        .card-tilt:hover {
+            transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<div class="custom-cursor hidden md:block" id="cursor"></div>
+<div class="grain-overlay"></div>
+<!-- Ticker Tape -->
+<div class="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-primary h-6">
+<div class="whitespace-nowrap animate-marquee flex items-center">
+<span class="font-mono text-[10px] uppercase tracking-[0.2em] text-surface px-4">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
+<span class="font-mono text-[10px] uppercase tracking-[0.2em] text-surface px-4">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
+</div>
+</div>
+<!-- Sidebar -->
+<aside class="fixed left-0 top-6 h-[calc(100vh-24px)] w-[280px] bg-surface-container-low z-40 px-8 py-12 flex flex-col shadow-[20px_0_30px_rgba(26,18,8,0.03)] overflow-y-auto hide-scrollbar">
+<div class="mb-12">
+<h1 class="font-unbounded font-black text-3xl tracking-tighter flex items-center gap-2">
+                WEAVE <span class="text-primary text-xl">✦</span>
+</h1>
+<p class="font-fraunces italic text-xs text-on-surface-variant opacity-60 mt-1 uppercase tracking-widest">Editorial Scrapbook</p>
+</div>
+<nav class="space-y-6 mb-12">
+<a class="flex items-center gap-4 group" href="#">
+<span class="material-symbols-outlined text-on-surface opacity-40 group-hover:opacity-100 transition-opacity">grid_view</span>
+<span class="font-mono text-[11px] uppercase tracking-[0.2em] text-on-surface opacity-60 group-hover:opacity-100 transition-opacity">Home</span>
+</a>
+<a class="flex items-center gap-4 group" href="#"><span class="material-symbols-outlined text-on-surface opacity-40 group-hover:opacity-100 transition-opacity">auto_fix_high</span><span class="font-mono text-[11px] uppercase tracking-[0.2em] text-on-surface opacity-60 group-hover:opacity-100 transition-opacity">Studio</span></a>
+<a class="flex items-center gap-4 group text-primary" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shelves</span><span class="font-mono text-[11px] uppercase tracking-[0.2em] font-bold border-b border-primary/40 pb-0.5">Vault</span></a>
+<a class="flex items-center gap-4 group" href="#">
+<span class="material-symbols-outlined text-on-surface opacity-40 group-hover:opacity-100 transition-opacity">settings</span>
+<span class="font-mono text-[11px] uppercase tracking-[0.2em] text-on-surface opacity-60 group-hover:opacity-100 transition-opacity">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-8 border-t border-on-surface/5">
+<h3 class="font-unbounded font-black text-[10px] uppercase tracking-wider text-primary mb-6">Refine Results</h3>
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant">Category</label>
+<div class="relative">
+<input class="w-full bg-transparent border-b-2 border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary transition-colors" placeholder="Outerwear" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant">Hue Mapping</label>
+<div class="grid grid-cols-4 gap-2">
+<button class="aspect-square bg-[#3d4c0e] rounded-sm"></button>
+<button class="aspect-square bg-[#a63319] rounded-sm ring-1 ring-offset-2 ring-primary"></button>
+<button class="aspect-square bg-[#58413c] rounded-sm"></button>
+<button class="aspect-square bg-[#e8e2d3] rounded-sm"></button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant">Silhouette</label>
+<select class="w-full bg-transparent border-b-2 border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none">
+<option>Oversized</option>
+<option>Structured</option>
+<option>Fluid</option>
+</select>
+</div>
+<button class="w-full bg-primary text-surface py-3 font-unbounded font-black text-[10px] uppercase tracking-widest relative overflow-hidden group">
+<span class="relative z-10">Apply Filters</span>
+<div class="absolute inset-0 bg-on-background translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+</button>
+</div>
+<div class="mt-8 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm">bolt</span>
+<span class="font-fraunces italic text-[10px] text-secondary opacity-80">Powered by SigLIP semantic search</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[280px] pt-12 min-h-screen relative overflow-x-hidden">
+<!-- Giant Background Text -->
+<div class="absolute top-20 left-10 pointer-events-none select-none overflow-hidden w-full">
+<h2 class="font-unbounded font-black text-[180px] leading-none opacity-[0.03] tracking-tighter text-on-surface">CATALOGUE</h2>
+</div>
+<header class="px-12 mb-16 relative z-10 flex justify-between items-end">
+<div class="flex gap-4 overflow-x-auto hide-scrollbar">
+<button class="px-6 py-2 bg-on-surface text-surface rounded-full font-mono text-[10px] uppercase tracking-widest whitespace-nowrap">For You</button>
+<button class="px-6 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-mono text-[10px] uppercase tracking-widest hover:bg-surface-container-highest transition-colors whitespace-nowrap">New Arrivals</button>
+<button class="px-6 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-mono text-[10px] uppercase tracking-widest hover:bg-surface-container-highest transition-colors whitespace-nowrap">Trending</button>
+</div>
+<div class="flex gap-2">
+<div class="px-3 py-1 bg-surface-container-highest border border-on-surface/5 flex items-center gap-2">
+<span class="font-mono text-[9px] uppercase text-on-surface-variant">Color Score:</span>
+<span class="font-mono text-[9px] font-bold text-primary">0.82</span>
+</div>
+<div class="px-3 py-1 bg-surface-container-highest border border-on-surface/5 flex items-center gap-2">
+<span class="font-mono text-[9px] uppercase text-on-surface-variant">Semantic:</span>
+<span class="font-mono text-[9px] font-bold text-secondary">Match</span>
+</div>
+</div>
+</header>
+<!-- Product Grid -->
+<section class="px-12 pb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 relative z-10">
+<!-- Card 1 -->
+<div class="card-tilt group bg-surface border-[1.5px] border-on-surface p-2 flex flex-col relative rotate-[-0.5deg]">
+<div class="absolute top-4 right-4 z-20 bg-surface-container px-2 py-0.5 border border-on-surface/10 -rotate-2">
+<span class="font-unbounded font-black text-[8px] uppercase">WEAVE ✦</span>
+</div>
+<div class="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
+<img class="w-full h-full object-cover filter contrast-[1.05] saturate-[0.95]" data-alt="high fashion editorial shot of a woman in a structured rust-colored oversized coat against a cream textured wall, minimalist studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlxOLyptUfarymgZMAu4vgoVAxGmxwl6Ppr1tkOOUWUEMSV62jNgwYXPhWW2ltGaSDmDTF8GOyfZ566rz-NxgK_sXqaueBAjs0LYCrXh_nQfOs5bagRzaGwPyfCnXCzcDWrkwH3FxYrRbkmBi4hYIe3jxVPt6c1Z8CFc01saMl8f7R-lbVO1ogbgPZp30liuhNIVqO4wQmVImp_SLGVs-fw7WcW5lzRN9_hkIK3Kcht0CXPOpWyMuOXRsIE-7Hd-E6Wjshlct7vKho"/>
+<!-- Hover Overlay -->
+<div class="absolute inset-0 bg-surface-container-low/90 backdrop-blur-sm flex flex-col items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out p-6">
+<div class="flex gap-6 mb-8">
+<button class="material-symbols-outlined text-secondary hover:scale-125 transition-transform text-3xl">thumb_up</button>
+<button class="material-symbols-outlined text-primary hover:scale-125 transition-transform text-3xl">thumb_down</button>
+</div>
+<button class="w-full border-2 border-on-surface py-3 font-unbounded font-black text-[11px] uppercase tracking-widest hover:bg-on-surface hover:text-surface transition-colors flex items-center justify-center gap-2">
+                            Try On <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="py-4 px-1 space-y-1">
+<div class="flex justify-between items-start">
+<span class="font-mono text-[9px] uppercase tracking-[0.15em] text-on-surface/60">L'Artiste Studios</span>
+<span class="font-fraunces font-900 text-primary text-lg">$420.00</span>
+</div>
+<h4 class="font-fraunces font-700 text-xl text-on-surface ink-underline inline-block">Wool Structured Overcoat</h4>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="card-tilt group bg-surface border-[1.5px] border-on-surface p-2 flex flex-col relative rotate-[1.2deg] mt-8">
+<div class="absolute top-4 right-4 z-20 bg-surface-container px-2 py-0.5 border border-on-surface/10 rotate-3">
+<span class="font-unbounded font-black text-[8px] uppercase">WEAVE ✦</span>
+</div>
+<div class="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
+<img class="w-full h-full object-cover filter contrast-[1.05] saturate-[0.95]" data-alt="editorial fashion photo of a beige denim utility jacket with visible stitching detail, layered look, warm sunlight, soft grainy texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjoDqIzTvoskX1wLnBniMNPJ1PnJUHGpVJOY_tS2MT7Af5amtmz_IZYQm3WIcfoC2UnQSftV_sp16AfZUj9zp7dP5Wp1pqUxeXuskleKf_sD5cQZ9h3l7eil-BMtG2JiqQT3Q8jSpGVXINJg163d8osQrSIrOuVjBu0Cg6YnO3dJeN1mSQ_uzJYmWlS0e3mJ5WplQwjIsqDlG-dm21b1ZNnWwzGxOSCqp_IBnmK67Mmct7jxj632SQtaTatMyXO8v8R1NxsIZu7sud"/>
+<div class="absolute inset-0 bg-surface-container-low/90 backdrop-blur-sm flex flex-col items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out p-6">
+<div class="flex gap-6 mb-8">
+<button class="material-symbols-outlined text-secondary hover:scale-125 transition-transform text-3xl">thumb_up</button>
+<button class="material-symbols-outlined text-primary hover:scale-125 transition-transform text-3xl">thumb_down</button>
+</div>
+<button class="w-full border-2 border-on-surface py-3 font-unbounded font-black text-[11px] uppercase tracking-widest hover:bg-on-surface hover:text-surface transition-colors flex items-center justify-center gap-2">
+                            Try On <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="py-4 px-1 space-y-1">
+<div class="flex justify-between items-start">
+<span class="font-mono text-[9px] uppercase tracking-[0.15em] text-on-surface/60">Raw Canvas</span>
+<span class="font-fraunces font-900 text-primary text-lg">$185.00</span>
+</div>
+<h4 class="font-fraunces font-700 text-xl text-on-surface ink-underline inline-block">Deconstructed Denim</h4>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="card-tilt group bg-surface border-[1.5px] border-on-surface p-2 flex flex-col relative rotate-[-1.5deg]">
+<div class="absolute top-4 right-4 z-20 bg-surface-container px-2 py-0.5 border border-on-surface/10 -rotate-1">
+<span class="font-unbounded font-black text-[8px] uppercase">WEAVE ✦</span>
+</div>
+<div class="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
+<img class="w-full h-full object-cover filter contrast-[1.05] saturate-[0.95]" data-alt="fashion photography of a heavy knit olive sweater with interesting texture, minimalist background, editorial soft lighting, paper grain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrtgVrdeqTT7PHtOlXLqwwBUzaWzJDYQgN3gUXsObqpK1djih09TvPv0AKRXf8E74EUPoo2vpA2fuAb_pHqrs-J_Hz3tsGv5SLjK1l57GX5atlC3f8ywxGt6l9qoAkjyO9gkD1S85x0Rwe4hv8IQyEt-V4v6gJxYmmQjwH1g7gnyT9gljlE6hSSHt0A_iMsrZ-bQurW6Yss_ZfFOIwxlR2DTVsNLhfGJbuWVi7JSUGEgsKJjVwtNnPrki-nSVovV3idlZ8Rm2uhALH"/>
+<div class="absolute inset-0 bg-surface-container-low/90 backdrop-blur-sm flex flex-col items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out p-6">
+<div class="flex gap-6 mb-8">
+<button class="material-symbols-outlined text-secondary hover:scale-125 transition-transform text-3xl">thumb_up</button>
+<button class="material-symbols-outlined text-primary hover:scale-125 transition-transform text-3xl">thumb_down</button>
+</div>
+<button class="w-full border-2 border-on-surface py-3 font-unbounded font-black text-[11px] uppercase tracking-widest hover:bg-on-surface hover:text-surface transition-colors flex items-center justify-center gap-2">
+                            Try On <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="py-4 px-1 space-y-1">
+<div class="flex justify-between items-start">
+<span class="font-mono text-[9px] uppercase tracking-[0.15em] text-on-surface/60">Atelier Mono</span>
+<span class="font-fraunces font-900 text-primary text-lg">$210.00</span>
+</div>
+<h4 class="font-fraunces font-700 text-xl text-on-surface ink-underline inline-block">Textured Moss Knit</h4>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="card-tilt group bg-surface border-[1.5px] border-on-surface p-2 flex flex-col relative rotate-[0.8deg] mt-12">
+<div class="absolute top-4 right-4 z-20 bg-surface-container px-2 py-0.5 border border-on-surface/10">
+<span class="font-unbounded font-black text-[8px] uppercase">WEAVE ✦</span>
+</div>
+<div class="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
+<img class="w-full h-full object-cover filter contrast-[1.05] saturate-[0.95]" data-alt="aesthetic fashion shot of a dark chocolate leather jacket, matte finish, soft shadows, high-end editorial look, film photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANR6tLmSgPg1OzlOLcfIPiyLeqaWOSa9QjnwsXvkVr6MrAR1JNrcXkWwafBEFoBUnUSd5cuQDNEMaTbIbK35lI5xY5qPcOVMAYndnYv3h0L4VC5kwiV5MLpLXaNy7YhIN1FM5GOz5BRNMKqrEHK1ToGKZi25cd8VVHT3i9-v9l5Hv2BS8aO5ByRkw3g2c56HfD6DhHXMN_VqEw80GfRVtna_WWVM94iyN-qEVIIymnxnSAzvls4hhlctzTylipos1dNMNPTf1TxbNS"/>
+<div class="absolute inset-0 bg-surface-container-low/90 backdrop-blur-sm flex flex-col items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out p-6">
+<div class="flex gap-6 mb-8">
+<button class="material-symbols-outlined text-secondary hover:scale-125 transition-transform text-3xl">thumb_up</button>
+<button class="material-symbols-outlined text-primary hover:scale-125 transition-transform text-3xl">thumb_down</button>
+</div>
+<button class="w-full border-2 border-on-surface py-3 font-unbounded font-black text-[11px] uppercase tracking-widest hover:bg-on-surface hover:text-surface transition-colors flex items-center justify-center gap-2">
+                            Try On <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="py-4 px-1 space-y-1">
+<div class="flex justify-between items-start">
+<span class="font-mono text-[9px] uppercase tracking-[0.15em] text-on-surface/60">Vault 03</span>
+<span class="font-fraunces font-900 text-primary text-lg">$890.00</span>
+</div>
+<h4 class="font-fraunces font-700 text-xl text-on-surface ink-underline inline-block">Matte Leather Biker</h4>
+</div>
+</div>
+</section>
+<!-- Floating FAB (Suppressed for Details, but visible on Dashboard) -->
+<button class="fixed bottom-8 right-8 z-[100] bg-on-background text-surface w-16 h-16 rounded-sm rotate-3 hover:rotate-0 transition-transform flex items-center justify-center shadow-xl group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">add_a_photo</span>
+</button>
+</main>
+<script>
+        // Custom Cursor Movement
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Hover Effect on clickable elements for cursor
+        const clickables = document.querySelectorAll('a, button, input, select');
+        clickables.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.width = '32px';
+                cursor.style.height = '32px';
+                cursor.style.backgroundColor = 'transparent';
+                cursor.style.border = '1px solid #a63319';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.width = '12px';
+                cursor.style.height = '12px';
+                cursor.style.backgroundColor = '#a63319';
+                cursor.style.border = 'none';
+            });
+        });
+
+        // Subtle parallax effect on background text
+        document.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const catalogueText = document.querySelector('h2');
+            catalogueText.style.transform = `translateX(${scrolled * 0.1}px)`;
+        });
+    </script>
+</body></html>

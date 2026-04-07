@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&amp;family=Unbounded:wght@200..900&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#161f00",
+              "on-tertiary-container": "#fffaf9",
+              "surface-variant": "#e8e2d3",
+              "on-error": "#ffffff",
+              "surface": "#fff9ea",
+              "on-primary-container": "#fffbff",
+              "inverse-surface": "#333027",
+              "surface-bright": "#fff9ea",
+              "secondary-container": "#d4e899",
+              "secondary": "#546524",
+              "on-tertiary-fixed": "#281800",
+              "primary-container": "#c84b2f",
+              "on-primary-fixed-variant": "#891e05",
+              "tertiary": "#7c5300",
+              "primary-fixed": "#ffdad2",
+              "surface-container-highest": "#e8e2d3",
+              "inverse-primary": "#ffb4a3",
+              "on-secondary-fixed-variant": "#3d4c0e",
+              "secondary-fixed": "#d7eb9c",
+              "tertiary-fixed-dim": "#ffba43",
+              "on-tertiary-fixed-variant": "#614000",
+              "on-primary": "#ffffff",
+              "outline-variant": "#e0bfb8",
+              "secondary-fixed-dim": "#bbcf82",
+              "on-error-container": "#93000a",
+              "surface-container": "#f3edde",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed": "#ffddaf",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#9c6a00",
+              "error-container": "#ffdad6",
+              "on-secondary-container": "#586928",
+              "outline": "#8c716b",
+              "on-surface-variant": "#58413c",
+              "surface-container-low": "#f9f3e4",
+              "surface-container-high": "#eee8d9",
+              "primary": "#a63319",
+              "surface-dim": "#dfdacb",
+              "on-background": "#1d1c13",
+              "inverse-on-surface": "#f6f0e1",
+              "surface-tint": "#aa361c",
+              "error": "#ba1a1a",
+              "background": "#fff9ea",
+              "on-secondary": "#ffffff",
+              "on-surface": "#1d1c13",
+              "primary-fixed-dim": "#ffb4a3",
+              "on-primary-fixed": "#3d0600"
+            },
+            fontFamily: {
+              "fraunces": ["Fraunces", "serif"],
+              "unbounded": ["Unbounded", "sans-serif"],
+              "mono": ["Space Mono", "monospace"],
+              "headline": ["Newsreader", "serif"],
+              "body": ["Newsreader", "serif"],
+              "label": ["Space Grotesk", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .grain-overlay {
+            pointer-events: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        .custom-cursor {
+            width: 12px;
+            height: 12px;
+            background: #a63319;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+        .ink-border {
+            border-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 5 H95 V95 H5 Z' stroke='%231A1208' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' stroke-dasharray='1 4'/%3E%3C/svg%3E") 20 stretch;
+        }
+        .marquee-content {
+            display: flex;
+            animation: marquee 30s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .shimmer {
+            background: linear-gradient(90deg, #f3edde 25%, #e8e2d3 50%, #f3edde 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary selection:text-white cursor-none font-body">
+<div class="grain-overlay"></div>
+<div class="custom-cursor hidden md:block"></div>
+<header class="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-[#C84B2F] h-6">
+<div class="marquee-content whitespace-nowrap">
+<span class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5EFE0] px-4">
+                AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦
+            </span>
+<span class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5EFE0] px-4">
+                AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦
+            </span>
+</div>
+</header>
+<nav class="fixed top-[24px] left-0 w-full flex justify-between items-center px-8 h-16 bg-[#F5EFE0]/90 backdrop-blur-md mix-blend-multiply border-b border-[#1A1208]/10 z-50">
+<div class="text-2xl font-black text-[#1A1208] font-unbounded tracking-tighter">WEAVE</div>
+<div class="flex gap-12">
+<a class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C84B2F] font-bold underline decoration-wavy transition-colors duration-300" href="#">STUDIO</a>
+<a class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#1A1208] opacity-80 hover:text-[#C84B2F] transition-colors duration-300" href="#">CATALOGUE</a>
+<a class="font-mono text-[10px] uppercase tracking-[0.2em] text-[#1A1208] opacity-80 hover:text-[#C84B2F] transition-colors duration-300" href="#">ABOUT</a>
+</div>
+<button class="bg-[#a63319] text-[#ffffff] px-6 py-2 font-unbounded text-[10px] tracking-widest rounded-sm active:scale-95 transition-transform">SIGN IN</button>
+</nav>
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-20 flex flex-col items-center py-8 z-40 bg-transparent shadow-[20px_0_30px_rgba(26,18,8,0.06)] hidden md:flex">
+<div class="flex flex-col gap-10 items-center w-full">
+<div class="flex flex-col items-center gap-2 cursor-pointer group scale-105 -rotate-2 bg-[#C84B2F] p-3 text-[#F5EFE0]">
+<span class="material-symbols-outlined text-2xl">auto_fix_high</span>
+<span class="font-mono text-[8px] uppercase tracking-tighter">Studio</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer group text-[#1A1208] hover:rotate-1 hover:bg-[#F5EFE0] p-3 transition-all">
+<span class="material-symbols-outlined text-2xl">grid_view</span>
+<span class="font-mono text-[8px] uppercase tracking-tighter">Home</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer group text-[#1A1208] hover:rotate-1 hover:bg-[#F5EFE0] p-3 transition-all">
+<span class="material-symbols-outlined text-2xl">shelves</span>
+<span class="font-mono text-[8px] uppercase tracking-tighter">Vault</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer group text-[#1A1208] hover:rotate-1 hover:bg-[#F5EFE0] p-3 transition-all">
+<span class="material-symbols-outlined text-2xl">settings</span>
+<span class="font-mono text-[8px] uppercase tracking-tighter">Settings</span>
+</div>
+</div>
+</aside>
+<main class="pt-32 pb-20 px-8 md:pl-32 max-w-7xl mx-auto">
+<div class="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div>
+<h1 class="font-fraunces text-6xl md:text-8xl font-black tracking-tighter text-[#1A1208]">
+                    Try-On <span class="text-primary italic font-light">Studio</span>
+</h1>
+<p class="font-fraunces italic text-lg text-on-surface-variant mt-4 max-w-md">
+                    Synthesizing textiles and silhouette through generative color science. 
+                </p>
+</div>
+<div class="flex gap-2 bg-surface-container-high p-1 rounded-sm border border-outline-variant/20">
+<button class="px-6 py-2 font-unbounded text-[10px] bg-primary text-white rounded-sm">PHOTO MODE</button>
+<div class="relative">
+<button class="px-6 py-2 font-unbounded text-[10px] text-on-surface-variant opacity-50 cursor-not-allowed">REAL-TIME</button>
+<span class="absolute -top-3 -right-2 bg-tertiary-fixed text-on-tertiary-fixed font-mono text-[8px] px-2 py-0.5 rotate-6 shadow-sm border border-tertiary/20">COMING SOON</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="font-unbounded font-black text-xs tracking-widest text-[#1A1208] uppercase">01 / Your Photo</h2>
+<span class="font-mono text-[10px] opacity-40">INPUT_BUFFER_RAW</span>
+</div>
+<div class="relative aspect-[3/4] bg-surface-container-low flex flex-col items-center justify-center p-8 border-2 border-dashed border-outline-variant hover:border-primary transition-colors cursor-pointer group">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/pinstriped-suit.png')] opacity-5 pointer-events-none"></div>
+<div class="text-center space-y-4">
+<div class="w-32 h-32 mx-auto mb-6 flex items-center justify-center opacity-20 group-hover:opacity-40 transition-opacity">
+<svg class="w-full h-full fill-current text-on-surface" viewbox="0 0 100 100">
+<path d="M50 10c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20zm0 45c-16.6 0-30 13.4-30 30v5h60v-5c0-16.6-13.4-30-30-30z"></path>
+</svg>
+</div>
+<h3 class="font-fraunces font-bold text-2xl italic">Drop your image here</h3>
+<p class="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant max-w-[200px] mx-auto leading-relaxed">
+                            JPEG, PNG or RAW. High resolution portrait works best.
+                        </p>
+<div class="pt-4">
+<span class="bg-primary text-white font-unbounded text-[10px] px-8 py-3 rounded-sm group-hover:scale-105 transition-transform inline-block">UPLOAD FILE</span>
+</div>
+</div>
+<div class="absolute top-4 left-4 font-mono text-[8px] text-primary opacity-60">GUIDE_LAYER_V02</div>
+</div>
+<div class="bg-surface-container-highest p-6 relative -rotate-1 shadow-sm">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-8 bg-secondary-container/60 -rotate-2 mix-blend-multiply flex items-center justify-center font-mono text-[8px] tracking-[0.2em] text-on-secondary-container">TAPE_SECURE</div>
+<div class="flex gap-4 items-center">
+<div class="w-16 h-16 bg-surface-variant overflow-hidden rounded-sm flex-shrink-0 grayscale">
+<img alt="Garment Preview" class="w-full h-full object-cover" data-alt="Close-up of a structured beige wool blazer on a minimalist background with clean editorial lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClGNMsNbVqgb8cTb1kCavaYa1bpRdPFrPPuIqqrhnZbFWRvd-E-obsie2DnqzrVtxUqZ01iDWS4YQ72-8Dl-hR4ImWmzHl0u6Jez7YA5FuCa4pbBZIWfpE_mP01batEcfjGWZEiBeGLoLWFYdG_liJurnoZMDrpWMvhUrTj9DG_mJjv3F8OvWFW-OgBMvTmR3NN0yIBoBulUXzig7Vz_VP3GxrIB01MumYESJQJYsVotlQtQ_1e2a-KJWFe-tb_nrV6XbBaU_yN4Rx"/>
+</div>
+<div class="flex-grow">
+<div class="text-[10px] font-unbounded font-black">SELECTED GARMENT</div>
+<div class="font-fraunces italic text-lg leading-tight">Vintage Oversized Blazer in 'Ecru'</div>
+</div>
+<button class="font-mono text-[10px] border-b border-on-surface/20 hover:text-primary transition-colors">CHANGE</button>
+</div>
+</div>
+</section>
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="font-unbounded font-black text-xs tracking-widest text-[#1A1208] uppercase">02 / Try-On Result</h2>
+<span class="font-mono text-[10px] opacity-40">RENDER_OUTPUT_FINAL</span>
+</div>
+<div class="relative aspect-[3/4] bg-surface-container-low overflow-hidden flex flex-col items-center justify-center p-4">
+<div class="absolute inset-0 shimmer opacity-20"></div>
+<div class="relative z-10 text-center space-y-6">
+<div class="relative w-24 h-24 mx-auto flex items-center justify-center">
+<div class="absolute inset-0 border-2 border-primary border-dotted rounded-full animate-[spin_10s_linear_infinite]"></div>
+<span class="material-symbols-outlined text-primary text-4xl animate-pulse">model_training</span>
+</div>
+<div class="space-y-2">
+<p class="font-fraunces italic text-xl">Generating your look...</p>
+<p class="font-mono text-[10px] text-on-surface-variant max-w-[200px] mx-auto opacity-60">
+                                Processing textures and light mapping via ResUnet...
+                            </p>
+</div>
+<div class="w-48 h-1 bg-surface-variant mx-auto overflow-hidden">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+</div>
+<div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+<div class="font-mono text-[8px] leading-tight text-on-surface-variant">
+                            EST_TIME: 1.2s<br/>
+                            DEVICE: GPU_ACCELERATED
+                        </div>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 border border-outline-variant py-4 font-unbounded text-[10px] tracking-widest hover:bg-surface-variant transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">download</span> DOWNLOAD
+                    </button>
+<button class="flex-1 border border-outline-variant py-4 font-unbounded text-[10px] tracking-widest hover:bg-surface-variant transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">share</span> SHARE
+                    </button>
+</div>
+</section>
+</div>
+<section class="mt-32 border-t border-outline-variant/30 pt-12">
+<h3 class="font-unbounded font-black text-lg mb-8">Recent Generations</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<div class="space-y-3 group cursor-pointer rotate-1">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden rounded-sm grayscale group-hover:grayscale-0 transition-all duration-500">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Editorial fashion photography of a woman in a vibrant yellow dress standing against a brutalist concrete wall in daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmkaERvbCqvrNQJnVwZn7-HugTkniG8SnGqshvsI8xFFBWXNN8SvoJBMJAwhNLtRWfvbFYagKnNBZPeztl0LRmCR6MwEA-5a6dnLJdxKmnYJYc8fAllevWjLhzuuhfMSkT8XRRQ3_DXOoNAiIxFrnfdu-Y41DyRwBn82qterpDKr73b3oFAymzAioaWKMoyn1r_2PPXghDxErXDbwRzwXjZAiEbSY9ZZiDm9jtXGBKDvpNx6F8WHSwFILLgaaLSdD2zt9Av7SPZn2Y"/>
+</div>
+<div class="font-mono text-[8px] opacity-40 uppercase">01 APR / SILK_DRESS</div>
+</div>
+<div class="space-y-3 group cursor-pointer -rotate-2">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden rounded-sm grayscale group-hover:grayscale-0 transition-all duration-500">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="High-fashion model posing in an oversized denim jacket and layered accessories, soft cinematic lighting, studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXBov5AGXAcQYlwNlm7hmSQ5N3m-U9MNA3Wl9nqMAxZTTws4AISDn3QKTlc604Wi3SfDeCofbiaK-DfDhJVE4kPf-W4UNT1VPetSdEcl1ERGu1s5iaFRKl9585Dd0XEO70E627OT-ZiBp5CKjsWg6x1J7QoEVYNJOO6LUOjUVn5AqmtmjaiTo3ugTyxmOD2GGT84e5BZvBNce5AVjcFS4ovDAktLOAP3g6YhBNy972chVfaXsG7Go_re1GGe0HidFWS-y3fen7SBeh"/>
+</div>
+<div class="font-mono text-[8px] opacity-40 uppercase">28 MAR / DENIM_JACKET</div>
+</div>
+<div class="space-y-3 group cursor-pointer rotate-2">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden rounded-sm grayscale group-hover:grayscale-0 transition-all duration-500">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Portrait of a young person in a luxury knit sweater, warm golden hour light through a window, soft textures" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBV9KiMI3aiCQjgd58jJC2YJeE4Jd9goPi3BpQFpZ1r0Fw7N3sSvfw8py4KN5X8p0ejAuXEBbVUw63iEWEkmlmDFscNoDZTBO6ZfnFuSoTDzfOIGS_pVTYG-72w-Faq3j4cRxHoVrJWAyQ4Py6KcfqxNTISNk2l6rgnHFr8poj59VYCjLY6zBrKbKw14PGcRKEoAy8ug20SgrjLHX9voaAEI5T-6zyhkvR6NB7fwymVLHI3SYZPA1ZrTZ_30q0xUvOPVFkefLYUScRt"/>
+</div>
+<div class="font-mono text-[8px] opacity-40 uppercase">24 MAR / KNIT_WEAR</div>
+</div>
+<div class="space-y-3 group cursor-pointer -rotate-1">
+<div class="aspect-[4/5] bg-surface-container overflow-hidden rounded-sm grayscale group-hover:grayscale-0 transition-all duration-500">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Close-up of a man in a structured minimalist coat, moody blue shadows and sharp lighting, fashion editorial style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdQlLeyOTvLVlugmDYMczXQ73QfRiEyWoxtp4G_RY_dEJmc7Kig2b1541UdH4xNQHHJzAY8tgoVc8yri6bM-L5_J7ilzwDZLtUmThWvvLg0I6v-H4imhxBDqJA_4nON6uHWU_UpBVJSVtIPV9AKHZksyWBCR0_ERSkxpkoN7LJ37Pss285cA9sIcn0L3nhSd2gG08FycOza8BgFEC8_szYVzTV2W-kE9pMWE1pIR_Hd66bZWiuwhiuD-THssnD4MjvQkUiPvY81dkM"/>
+</div>
+<div class="font-mono text-[8px] opacity-40 uppercase">19 MAR / COAT_STRUCT</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="mt-20 py-12 px-8 border-t border-outline-variant/20 md:ml-20">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+<div class="font-unbounded font-black text-xl">WEAVE</div>
+<div class="font-mono text-[10px] tracking-widest flex gap-8">
+<a class="hover:text-primary transition-colors" href="#">PRIVACY</a>
+<a class="hover:text-primary transition-colors" href="#">TERMS</a>
+<a class="hover:text-primary transition-colors" href="#">API_DOCS</a>
+<a class="hover:text-primary transition-colors" href="#">CONTACT</a>
+</div>
+<div class="font-fraunces italic text-sm opacity-60">
+                © 2024 Weave Virtual Studio. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        document.querySelectorAll('a, button, [role="button"]').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'translate(-50%, -50%) scale(2.5)';
+                cursor.style.mixBlendMode = 'difference';
+                cursor.style.backgroundColor = '#d4e899';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursor.style.mixBlendMode = 'normal';
+                cursor.style.backgroundColor = '#a63319';
+            });
+        });
+    </script>
+</body></html>

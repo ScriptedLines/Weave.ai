@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&amp;family=Unbounded:wght@200..900&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#161f00",
+              "on-tertiary-container": "#fffaf9",
+              "surface-variant": "#e8e2d3",
+              "on-error": "#ffffff",
+              "surface": "#fff9ea",
+              "on-primary-container": "#fffbff",
+              "inverse-surface": "#333027",
+              "surface-bright": "#fff9ea",
+              "secondary-container": "#d4e899",
+              "secondary": "#546524",
+              "on-tertiary-fixed": "#281800",
+              "primary-container": "#c84b2f",
+              "on-primary-fixed-variant": "#891e05",
+              "tertiary": "#7c5300",
+              "primary-fixed": "#ffdad2",
+              "surface-container-highest": "#e8e2d3",
+              "inverse-primary": "#ffb4a3",
+              "on-secondary-fixed-variant": "#3d4c0e",
+              "secondary-fixed": "#d7eb9c",
+              "tertiary-fixed-dim": "#ffba43",
+              "on-tertiary-fixed-variant": "#614000",
+              "on-primary": "#ffffff",
+              "outline-variant": "#e0bfb8",
+              "secondary-fixed-dim": "#bbcf82",
+              "on-error-container": "#93000a",
+              "surface-container": "#f3edde",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed": "#ffddaf",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#9c6a00",
+              "error-container": "#ffdad6",
+              "on-secondary-container": "#586928",
+              "outline": "#8c716b",
+              "on-surface-variant": "#58413c",
+              "surface-container-low": "#f9f3e4",
+              "surface-container-high": "#eee8d9",
+              "primary": "#a63319",
+              "surface-dim": "#dfdacb",
+              "on-background": "#1d1c13",
+              "inverse-on-surface": "#f6f0e1",
+              "surface-tint": "#aa361c",
+              "error": "#ba1a1a",
+              "background": "#fff9ea",
+              "on-secondary": "#ffffff",
+              "on-surface": "#1d1c13",
+              "primary-fixed-dim": "#ffb4a3",
+              "on-primary-fixed": "#3d0600"
+            },
+            fontFamily: {
+              "fraunces": ["Fraunces", "serif"],
+              "unbounded": ["Unbounded", "sans-serif"],
+              "mono": ["Space Mono", "monospace"],
+              "headline": ["Newsreader", "serif"],
+              "body": ["Newsreader", "serif"],
+              "label": ["Space Grotesk", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .grain-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        .custom-cursor {
+            width: 12px;
+            height: 12px;
+            background: #a63319;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .ink-underline {
+            position: relative;
+        }
+        .ink-underline::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #C84B2F;
+            mask-image: url("data:image/svg+xml,%3Csvg width='100' height='2' viewBox='0 0 100 2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 1C20 0.5 40 1.5 60 1C80 0.5 100 1' stroke='black' fill='none'/%3E%3C/svg%3E");
+        }
+        body {
+            cursor: none;
+        }
+        .tape-strip {
+            clip-path: polygon(2% 0%, 98% 2%, 100% 98%, 0% 95%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary/30 min-h-screen overflow-x-hidden font-fraunces">
+<div class="grain-overlay"></div>
+<div class="custom-cursor hidden md:block"></div>
+<!-- Ticker Tape (TopTickerTape) -->
+<div class="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-[#C84B2F] h-6">
+<div class="animate-marquee font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5EFE0] flex gap-8 py-1">
+<span>AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
+<span>AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
+</div>
+</div>
+<!-- Main Container -->
+<main class="pt-12 px-6 pb-24 max-w-7xl mx-auto flex flex-col gap-32 items-center">
+<!-- Screen 1: Auth Card Section -->
+<section class="min-h-screen flex items-center justify-center w-full relative">
+<!-- Radial Glow -->
+<div class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+<div class="w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px]"></div>
+</div>
+<div class="relative z-10 w-full max-w-md">
+<!-- Auth Card -->
+<div class="bg-[#E4DCC6] border border-on-surface/10 rounded-[20px] shadow-[0_30px_60px_-15px_rgba(26,18,8,0.25)] p-10 flex flex-col gap-8 relative overflow-hidden">
+<!-- Tape Strip Stamp -->
+<div class="absolute -top-1 -right-4 transform rotate-12">
+<div class="bg-primary text-white font-unbounded text-[10px] px-6 py-2 tape-strip tracking-widest uppercase">
+                            WEAVE STUDIO
+                        </div>
+</div>
+<!-- Tabs -->
+<div class="flex gap-8 items-end border-b border-on-surface/5 pb-2">
+<button class="font-unbounded text-primary text-sm font-bold ink-underline pb-1">SIGN UP</button>
+<button class="font-unbounded text-on-surface/40 text-sm font-bold pb-1 hover:text-on-surface transition-colors">LOG IN</button>
+</div>
+<!-- Form -->
+<form class="flex flex-col gap-6" onsubmit="return false;">
+<div class="flex flex-col gap-1.5">
+<label class="font-unbounded text-[9px] font-black text-on-surface/60 tracking-wider">FULL NAME</label>
+<input class="bg-surface/50 border-b-[1.5px] border-on-surface outline-none py-3 px-1 italic font-fraunces text-lg placeholder:text-on-surface/20 focus:border-primary transition-all" placeholder="ALEXANDRA VOGUE" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-unbounded text-[9px] font-black text-on-surface/60 tracking-wider">EMAIL ADDRESS</label>
+<input class="bg-surface/50 border-b-[1.5px] border-on-surface outline-none py-3 px-1 italic font-fraunces text-lg placeholder:text-on-surface/20 focus:border-primary transition-all" placeholder="CURATOR@WEAVE.STUDIO" type="email"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-unbounded text-[9px] font-black text-on-surface/60 tracking-wider">PASSWORD</label>
+<input class="bg-surface/50 border-b-[1.5px] border-on-surface outline-none py-3 px-1 italic font-fraunces text-lg placeholder:text-on-surface/20 focus:border-primary transition-all" placeholder="••••••••" type="password"/>
+</div>
+<!-- CTA -->
+<button class="mt-4 bg-primary text-on-primary font-unbounded text-xs py-5 font-black tracking-widest relative group overflow-hidden transition-all active:scale-95">
+<span class="relative z-10">CREATE ARCHIVE</span>
+<div class="absolute inset-0 bg-on-background transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
+</button>
+<div class="flex items-center gap-4 py-2">
+<div class="h-[1px] flex-1 bg-on-surface/10"></div>
+<span class="font-mono text-[9px] text-on-surface/40">OR CURATE WITH</span>
+<div class="h-[1px] flex-1 bg-on-surface/10"></div>
+</div>
+<!-- Social Buttons -->
+<div class="flex gap-4">
+<button class="flex-1 py-4 border border-on-surface flex items-center justify-center hover:bg-on-surface hover:text-surface transition-colors">
+<span class="material-symbols-outlined text-xl">brand_family</span>
+</button>
+<button class="flex-1 py-4 border border-on-surface flex items-center justify-center hover:bg-on-surface hover:text-surface transition-colors">
+<span class="material-symbols-outlined text-xl">all_inclusive</span>
+</button>
+</div>
+</form>
+</div>
+<!-- Helper Annotation -->
+<div class="absolute -bottom-16 left-0 right-0 text-center">
+<p class="font-fraunces italic text-on-surface/40 text-sm">By joining, you agree to our Editorial Guidelines.</p>
+</div>
+</div>
+</section>
+<!-- Screen 2: Onboarding Section -->
+<section class="min-h-screen flex flex-col items-center justify-center w-full max-w-4xl">
+<div class="text-center mb-16 space-y-4">
+<span class="font-mono text-[10px] tracking-[0.3em] text-primary uppercase">Step 02 — Color DNA</span>
+<h1 class="text-6xl md:text-8xl font-fraunces font-black tracking-tight text-on-background italic">Let's find your palette.</h1>
+<p class="max-w-xl mx-auto font-fraunces italic text-lg text-on-surface/60">Upload a portrait. Our AI parses skin, hair, and eye pigments to calibrate your virtual wardrobe.</p>
+</div>
+<!-- Onboarding Grid -->
+<div class="grid md:grid-cols-2 gap-12 w-full">
+<!-- State A: Upload Dropzone -->
+<div class="relative group">
+<!-- Decorative tape -->
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-24 h-8 bg-secondary-container/40 backdrop-blur-sm tape-strip"></div>
+<div class="aspect-[4/5] bg-surface-container-low border-2 border-dashed border-on-surface/10 flex flex-col items-center justify-center gap-6 p-8 transition-all group-hover:border-primary group-hover:bg-surface-container relative">
+<!-- Silhouette SVG -->
+<div class="w-48 h-48 text-on-surface/5 group-hover:text-primary/10 transition-colors">
+<svg fill="currentColor" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<path d="M50 10C35 10 25 20 25 35C25 45 30 50 35 55C30 60 15 65 10 85H90C85 65 70 60 65 55C70 50 75 45 75 35C75 20 65 10 50 10Z"></path>
+</svg>
+</div>
+<div class="text-center space-y-2">
+<button class="font-unbounded text-xs font-bold py-3 px-8 border border-on-surface group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">UPLOAD HEADSHOT</button>
+<p class="font-mono text-[10px] text-on-surface/30 uppercase tracking-widest">DRAG AND DROP JPG/PNG</p>
+</div>
+<!-- Processing State Overlay (Hidden by default, shown via mock classes if needed) -->
+<div class="absolute inset-0 bg-surface/80 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 pointer-events-none group-active:opacity-100 transition-opacity">
+<div class="w-16 h-16 border-4 border-on-surface/10 border-t-primary rounded-full animate-spin mb-4"></div>
+<span class="font-mono text-[10px] tracking-widest uppercase">ANALYZING PIGMENTS...</span>
+</div>
+</div>
+</div>
+<!-- State B: Result State / Visualization -->
+<div class="flex flex-col gap-8">
+<!-- Card 1: Skin Tone -->
+<div class="bg-surface-container-highest p-8 flex items-center gap-8 relative overflow-hidden group hover:-rotate-1 transition-transform">
+<div class="relative">
+<div class="w-24 h-24 rounded-full border-2 border-on-surface overflow-hidden shadow-xl bg-[#E8C3A9]"></div>
+<div class="absolute -top-2 -right-2 bg-on-background text-surface font-mono text-[8px] px-2 py-1">68% MATCH</div>
+</div>
+<div class="flex-1 space-y-2">
+<h3 class="font-unbounded text-xs font-black tracking-widest uppercase">DERMIS PROFILE</h3>
+<div class="font-mono text-[10px] text-on-surface/40 leading-relaxed">
+                                L*: 72.4 <br/>
+                                a*: 14.8 <br/>
+                                b*: 22.1 <br/>
+<span class="text-primary italic">[WARM AUTUMN UNDERTONE]</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface/10 text-6xl absolute -right-4 -bottom-4">fingerprint</span>
+</div>
+<!-- Card 2: Hair/Contrast -->
+<div class="bg-surface-container-highest p-8 flex items-center gap-8 relative overflow-hidden group hover:rotate-1 transition-transform">
+<div class="relative">
+<div class="w-24 h-24 rounded-full border-2 border-on-surface overflow-hidden shadow-xl bg-[#3D2B1F]"></div>
+<div class="absolute -top-2 -right-2 bg-on-background text-surface font-mono text-[8px] px-2 py-1">VIVID</div>
+</div>
+<div class="flex-1 space-y-2">
+<h3 class="font-unbounded text-xs font-black tracking-widest uppercase">FOLLICLE SATURATION</h3>
+<div class="font-mono text-[10px] text-on-surface/40 leading-relaxed">
+                                HEX: #3D2B1F <br/>
+                                CONTRAST: HIGH (0.84) <br/>
+                                SAT: 42% <br/>
+<span class="text-primary italic">[DEEP ESPRESSO BASE]</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface/10 text-6xl absolute -right-4 -bottom-4">palette</span>
+</div>
+<!-- Final Action -->
+<div class="mt-auto pt-8 border-t border-on-surface/5 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-mono text-[9px] text-on-surface/30">CURRENT SELECTION</span>
+<span class="font-fraunces italic font-bold">The Earthen Curator</span>
+</div>
+<button class="bg-on-background text-surface font-unbounded text-xs py-4 px-10 font-black tracking-widest hover:bg-primary transition-colors">
+                            GENERATE STUDIO
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Aesthetic Filler / Mosaic Footer -->
+<section class="w-full py-24 grid grid-cols-2 md:grid-cols-4 gap-4 opacity-40 grayscale">
+<div class="aspect-square bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="minimalist fashion portrait with warm lighting and paper texture overlay editorial style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY9sONIa-E5VVeg6J4MG-II9TY6H9KAWxpPpyjb7h2vimb-mE16spVaxaE6J0hZVIuUdvm9vLVws5eQ3bGQOk6kXFYwvfYc_WDu8aPBcQ6FyPwkrgtNyC--NlUVe4KX-kHBOlWYrxvxpjA-tHAJbGAzYDhhCCtQz8kzDh0mP-cto4TKHoBWyetRBKhOHUj9CHFjnLqWKlpWHksMp-4So0aPh-ARjZypvOi--VU8BILn_cFawatrukTbaECd8BsLm4KEdpZAUN_Pr-t"/>
+</div>
+<div class="aspect-square bg-surface-container-high overflow-hidden transform translate-y-8">
+<img class="w-full h-full object-cover" data-alt="close up of beige fabric texture with soft shadows and editorial grain aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgjniqZLk5SCbg2_vAiWBDX3QW_5UOECPAWNeyk8TEa05FHWl8y4cn4w2Y4Zv5zq-DGmp18OjbjyodmaZDBADKfHzByoAXSaPMG4Ssh1LdHGjcQSPYMjjgRZCttKCv3mJ2VAY0X92eyyoU2uMnNGf0EfOJfYpl5QudtyTW6zaW1VIfU5kUnmcR1lB6VqNE8qS6DgxqA-zmTyGGxyDOKUNshdpYhEvZGtovV-CZMQ4UpVCgU5s88R2QTLjexkQ4E3Nm66oHMk-mm09E"/>
+</div>
+<div class="aspect-square bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="abstract editorial fashion photography with neutral tones and artistic composition" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY5nrWS_LhH3sdz4BhHn7XCn-YRjwEuExXoMtvSxyt84ZDCuFH_ukRYK9vp1hq_4g-txHoczzcDpmjB_0-rAbw3n0AZClWtUbghb7fFlwIlQ8AD9DjcIF6SJgnmUiXLb4SoBTqfczUEvH9S3yaC5wUTYh796rucVJIlG2c_Z2XzFWDYCUmccACTozjZ_AmhiSnfRnnmfpbUNYKej_yd4MwXP117AgSuCI6_8ewoiNVrzfOW_Jlzj3Kz6qXgLdCRb-ZQmx9FxknJ8n8"/>
+</div>
+<div class="aspect-square bg-surface-container-high overflow-hidden transform -translate-y-4">
+<img class="w-full h-full object-cover" data-alt="vogue style editorial portrait of a model in neutral linen clothing soft paper tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtDxW2iHsgnhLfzrUpBLfMst1bj7cl6r4d1ibAqqzrEWS2xV3GIom3teAus_iCZ9lo-F20Auzo2niA9OR2Hx0gp0YyoC8LELZp-aKBJe5vVAk1clodNW40grb06wl5ZBVUppbr7DmpJYYm-98FYghHfV_s4j_LiZRsxYIryKXgb1VstgGj4QHOEYBsdvWbBWjjKzheU8FtpLXEZx0EieqC5EZYIbxdmZ3PIM5v_YIaRTagY-Co99ZO9Ea1Ju0NsGsWjI0d8YYMFrm9"/>
+</div>
+</section>
+</main>
+<!-- Side Navigation Shell (SideNavBar) -->
+<div class="fixed left-0 top-16 h-[calc(100vh-64px)] w-20 flex flex-col items-center py-8 z-40 bg-transparent shadow-[20px_0_30px_rgba(26,18,8,0.06)]">
+<div class="flex flex-col gap-10">
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-12 h-12 flex items-center justify-center rounded-none text-on-surface hover:rotate-1 transition-transform">
+<span class="material-symbols-outlined text-2xl">grid_view</span>
+</div>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-12 h-12 flex items-center justify-center rounded-none bg-primary text-surface -rotate-2 scale-105 transition-transform">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+</div>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-12 h-12 flex items-center justify-center rounded-none text-on-surface hover:rotate-1 transition-transform">
+<span class="material-symbols-outlined text-2xl">shelves</span>
+</div>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-12 h-12 flex items-center justify-center rounded-none text-on-surface hover:rotate-1 transition-transform">
+<span class="material-symbols-outlined text-2xl">settings</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Scripts for Custom Cursor -->
+<script>
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mousedown', () => cursor.style.transform = 'translate(-50%, -50%) scale(0.8)');
+        document.addEventListener('mouseup', () => cursor.style.transform = 'translate(-50%, -50%) scale(1)');
+    </script>
+</body></html>

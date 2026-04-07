@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&amp;family=Space+Mono:wght@400;700&amp;family=Space+Grotesk:wght@300;700&amp;family=Newsreader:ital,wght@0,400;0,700;0,800;1,400&amp;family=Unbounded:wght@700;900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ink-bleed-divider {
+            mask-image: url("data:image/svg+xml,%3Csvg width='100%25' height='20' viewBox='0 0 1200 20' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20L12.5 15.5L25 18L37.5 12L50 16.5L62.5 10L75 14L87.5 8L100 13L112.5 7L125 11L137.5 5L150 9.5L162.5 3L175 7L187.5 1.5L200 5.5L212.5 0.5L225 4L237.5 0L250 3.5L1200 4.5V20H0Z' fill='black'/%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='100%25' height='20' viewBox='0 0 1200 20' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20L12.5 15.5L25 18L37.5 12L50 16.5L62.5 10L75 14L87.5 8L100 13L112.5 7L125 11L137.5 5L150 9.5L162.5 3L175 7L187.5 1.5L200 5.5L212.5 0.5L225 4L237.5 0L250 3.5L1200 4.5V20H0Z' fill='black'/%3E%3C/svg%3E");
+        }
+        .grain-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        .sticker-rotate-1 { transform: rotate(1.5deg); }
+        .sticker-rotate-2 { transform: rotate(-2.1deg); }
+        .sticker-rotate-3 { transform: rotate(0.8deg); }
+        
+        body {
+            background-color: #F5EFE0;
+            color: #1A1208;
+            cursor: crosshair;
+        }
+
+        .fraunces-display { font-family: 'Fraunces', serif; font-weight: 900; letter-spacing: -0.05em; }
+        .fraunces-body { font-family: 'Fraunces', serif; font-weight: 300; font-style: italic; }
+        .space-mono { font-family: 'Space Mono', monospace; letter-spacing: 0.2em; text-transform: uppercase; }
+        .unbounded-ui { font-family: 'Unbounded', sans-serif; font-weight: 900; text-transform: uppercase; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-variant": "#e8e2d3",
+              "secondary-fixed-dim": "#bbcf82",
+              "on-surface-variant": "#58413c",
+              "on-primary-container": "#fffbff",
+              "on-secondary-fixed": "#161f00",
+              "on-error": "#ffffff",
+              "tertiary-container": "#9c6a00",
+              "outline": "#8c716b",
+              "inverse-primary": "#ffb4a3",
+              "surface-tint": "#aa361c",
+              "secondary-fixed": "#d7eb9c",
+              "on-error-container": "#93000a",
+              "error-container": "#ffdad6",
+              "surface": "#fff9ea",
+              "tertiary": "#7c5300",
+              "on-surface": "#1d1c13",
+              "surface-container-high": "#eee8d9",
+              "secondary": "#546524",
+              "background": "#fff9ea",
+              "inverse-on-surface": "#f6f0e1",
+              "inverse-surface": "#333027",
+              "tertiary-fixed": "#ffddaf",
+              "surface-container": "#f3edde",
+              "on-secondary-fixed-variant": "#3d4c0e",
+              "on-tertiary-fixed-variant": "#614000",
+              "surface-container-highest": "#e8e2d3",
+              "outline-variant": "#e0bfb8",
+              "secondary-container": "#d4e899",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#fffaf9",
+              "primary-fixed": "#ffdad2",
+              "error": "#ba1a1a",
+              "surface-container-low": "#f9f3e4",
+              "surface-bright": "#fff9ea",
+              "primary": "#a63319",
+              "on-primary-fixed-variant": "#891e05",
+              "primary-fixed-dim": "#ffb4a3",
+              "on-tertiary-fixed": "#281800",
+              "on-primary-fixed": "#3d0600",
+              "on-background": "#1d1c13",
+              "primary-container": "#c84b2f",
+              "on-primary": "#ffffff",
+              "surface-dim": "#dfdacb",
+              "on-secondary-container": "#586928",
+              "on-tertiary": "#ffffff",
+              "on-secondary": "#ffffff",
+              "tertiary-fixed-dim": "#ffba43"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Newsreader"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-x-hidden">
+<div class="grain-overlay"></div>
+<!-- TopNavBar Shared Component -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#F5EFE0]/80 backdrop-blur-md flex justify-between items-center w-full px-6 py-4 border-b border-[#1A1208]/10">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black uppercase tracking-widest text-[#1A1208]">WEAVE</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-[#1A1208]/60 hover:text-[#C84B2F] transition-colors font-['Newsreader'] italic" href="#">Archives</a>
+<a class="text-[#C84B2F] font-bold font-['Newsreader'] italic" href="#">Pipeline</a>
+<a class="text-[#1A1208]/60 hover:text-[#C84B2F] transition-colors font-['Newsreader'] italic" href="#">Runway</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex items-center bg-[#1A1208]/5 px-3 py-1 rounded-sm border border-[#1A1208]/10">
+<span class="material-symbols-outlined text-sm opacity-60">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-[10px] space-mono w-32" placeholder="QUERY ARCHIVE" type="text"/>
+</div>
+<span class="material-symbols-outlined text-[#1A1208] cursor-pointer hover:text-[#C84B2F]">settings</span>
+<span class="material-symbols-outlined text-[#1A1208] cursor-pointer hover:text-[#C84B2F]">account_circle</span>
+</div>
+</header>
+<!-- SideNavBar Shared Component -->
+<aside class="fixed left-0 top-0 h-full hidden lg:flex flex-col pt-24 pb-8 px-4 bg-[#F5EFE0] w-64 border-r border-[#1A1208]/10">
+<div class="mb-12 px-4">
+<h2 class="font-['Newsreader'] font-[900] text-2xl leading-tight">Technical Studio</h2>
+<p class="font-['Newsreader'] italic text-sm opacity-60">AI Fashion Architecture</p>
+</div>
+<nav class="flex-1 space-y-2">
+<div class="flex items-center gap-3 bg-[#C84B2F] text-[#F5EFE0] rounded-sm px-4 py-3 rotate-1 translate-x-1 shadow-md">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-['Unbounded'] font-[700] text-xs uppercase tracking-tight">Pipeline</span>
+</div>
+<div class="flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-all hover:-rotate-1">
+<span class="material-symbols-outlined">memory</span>
+<span class="font-['Unbounded'] font-[700] text-xs uppercase tracking-tight">Engine</span>
+</div>
+<div class="flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-all hover:-rotate-1">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-['Unbounded'] font-[700] text-xs uppercase tracking-tight">Inference</span>
+</div>
+<div class="flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-all hover:-rotate-1">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-['Unbounded'] font-[700] text-xs uppercase tracking-tight">Docs</span>
+</div>
+</nav>
+<button class="mt-auto bg-primary text-on-primary font-['Unbounded'] font-[900] py-4 rounded-sm text-xs hover:scale-105 active:scale-95 transition-transform">
+        NEW EXPERIMENT
+    </button>
+</aside>
+<!-- Main Canvas -->
+<main class="lg:ml-64 pt-24 pb-20 px-8 md:px-16 max-w-7xl mx-auto">
+<!-- Header Section -->
+<section class="mb-20">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div class="max-w-2xl">
+<span class="space-mono text-primary text-xs mb-4 block">Section 04 // HOW IT'S BUILT</span>
+<h1 class="fraunces-display text-6xl md:text-8xl text-on-background leading-[0.85] mb-6">
+                    Three-Stage <br/>Knowledge <br/>Distillation.
+                </h1>
+</div>
+<div class="md:w-1/3 border-t border-on-background/20 pt-4">
+<p class="fraunces-body text-xl leading-relaxed">
+                    An intricate ballet of neural weights. We move beyond simple GANs to a curriculum-based distillation that captures the drape, fold, and texture of high fashion with anatomical precision.
+                </p>
+</div>
+</div>
+</section>
+<!-- The Pipeline Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 relative">
+<!-- STAGE 1 -->
+<div class="md:col-span-7 group">
+<div class="relative bg-surface-container-low p-8 sticker-rotate-3 border-b-4 border-primary/20 hover:rotate-0 transition-transform duration-500">
+<div class="absolute -top-4 -left-4 bg-primary text-on-primary px-3 py-1 space-mono text-[10px] z-10">STAGE_01</div>
+<div class="flex justify-between items-start mb-12">
+<h3 class="unbounded-ui text-3xl text-primary">PB-Warp <br/>Training</h3>
+<div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>texture</span>
+</div>
+</div>
+<div class="mb-8 overflow-hidden">
+<img class="w-full h-64 object-cover filter grayscale hover:grayscale-0 transition-all duration-700" data-alt="Technical architectural diagram of clothing mesh warping with colorful heatmaps representing DensePose point clouds on a mannequin" src="https://lh3.googleusercontent.com/aida/ADBb0uinLwQC0sFwFLEDnYrQa3AanLdMIW6hwnE2w0UGmTFN8KDW5ZFBU4MggzdlFXcM47lPl32U0S5MOY7Zg0clMbxr6I0F9tNCXS5Xn_tGfeqLtGZWGxF8sQsLskVAfS4Gv7xx9DGDOk77vvBck8gNRBZUMLG2ScDMfYxO1jDN_13VRSMncSCa-9H-b8lt5_7z1-CdfIhkchww-aLR1HyiGYzkWiD3VIVeL9coJCtJTkZfqZVxpvMuOSsbWMf6w1GSP4vZ90VDcjgDyYI"/>
+</div>
+<div class="space-y-4">
+<p class="fraunces-body text-2xl">
+                        PBAFWM (45ch) learns cloth warping with DensePose + Pose markers. 
+                    </p>
+<div class="pt-6 border-t border-on-background/5">
+<span class="space-mono text-[10px] opacity-40">PARAMETERS</span>
+<div class="flex flex-wrap gap-2 mt-2">
+<span class="bg-surface-container-highest px-2 py-1 space-mono text-[10px] border border-outline-variant/30">DENSEPOSE_V1</span>
+<span class="bg-surface-container-highest px-2 py-1 space-mono text-[10px] border border-outline-variant/30">WARP_FLOW_EXTRACT</span>
+<span class="bg-surface-container-highest px-2 py-1 space-mono text-[10px] border border-outline-variant/30">LR: 1E-4</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- STAGE 2 -->
+<div class="md:col-span-5 self-center">
+<div class="relative bg-surface-container p-8 sticker-rotate-2 hover:rotate-0 transition-transform duration-500 shadow-xl">
+<div class="absolute -top-4 -right-4 bg-secondary text-on-secondary px-3 py-1 space-mono text-[10px] z-10">STAGE_02</div>
+<div class="flex justify-between items-start mb-8">
+<h3 class="unbounded-ui text-2xl text-secondary">PB-E2E <br/>Training</h3>
+<span class="material-symbols-outlined text-secondary text-4xl">dynamic_form</span>
+</div>
+<p class="fraunces-body text-xl mb-6">
+                    End-to-end training of Warp + ResUnetGenerator with 8-channel input. 
+                </p>
+<div class="mb-6 overflow-hidden border border-secondary/20"><img alt="Diffusion-based synthesis pipeline" class="w-full h-auto object-cover filter grayscale hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida/ADBb0ujd0YPduUw5HNbnTQlCB3F4tjPg7_dASn55EYrmLCFgD8ySoOVQ6gzgk5H8pREgtdvz29TDVWjAavuaNac80M3W4mSDGYVXwnJFkh7yAj7l6l6Ut7YEyTlDw3PWWJ4DhI6z500qsf3HSkCDbAZRgFUSucqyM4Fbhn0MGfR-G9-8kuGFNVwPO0z5n15DFCb4FXmzjaDrJLCsV2AVDK0Ko9n_96ZT9MYsN1ErkJxSqv0L2J2hHJvVm5uANmQ2_oegIwxc3GijY0S9mUg"/></div><div class="bg-[#1A1208] text-[#F5EFE0] p-6 font-mono text-[11px] leading-tight overflow-x-auto">
+<div class="flex gap-2 text-secondary-container mb-2">
+<span class="">// INITIALIZING GENERATOR</span>
+</div>
+<div class="opacity-70">
+                        input_channels = 8 <br/>
+                        latent_dim = 512 <br/>
+                        architecture = "ResUnet" <br/>
+                        loss = ["L1", "VGG", "Adversarial"]
+                    </div>
+</div>
+<div class="mt-6 flex items-center justify-between">
+<span class="space-mono text-[10px] text-secondary">STATUS: OPTIMIZED</span>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-secondary-container"></div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-secondary"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Ink Bleed Separator -->
+<div class="md:col-span-12 py-12">
+<div class="ink-bleed-divider bg-on-background h-[2px] w-full opacity-10"></div>
+</div>
+<!-- STAGE 3 (Full Width Featured) -->
+<div class="md:col-span-12">
+<div class="grid md:grid-cols-2 gap-0 bg-[#D7E3F5] text-on-surface border border-on-background/10">
+<div class="p-12 border-r border-on-background/10">
+<div class="bg-blue-600 text-white inline-block px-3 py-1 space-mono text-[10px] mb-8">STAGE_03</div>
+<h3 class="unbounded-ui text-5xl mb-8 leading-none text-blue-900">PF-E2E <br/>Student Training</h3>
+<p class="fraunces-body text-2xl mb-12">
+                        StyleAFWM student trained with curriculum loss and pseudo-labels from the teacher. The final refinement stage for mobile-first inference speeds.
+                    </p>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-white/40 border border-white/60">
+<span class="space-mono text-[10px] block mb-2">LOSS FUNCTION</span>
+<span class="unbounded-ui text-lg">Curriculum</span>
+</div>
+<div class="p-4 bg-white/40 border border-white/60">
+<span class="space-mono text-[10px] block mb-2">SOURCE</span>
+<span class="unbounded-ui text-lg">Pseudo-Labels</span>
+</div>
+</div>
+</div>
+<div class="relative overflow-hidden group flex items-center justify-center bg-[#1A1208]/5 p-8">
+<img class="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-1000" data-alt="Atmospheric fashion photography of a model in motion with digital artifacting and glowing blue neural network overlays" src="https://lh3.googleusercontent.com/aida/ADBb0uizdXhpglkH3vFmnlTvMQhoPYMh9DQeViM1uRVyjHq9D9Tp7n26ql9IJbFpZ4Eavm6-WHx8zFCpWneyrZA8K2sKzCkl1XMpomK4L4pgBoP0bbSJJ1ia0Ro4YUcNY97iovNFIzIqXlYeUEkjDhaPWyOgPqsiDq3jXh2lkXpCVOWpC2YaP3WrklHzDwU8y11FewFvcS22K-ceAdaWY758giWL3DpUA8UUyN8G1eq0Mn_Z47AthJgjWehrAHHJxNvhPVWjejzqOn5AeYM"/>
+<div class="absolute inset-0 bg-blue-900/10 mix-blend-overlay pointer-events-none"></div>
+<div class="absolute bottom-6 left-6 right-6 flex justify-between items-end">
+<div class="bg-[#F5EFE0] p-4 text-[#1A1208] sticker-rotate-1 shadow-lg max-w-[200px]">
+<p class="space-mono text-[8px] leading-tight">FIG. 42: STUDENT NETWORK REFINEMENT OUTPUT AT 400K STEPS.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer / Editorial Note -->
+<footer class="mt-32 pt-12 border-t border-on-background/10 grid grid-cols-1 md:grid-cols-3 gap-12">
+<div>
+<span class="space-mono text-[10px] opacity-40 block mb-4">CONTRIBUTORS</span>
+<p class="fraunces-body text-sm">Design System: The Digital Curator<br/>Architecture: Weave AI Labs<br/>Documentation: Editorial v4.2</p>
+</div>
+<div class="md:col-span-2">
+<span class="space-mono text-[10px] opacity-40 block mb-4">ABSTRACT</span>
+<p class="fraunces-body text-sm leading-relaxed italic">
+                Knowledge distillation in the context of fashion synthesis requires a specific focus on structural integrity versus stylistic fluidity. Our pipeline ensures that while the "student" model remains lightweight, it retains the high-frequency topological data of the "teacher," allowing for real-time virtual try-on without the computational overhead of traditional PB-warp generators.
+            </p>
+</div>
+</footer>
+</main>
+<!-- Scrolling Marquee Component -->
+<div class="fixed bottom-0 left-0 w-full bg-[#1A1208] py-2 overflow-hidden whitespace-nowrap z-50">
+<div class="flex animate-marquee space-x-12">
+<span class="space-mono text-[#ffba43] text-xs">PIPELINE ACTIVE</span>
+<span class="space-mono text-[#ffba43] text-xs">DISTILLING KNOWLEDGE</span>
+<span class="space-mono text-[#ffba43] text-xs">PB-WARP READY</span>
+<span class="space-mono text-[#ffba43] text-xs">STYLEAFWM STUDENT_STABLE</span>
+<span class="space-mono text-[#ffba43] text-xs">DENSEPOSE OVERLAY 98.4%</span>
+<span class="space-mono text-[#ffba43] text-xs">PIPELINE ACTIVE</span>
+<span class="space-mono text-[#ffba43] text-xs">DISTILLING KNOWLEDGE</span>
+<span class="space-mono text-[#ffba43] text-xs">PB-WARP READY</span>
+<span class="space-mono text-[#ffba43] text-xs">STYLEAFWM STUDENT_STABLE</span>
+<span class="space-mono text-[#ffba43] text-xs">DENSEPOSE OVERLAY 98.4%</span>
+</div>
+</div>
+<style>
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+        animation: marquee 30s linear infinite;
+    }
+</style>
+</body></html>

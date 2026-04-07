@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WEAVE — AI Virtual Try-On & Fashion Platform</title>
+    <meta name="description" content="A living mood board where fashion meets physics. Experiment with silhouettes using our proprietary neural rendering engine." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Unbounded:wght@200..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Space+Grotesk:wght@300..700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#161f00",
+              "on-tertiary-container": "#fffaf9",
+              "surface-variant": "#e8e2d3",
+              "on-error": "#ffffff",
+              "surface": "#fff9ea",
+              "on-primary-container": "#fffbff",
+              "inverse-surface": "#333027",
+              "surface-bright": "#fff9ea",
+              "secondary-container": "#d4e899",
+              "secondary": "#546524",
+              "on-tertiary-fixed": "#281800",
+              "primary-container": "#c84b2f",
+              "on-primary-fixed-variant": "#891e05",
+              "tertiary": "#7c5300",
+              "primary-fixed": "#ffdad2",
+              "surface-container-highest": "#e8e2d3",
+              "inverse-primary": "#ffb4a3",
+              "on-secondary-fixed-variant": "#3d4c0e",
+              "secondary-fixed": "#d7eb9c",
+              "tertiary-fixed-dim": "#ffba43",
+              "on-tertiary-fixed-variant": "#614000",
+              "on-primary": "#ffffff",
+              "outline-variant": "#e0bfb8",
+              "secondary-fixed-dim": "#bbcf82",
+              "on-error-container": "#93000a",
+              "surface-container": "#f3edde",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed": "#ffddaf",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#9c6a00",
+              "error-container": "#ffdad6",
+              "on-secondary-container": "#586928",
+              "outline": "#8c716b",
+              "on-surface-variant": "#58413c",
+              "surface-container-low": "#f9f3e4",
+              "surface-container-high": "#eee8d9",
+              "primary": "#a63319",
+              "surface-dim": "#dfdacb",
+              "on-background": "#1d1c13",
+              "inverse-on-surface": "#f6f0e1",
+              "surface-tint": "#aa361c",
+              "error": "#ba1a1a",
+              "background": "#fff9ea",
+              "on-secondary": "#ffffff",
+              "on-surface": "#1d1c13",
+              "primary-fixed-dim": "#ffb4a3",
+              "on-primary-fixed": "#3d0600",
+              "ink": "#1A1208",
+              "rust": "#C84B2F",
+              "paper": "#F5EFE0",
+              "marigold": "#FFB443",
+              "sky-blue": "#8EAFC5",
+              "olive": "#546524"
+            },
+            fontFamily: {
+              "fraunces": ["Fraunces", "serif"],
+              "unbounded": ["Unbounded", "sans-serif"],
+              "mono": ["Space Mono", "monospace"],
+              "headline": ["Newsreader", "serif"],
+              "body": ["Newsreader", "serif"],
+              "label": ["Space Grotesk", "sans-serif"]
+            },
+            borderRadius: {
+              "DEFAULT": "0.125rem",
+              "lg": "0.25rem",
+              "xl": "0.5rem",
+              "full": "0.75rem"
+            },
+            animation: {
+              'marquee': 'marquee 25s linear infinite',
+              'marquee-reverse': 'marquee-reverse 30s linear infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'spin-slow': 'spin 12s linear infinite',
+              'shimmer': 'shimmer 2s infinite linear',
+            },
+            keyframes: {
+              marquee: {
+                '0%': { transform: 'translateX(0%)' },
+                '100%': { transform: 'translateX(-50%)' },
+              },
+              'marquee-reverse': {
+                '0%': { transform: 'translateX(-50%)' },
+                '100%': { transform: 'translateX(0%)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0) rotate(-1deg)' },
+                '50%': { transform: 'translateY(-20px) rotate(1deg)' },
+              },
+              shimmer: {
+                '0%': { backgroundPosition: '200% 0' },
+                '100%': { backgroundPosition: '-200% 0' },
+              },
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      * { box-sizing: border-box; }
+      body { cursor: none; overflow-x: hidden; }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        font-family: 'Material Symbols Outlined';
+        font-style: normal;
+        font-size: 24px;
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        word-wrap: normal;
+        white-space: nowrap;
+        direction: ltr;
+      }
+      .grain-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
+      .custom-cursor {
+        width: 12px; height: 12px;
+        background: #C84B2F;
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 10000;
+        transform: translate(-50%, -50%);
+        transition: width 0.15s, height 0.15s, background 0.15s;
+      }
+      .cursor-ring {
+        width: 32px; height: 32px;
+        border: 1px solid #C84B2F;
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 10000;
+        transform: translate(-50%, -50%);
+        transition: width 0.2s, height 0.2s, left 0.08s, top 0.08s;
+      }
+      .card-tilt {
+        transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        transform-style: preserve-3d;
+      }
+      .card-tilt:hover {
+        transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+      }
+      .ink-underline { position: relative; }
+      .ink-underline::after {
+        content: '';
+        position: absolute;
+        bottom: -2px; left: 0;
+        width: 0; height: 2px;
+        background-color: currentColor;
+        transition: width 0.3s ease;
+        mask-image: url("data:image/svg+xml,%3Csvg width='100' height='10' viewBox='0 0 100 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 Q 25 0, 50 5 T 100 5' stroke='black' fill='transparent'/%3E%3C/svg%3E");
+      }
+      .group:hover .ink-underline::after, .ink-underline:hover::after { width: 100%; }
+      .tape-strip { clip-path: polygon(2% 0%, 98% 2%, 100% 98%, 0% 95%); }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .shimmer-bg {
+        background: linear-gradient(90deg, #f3edde 25%, #e8e2d3 50%, #f3edde 75%);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite linear;
+      }
+      @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      #root { min-height: 100vh; }
+    </style>
+  </head>
+  <body class="bg-background text-on-background font-fraunces selection:bg-primary/30">
+    <div class="grain-overlay"></div>
+    <div class="custom-cursor hidden md:block" id="weave-cursor"></div>
+    <div class="cursor-ring hidden md:block" id="weave-cursor-ring"></div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Global cursor logic
+      const cursor = document.getElementById('weave-cursor');
+      const ring = document.getElementById('weave-cursor-ring');
+      if (cursor && ring) {
+        document.addEventListener('mousemove', (e) => {
+          cursor.style.left = e.clientX + 'px';
+          cursor.style.top = e.clientY + 'px';
+          setTimeout(() => {
+            ring.style.left = e.clientX + 'px';
+            ring.style.top = e.clientY + 'px';
+          }, 60);
+        });
+        document.addEventListener('mousedown', () => { ring.style.width = '20px'; ring.style.height = '20px'; });
+        document.addEventListener('mouseup', () => { ring.style.width = '32px'; ring.style.height = '32px'; });
+        document.addEventListener('mouseover', (e) => {
+          const el = e.target;
+          if (el && (el.tagName === 'BUTTON' || el.tagName === 'A' || el.tagName === 'INPUT' || el.closest('button') || el.closest('a'))) {
+            cursor.style.width = '20px'; cursor.style.height = '20px';
+            cursor.style.background = '#d4e899';
+            cursor.style.mixBlendMode = 'difference';
+          } else {
+            cursor.style.width = '12px'; cursor.style.height = '12px';
+            cursor.style.background = '#C84B2F';
+            cursor.style.mixBlendMode = 'normal';
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

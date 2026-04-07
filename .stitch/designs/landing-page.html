@@ -1,0 +1,551 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WEAVE — AI Virtual Try-On &amp; Fashion Platform</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&amp;family=Unbounded:wght@200..900&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Space+Grotesk:wght@300..700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#161f00",
+              "on-tertiary-container": "#fffaf9",
+              "surface-variant": "#e8e2d3",
+              "on-error": "#ffffff",
+              "surface": "#fff9ea",
+              "on-primary-container": "#fffbff",
+              "inverse-surface": "#333027",
+              "surface-bright": "#fff9ea",
+              "secondary-container": "#d4e899",
+              "secondary": "#546524",
+              "on-tertiary-fixed": "#281800",
+              "primary-container": "#c84b2f",
+              "on-primary-fixed-variant": "#891e05",
+              "tertiary": "#7c5300",
+              "primary-fixed": "#ffdad2",
+              "surface-container-highest": "#e8e2d3",
+              "inverse-primary": "#ffb4a3",
+              "on-secondary-fixed-variant": "#3d4c0e",
+              "secondary-fixed": "#d7eb9c",
+              "tertiary-fixed-dim": "#ffba43",
+              "on-tertiary-fixed-variant": "#614000",
+              "on-primary": "#ffffff",
+              "outline-variant": "#e0bfb8",
+              "secondary-fixed-dim": "#bbcf82",
+              "on-error-container": "#93000a",
+              "surface-container": "#f3edde",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed": "#ffddaf",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#9c6a00",
+              "error-container": "#ffdad6",
+              "on-secondary-container": "#586928",
+              "outline": "#8c716b",
+              "on-surface-variant": "#58413c",
+              "surface-container-low": "#f9f3e4",
+              "surface-container-high": "#eee8d9",
+              "primary": "#a63319",
+              "surface-dim": "#dfdacb",
+              "on-background": "#1d1c13",
+              "inverse-on-surface": "#f6f0e1",
+              "surface-tint": "#aa361c",
+              "error": "#ba1a1a",
+              "background": "#fff9ea",
+              "on-secondary": "#ffffff",
+              "on-surface": "#1d1c13",
+              "primary-fixed-dim": "#ffb4a3",
+              "on-primary-fixed": "#3d0600",
+              "ink": "#1A1208",
+              "rust": "#C84B2F",
+              "paper": "#F5EFE0",
+              "marigold": "#FFB443",
+              "sky-blue": "#8EAFC5",
+              "olive": "#546524"
+            },
+            fontFamily: {
+              "fraunces": ["Fraunces", "serif"],
+              "unbounded": ["Unbounded", "sans-serif"],
+              "mono": ["Space Mono", "monospace"],
+              "headline": ["Newsreader", "serif"],
+              "body": ["Newsreader", "serif"],
+              "label": ["Space Grotesk", "sans-serif"]
+            },
+            borderRadius: {
+              "DEFAULT": "0.125rem",
+              "lg": "0.25rem",
+              "xl": "0.5rem",
+              "full": "0.75rem"
+            },
+            animation: {
+              'marquee': 'marquee 25s linear infinite',
+              'marquee-reverse': 'marquee-reverse 30s linear infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'spin-slow': 'spin 12s linear infinite',
+            },
+            keyframes: {
+              marquee: {
+                '0%': { transform: 'translateX(0%)' },
+                '100%': { transform: 'translateX(-50%)' },
+              },
+              'marquee-reverse': {
+                '0%': { transform: 'translateX(-50%)' },
+                '100%': { transform: 'translateX(0%)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0) rotate(-1deg)' },
+                '50%': { transform: 'translateY(-20px) rotate(1deg)' },
+              }
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .ink-bleed {
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='20'%3E%3Cfilter id='f'%3E%3CfeTurbulence baseFrequency='.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+      }
+      .grain-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/svg%3E");
+      }
+      .custom-cursor {
+        width: 12px;
+        height: 12px;
+        background: #C84B2F;
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 10000;
+        transform: translate(-50%, -50%);
+      }
+      .cursor-ring {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #C84B2F;
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 10000;
+        transform: translate(-50%, -50%);
+        transition: width 0.2s, height 0.2s;
+      }
+      .perspective-stage {
+        perspective: 1000px;
+      }
+      .tilt-card {
+        transition: transform 0.3s ease-out;
+      }
+      .tilt-card:hover {
+        transform: rotateY(10deg) rotateX(5deg);
+      }
+    </style>
+<style>
+  .perspective-stage .tilt-card {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .perspective-stage .tilt-card:hover {
+    z-index: 50 !important;
+    transform: scale(1.1) rotate(0deg) !important;
+  }
+</style></head>
+<body class="bg-paper text-ink font-fraunces selection:bg-rust selection:text-white overflow-x-hidden cursor-none">
+<div class="grain-overlay"></div>
+<div class="custom-cursor hidden md:block" style="left: 1278px; top: 577px;"></div>
+<div class="cursor-ring hidden md:block" style="left: 1278px; top: 577px; width: 32px; height: 32px;"></div>
+<!-- Top Ticker Tape -->
+<div class="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-rust h-6">
+<div class="flex whitespace-nowrap animate-marquee items-center h-full">
+<span class="text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-4" style="">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
+<span class="text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-4" style="">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
+</div>
+<div class="flex whitespace-nowrap animate-marquee items-center h-full">
+<span class="text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-4" style="">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
+<span class="text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-4" style="">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
+</div>
+</div>
+<!-- TopAppBar -->
+<header class="fixed top-[24px] left-0 w-full flex justify-between items-center px-8 h-16 bg-paper/90 dark:bg-ink/90 backdrop-blur-md mix-blend-multiply z-50 border-b border-ink/10">
+<div class="text-2xl font-black text-ink dark:text-paper font-unbounded tracking-tighter" style="">WEAVE</div>
+<nav class="hidden md:flex space-x-12">
+<a class="text-rust font-bold underline decoration-wavy font-mono text-[10px] uppercase tracking-[0.2em]" href="#" style="">STUDIO</a>
+<a class="text-ink dark:text-paper opacity-80 hover:text-rust transition-colors duration-300 font-mono text-[10px] uppercase tracking-[0.2em]" href="#" style="">CATALOGUE</a>
+<a class="text-ink dark:text-paper opacity-80 hover:text-rust transition-colors duration-300 font-mono text-[10px] uppercase tracking-[0.2em]" href="#" style="">ABOUT</a>
+</nav>
+<button class="bg-ink text-paper px-6 py-2 text-[10px] font-unbounded font-black tracking-widest hover:bg-rust transition-colors active:scale-95" style="">SIGN IN</button>
+</header>
+<!-- SideNavBar (Mobile/Minimalist) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-20 hidden lg:flex flex-col items-center py-12 z-40 bg-transparent space-y-12">
+<div class="group cursor-pointer">
+<span class="material-symbols-outlined text-rust bg-rust/10 p-3 -rotate-2 scale-110" style="">grid_view</span>
+</div>
+<div class="group cursor-pointer">
+<span class="material-symbols-outlined text-ink opacity-40 hover:opacity-100 hover:rotate-2 transition-all" style="">auto_fix_high</span>
+</div>
+<div class="group cursor-pointer">
+<span class="material-symbols-outlined text-ink opacity-40 hover:opacity-100 hover:rotate-2 transition-all" style="">shelves</span>
+</div>
+<div class="group cursor-pointer">
+<span class="material-symbols-outlined text-ink opacity-40 hover:opacity-100 hover:rotate-2 transition-all" style="">settings</span>
+</div>
+</aside>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="min-h-screen flex flex-col lg:flex-row items-center px-8 lg:px-24 py-16 gap-12 overflow-hidden">
+<div class="w-full lg:w-1/2 flex flex-col space-y-8 z-10">
+<span class="text-rust font-unbounded text-xs font-black tracking-widest uppercase" style="">The Digital Curator</span>
+<h1 class="text-7xl lg:text-9xl font-fraunces font-black leading-[0.9] tracking-tighter" style="">
+                    Wear it <br>
+<span class="text-rust italic font-light" style="">before</span> <br>
+                    you buy.
+                </h1>
+<p class="text-xl lg:text-2xl font-fraunces italic text-ink/70 max-w-lg" style="">
+                    A living mood board where fashion meets physics. Experiment with silhouettes using our proprietary neural rendering engine.
+                </p>
+<div class="flex flex-wrap gap-6 pt-4">
+<button class="group relative bg-rust text-paper px-8 py-4 font-unbounded font-black overflow-hidden transition-all duration-500" style="">
+<span class="relative z-10" style="">ENTER STUDIO →</span>
+<div class="absolute inset-0 bg-ink translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+</button>
+<button class="px-8 py-4 font-mono text-sm border border-ink/10 hover:border-rust hover:text-rust transition-all" style="">
+                        SEE HOW IT WORKS
+                    </button>
+</div>
+<div class="grid grid-cols-3 gap-8 pt-12 border-t border-ink/5">
+<div>
+<div class="font-unbounded font-black text-3xl" style="">98%</div>
+<div class="font-mono text-[10px] uppercase opacity-60 tracking-widest" style="">Accuracy</div>
+</div>
+<div>
+<div class="font-unbounded font-black text-3xl" style="">400ms</div>
+<div class="font-mono text-[10px] uppercase opacity-60 tracking-widest" style="">Inference</div>
+</div>
+<div>
+<div class="font-unbounded font-black text-3xl" style="">4K</div>
+<div class="font-mono text-[10px] uppercase opacity-60 tracking-widest" style="">Resolution</div>
+</div>
+</div>
+</div>
+<div class="w-full lg:w-1/2 relative h-[600px] perspective-stage">
+<!-- Parallax Background Elements -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-rust/10 rounded-full animate-pulse"></div>
+<!-- Floating Visual Cards -->
+<div class="absolute top-1/4 left-1/4 w-64 h-80 bg-gradient-to-br from-[#E1D5F5] to-[#B8A2D1] shadow-2xl tilt-card -rotate-6 z-20 flex flex-col p-4" style="transform: rotateX(0deg) rotateY(0deg) scale(1);">
+<div class="h-full bg-white/20 backdrop-blur-sm p-2">
+<img class="w-full h-full object-cover grayscale mix-blend-multiply opacity-80" data-alt="high fashion model in ethereal lilac draped silk dress floating against neutral background soft studio lighting" src="https://lh3.googleusercontent.com/aida/ADBb0uhJzlwnefJStn4WMupsDd0Cd7Srl-9saI4I8ZI1UcdEt5b9CahtByYTf_0_k2uvBjv2-5FbFm2qXyMef6ndc9op4lF4GRGN2W9n6a-zzpFhQ8h55HcSbCDIuBjCGSdKQZj6E6_qhb24VscqKoibw89C1o4qUIReryPl1C-MRogQb84u2E3H904LW_pdr46UpnO_a3fKPfHOjxqDdymJgnram_KgQPPiNC0dIj0ekqpxO6yGouZeUwO3AxYITwAjp4m4epOVdBviLw" style="">
+</div>
+<div class="mt-2 font-mono text-[8px] flex justify-between opacity-60">
+<span class="" style="">#LAVENDER_DRAPE</span>
+<span class="" style="">RESUNET-V2</span>
+</div>
+</div>
+<div class="absolute top-1/3 right-1/4 w-72 h-96 bg-gradient-to-br from-[#D1E1F5] to-[#8EAFC5] shadow-2xl tilt-card rotate-3 z-30 flex flex-col p-4" style="transform: rotateX(0deg) rotateY(0deg) scale(1);">
+<div class="h-full bg-white/20 backdrop-blur-sm p-2">
+<img class="w-full h-full object-cover" data-alt="close up of textured blue linen fabric on human form editorial fashion photography mood" src="https://lh3.googleusercontent.com/aida/ADBb0uhpzIw9gljzc1ZjYMpYulmgGbhLNC2scslWi1uAiEA9mqxVFUEY70Lz01OxN4pbSRMUStALQT375HoAmE8P1OeWtXTmA791517FPrZxsFcH2or1XN-t1Le5fUp3nzkV51Z5ahwKBZH-YbXMzSVdNyuwcT3YcjA3a0Ww7nN3E6_Beg1l_JHza6e2W1eDJ7HP8XBsPxFr8x1stfXfBTg-_D6uznC72S5uxNzJ6JtAkZiYuMdiVctZt8x38ZDWUZeoMqBY_PXZ6CZ43g" style="">
+</div>
+<div class="absolute -top-4 -right-4 bg-secondary-container px-3 py-1 rotate-6 shadow-sm">
+<span class="font-mono text-[10px] font-bold" style="">RESULTS</span>
+</div>
+</div>
+<div class="absolute bottom-1/4 left-1/3 w-64 h-80 bg-gradient-to-br from-[#F5D5D1] to-[#C58E8E] shadow-2xl tilt-card rotate-12 z-10 flex flex-col p-4" style="transform: rotateX(0deg) rotateY(0deg) scale(1);">
+<div class="h-full bg-white/20 backdrop-blur-sm p-2">
+<img class="w-full h-full object-cover" data-alt="vintage oversized terracotta wool coat hanging on architectural minimalist coat stand warm tones" src="https://lh3.googleusercontent.com/aida/ADBb0uhsoxGbm4ZwHNlkg_946NRGu-pNbCymTxSv6rV1cTNM2hwbHlWQ_GbZGjL4E7DLwtL4ww97r1Hx7GwBrCUAil3kajL0MPSRWqCllNuACzwEHrh8DJ94FAUJKihD4CjxKp2eWlFYNzg1z20q8sVFSNgk_WSqFDyBNz_F2sKEw_eOukbzdVEsEeeHRSP6YroHVxHBJIGgggv53DdWkuP5aUJilf064ud7tdidbjdKEd9eiOlXKJAo6lMTNHUB3jnIYVJ6pw6UwERfE2g" style="">
+</div>
+</div>
+<!-- Floating Badges -->
+<div class="absolute top-10 right-10 bg-rust text-paper p-6 rounded-full w-24 h-24 flex items-center justify-center text-center animate-spin-slow select-none cursor-pointer">
+<span class="font-unbounded text-[8px] font-black leading-tight uppercase" style="">THE WEAVE <br> PROTOCOL</span>
+</div>
+<div class="absolute bottom-20 right-0 bg-on-surface text-surface px-4 py-2 flex items-center gap-2 animate-float">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: &quot;FILL&quot; 1;">auto_fix_high</span>
+<span class="font-mono text-[10px] tracking-widest uppercase" style="">WEAVE POWERED</span>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section class="bg-ink text-paper py-32 relative overflow-hidden">
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5">
+<span class="text-[30vw] font-unbounded font-black" style="">WEAVE</span>
+</div>
+<div class="container mx-auto px-8 relative z-10">
+<div class="max-w-3xl mb-24">
+<h2 class="text-5xl lg:text-7xl font-fraunces italic font-bold text-surface mb-6" style="">Built on serious science.</h2>
+<p class="text-xl font-fraunces italic text-paper/60" style="">We’ve replaced the guess-work of online shopping with high-fidelity neural networks that respect drape, lighting, and skin-tone accuracy.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+<!-- Card 1 -->
+<div class="group flex flex-col space-y-6">
+<div class="flex items-baseline justify-between border-b border-rust/30 pb-4">
+<span class="font-mono text-rust text-sm" style="">01</span>
+<span class="font-mono text-[10px] uppercase tracking-widest text-rust/60" style="">Computer Vision</span>
+</div>
+<h3 class="text-2xl font-unbounded font-black tracking-tighter" style="">Photo-Realistic Try-On</h3>
+<p class="font-fraunces italic text-lg text-paper/70" style="">AFWM optical flow warps garments to your exact body geometry. ResUnet generates the final composite. Real-ESRGAN upscales 4× for pixel-perfect detail.</p>
+<div class="flex flex-wrap gap-2">
+<span class="bg-rust/10 text-rust/80 px-2 py-1 font-mono text-[9px] uppercase border border-rust/20" style="">ResUnet</span>
+<span class="bg-rust/10 text-rust/80 px-2 py-1 font-mono text-[9px] uppercase border border-rust/20" style="">AFWM Flow</span>
+<span class="bg-rust/10 text-rust/80 px-2 py-1 font-mono text-[9px] uppercase border border-rust/20" style="">Real-ESRGAN</span>
+<span class="bg-rust/10 text-rust/80 px-2 py-1 font-mono text-[9px] uppercase border border-rust/20" style="">CuPy CUDA</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group flex flex-col space-y-6">
+<div class="flex items-baseline justify-between border-b border-olive/30 pb-4">
+<span class="font-mono text-olive text-sm" style="">02</span>
+<span class="font-mono text-[10px] uppercase tracking-widest text-olive/60" style="">Custom Training Pipeline</span>
+</div>
+<h3 class="text-2xl font-unbounded font-black tracking-tighter" style="">3-Stage Distillation</h3>
+<p class="font-fraunces italic text-lg text-paper/70" style="">Trained a Parser-Based VITON (teacher) first. Then trained DM-VTON (student) using the teacher's warped outputs — dramatically reducing complexity.</p>
+<div class="flex flex-wrap gap-2">
+<span class="bg-olive/10 text-olive/80 px-2 py-1 font-mono text-[9px] uppercase border border-olive/20" style="">Parser-Based AFWM</span>
+<span class="bg-olive/10 text-olive/80 px-2 py-1 font-mono text-[9px] uppercase border border-olive/20" style="">StyleAFWM</span>
+<span class="bg-olive/10 text-olive/80 px-2 py-1 font-mono text-[9px] uppercase border border-olive/20" style="">ResUnetGenerator</span>
+<span class="bg-olive/10 text-olive/80 px-2 py-1 font-mono text-[9px] uppercase border border-olive/20" style="">VGG Loss</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group flex flex-col space-y-6">
+<div class="flex items-baseline justify-between border-b border-sky-blue/30 pb-4">
+<span class="font-mono text-sky-blue text-sm" style="">03</span>
+<span class="font-mono text-[10px] uppercase tracking-widest text-sky-blue/60" style="">Color AI</span>
+</div>
+<h3 class="text-2xl font-unbounded font-black tracking-tighter" style="">Your Exact Palette</h3>
+<p class="font-fraunces italic text-lg text-paper/70" style="">SCHP extracts skin and hair masks. Median LAB values become your permanent color profile. Recommendations are built around your actual complexion.</p>
+<div class="flex flex-wrap gap-2">
+<span class="bg-sky-blue/10 text-sky-blue/80 px-2 py-1 font-mono text-[9px] uppercase border border-sky-blue/20" style="">SCHP ResNet101</span>
+<span class="bg-sky-blue/10 text-sky-blue/80 px-2 py-1 font-mono text-[9px] uppercase border border-sky-blue/20" style="">CIHP Dataset</span>
+<span class="bg-sky-blue/10 text-sky-blue/80 px-2 py-1 font-mono text-[9px] uppercase border border-sky-blue/20" style="">LAB Color Space</span>
+<span class="bg-sky-blue/10 text-sky-blue/80 px-2 py-1 font-mono text-[9px] uppercase border border-sky-blue/20" style="">Morphological Erosion</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group flex flex-col space-y-6">
+<div class="flex items-baseline justify-between border-b border-marigold/30 pb-4">
+<span class="font-mono text-marigold text-sm" style="">04</span>
+<span class="font-mono text-[10px] uppercase tracking-widest text-marigold/60" style="">Tri-Modal Recommendation</span>
+</div>
+<h3 class="text-2xl font-unbounded font-black tracking-tighter" style="">Finds Your Style</h3>
+<p class="font-fraunces italic text-lg text-paper/70" style="">Three weighted signals: color compatibility (LAB distance), semantic content (SigLIP embeddings), and collaborative filtering. Weights auto-adjust.</p>
+<div class="flex flex-wrap gap-2">
+<span class="bg-marigold/10 text-marigold/80 px-2 py-1 font-mono text-[9px] uppercase border border-marigold/20" style="">SigLIP marqo-fashionSigLIP</span>
+<span class="bg-marigold/10 text-marigold/80 px-2 py-1 font-mono text-[9px] uppercase border border-marigold/20" style="">pgvector</span>
+<span class="bg-marigold/10 text-marigold/80 px-2 py-1 font-mono text-[9px] uppercase border border-marigold/20" style="">Collaborative Filtering</span>
+<span class="bg-marigold/10 text-marigold/80 px-2 py-1 font-mono text-[9px] uppercase border border-marigold/20" style="">KMeans LAB</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Mid-page Marquee -->
+<div class="bg-marigold py-6 border-y-2 border-ink overflow-hidden">
+<div class="flex whitespace-nowrap animate-marquee-reverse">
+<span class="text-ink font-fraunces text-[22px] font-bold italic px-8" style="">Wear it before you buy ✦ Trained from scratch ✦ 4GB VRAM ✦ Your palette, your rules ✦ Student beats teacher ✦</span>
+<span class="text-ink font-fraunces text-[22px] font-bold italic px-8" style="">Wear it before you buy ✦ Trained from scratch ✦ 4GB VRAM ✦ Your palette, your rules ✦ Student beats teacher ✦</span>
+<span class="text-ink font-fraunces text-[22px] font-bold italic px-8" style="">Wear it before you buy ✦ Trained from scratch ✦ 4GB VRAM ✦ Your palette, your rules ✦ Student beats teacher ✦</span>
+</div>
+</div>
+<!-- How It Works Section -->
+<section class="py-32 bg-paper px-8">
+<div class="container mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+<div class="grid grid-cols-2 gap-4">
+<div class="aspect-[4/5] bg-surface-container relative overflow-hidden group">
+<img class="w-full h-full object-cover grayscale opacity-50 group-hover:scale-110 transition-transform duration-700" data-alt="minimalist studio photography of model silhouette standing in front of soft light window" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl1U8ie5QFD2otcrSKME2LOr9YRpgFQltV54tgqvPh1Ot7h36Yg2A5Aeqm2IBsQI2tqL1AfOnx_-v-tZQasd0H5z8EhLachsWNLkFUxINteEhm4ZrPZB0hyeytvmxbKSCIpMm8-5qAbXNLZiS-X-cclqP-RT1bgqsDf70IKXOWGL9EvJskaCbcvD7gJUdXe9rrVzocDqId6XaanvKlkvExR8w-_GfIgEOB2x9z-dmwgp2rS7R5wQRtXAnKhsp2wyWs7Q6Kiqndl042" style="">
+<div class="absolute inset-0 bg-rust/10 mix-blend-multiply"></div>
+<span class="absolute top-4 left-4 text-8xl font-unbounded font-black opacity-10" style="">1</span>
+</div>
+<div class="aspect-[4/5] bg-surface-container relative overflow-hidden group translate-y-12">
+<img class="w-full h-full object-cover grayscale opacity-50 group-hover:scale-110 transition-transform duration-700" data-alt="assorted designer clothes on a minimal clothing rack with editorial lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApvjoLGmA-REnPpSkEGREyZsL7L8lJRzPkXI1uC0qYimIKz-2YxKU_WV11oMpIFByHpnDkWX0pVCgwv75_JATUJo7kmwpLoSMGSygCv6KdqoJMQGMVKb_TcDuaMRwxg9dJfZT-MbtMbF5cK2-RYSKxg_TsJCIUNm9LkgoVzNzANVw02CiedwlswX9WyEq89aJszM_h6EKIlEGg_8VQzyntLZMVNm9LGkXA5XyqUc-0jsKNhhXEo2ROdi60aGYSKhTNMBatahdjLsVo" style="">
+<div class="absolute inset-0 bg-secondary/10 mix-blend-multiply"></div>
+<span class="absolute top-4 left-4 text-8xl font-unbounded font-black opacity-10" style="">2</span>
+</div>
+<div class="aspect-[4/5] bg-surface-container relative overflow-hidden group -translate-y-12">
+<img class="w-full h-full object-cover grayscale opacity-50 group-hover:scale-110 transition-transform duration-700" data-alt="highly detailed neural network node connections representing artificial intelligence fashion technology" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNZQ5x9zvYssQtykSJo4ML5d3rVqkXaytPCVd3wCO6MVoy7Vc_7p6cvj0iWojZl-fI6Len6Q27RnLVVXY_rcsHxo7B6T5LyXA1UPzQ9e2aHdUB_OAfbNnEyopKXWhrmVSlBc2JkHTh881IisPtp2AHPA0Ume7Lu-GDvLI_H3P5JT-p5x30PDV1oYmZhE35-AWxq3UKmeQrcjnx0RxYmTDn7u0SbS2Ihw8b9djRxWtTho2fjlzs8wwhMB55DObnBWk-ADWEdoStutpT" style="">
+<div class="absolute inset-0 bg-tertiary/10 mix-blend-multiply"></div>
+<span class="absolute top-4 left-4 text-8xl font-unbounded font-black opacity-10" style="">3</span>
+</div>
+<div class="aspect-[4/5] bg-surface-container relative overflow-hidden group">
+<img class="w-full h-full object-cover grayscale opacity-50 group-hover:scale-110 transition-transform duration-700" data-alt="stylish person walking away with shopping bags in a high-end fashion district" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiDseRFYMic0xZiHnqM5PtMBfPGVczw_M33Uy3ykt3GD8Ag3s8xibvF417XbeBF_5JKLnbM4WmvV42lymlorTXZxYWH-ISLIikF8r5HVAefEWgMoDVi5m6Nenj5I3FpZTRRrGGg2KyyZv_iYZA40yYFZfermPZFCFC2YTPpVqDTjnNrx_mrsRxJyJrFFfdV_N-NB8ovooOmRbhXcG_EdO_Mt4byaYPJrWe_0oVzIVINojdPQvf2olYzN5DWx7ZoAbm7tDj7YR8yD2c" style="">
+<div class="absolute inset-0 bg-ink/10 mix-blend-multiply"></div>
+<span class="absolute top-4 left-4 text-8xl font-unbounded font-black opacity-10" style="">4</span>
+</div>
+</div>
+<div class="flex flex-col space-y-12">
+<div class="space-y-4">
+<h2 class="text-6xl font-fraunces font-black tracking-tighter" style="">Simple <br> <span class="italic text-rust" style="">but effective.</span></h2>
+<p class="text-xl font-fraunces italic opacity-70" style="">Four steps between you and your new aesthetic.</p>
+</div>
+<div class="space-y-8">
+<div class="flex gap-6 items-start">
+<span class="font-unbounded font-black text-xl text-rust" style="">01.</span>
+<div>
+<h4 class="font-unbounded font-bold text-lg" style="">Upload Your Canvas</h4>
+<p class="font-fraunces italic text-ink/60" style="">Take a quick snap or upload a photo. Our engine maps your body topography instantly.</p>
+</div>
+</div>
+<div class="flex gap-6 items-start">
+<span class="font-unbounded font-black text-xl text-rust" style="">02.</span>
+<div>
+<h4 class="font-unbounded font-bold text-lg" style="">Browse the Vault</h4>
+<p class="font-fraunces italic text-ink/60" style="">Choose from thousands of high-resolution digital garments from boutique partners.</p>
+</div>
+</div>
+<div class="flex gap-6 items-start">
+<span class="font-unbounded font-black text-xl text-rust" style="">03.</span>
+<div>
+<h4 class="font-unbounded font-bold text-lg" style="">Neural Render</h4>
+<p class="font-fraunces italic text-ink/60" style="">Wait 400ms while we calculate gravity, friction, and light bounce on the fabric.</p>
+</div>
+</div>
+<div class="flex gap-6 items-start">
+<span class="font-unbounded font-black text-xl text-rust" style="">04.</span>
+<div>
+<h4 class="font-unbounded font-bold text-lg" style="">Own the Look</h4>
+<p class="font-fraunces italic text-ink/60" style="">Love the silhouette? Buy with confidence knowing exactly how it falls on you.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Testimonials -->
+<section class="bg-ink py-24 overflow-hidden border-t-8 border-rust">
+<div class="flex space-x-12 px-8 overflow-x-auto pb-8 scrollbar-hide">
+<div class="min-w-[400px] bg-paper p-8 -rotate-2 shadow-xl">
+<p class="font-fraunces italic text-2xl mb-6" style="">"Finally, an online fitting room that doesn't feel like a 2005 video game. The texture mapping is uncanny."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-rust rounded-sm overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="headshot of smiling fashion editor with stylish glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaowZpyUHnCPgfW9Y8MxHXzo25VRkpH6WPSSn7ARcqtbepQpkX4d1r2Dx1J14kh7RBPp_lLom3Tbn4fGF8ESrbkFSB4GB31kck9hmb7phodT1Y5w6jXDQUt6AaHAq5druyxcq-884nSIHEajZxzWRv150sej5g7zmmnHcQvJy9hId66NOp3Rxvczo_0KieFi2lBcyF6lrmZunzNNQcNkV3FJ0aIBf1j1yzLU6vWqKirQb1WvDeH4Z-HLiTGolr0A0ujmY44gBzw58B" style="">
+</div>
+<div>
+<div class="font-unbounded font-black text-xs" style="">Elena V.</div>
+<div class="font-mono text-[8px] uppercase tracking-widest" style="">Creative Director, i-D</div>
+</div>
+</div>
+</div>
+<div class="min-w-[400px] bg-paper p-8 rotate-1 shadow-xl">
+<p class="font-fraunces italic text-2xl mb-6" style="">"WEAVE has reduced our return rate by 42%. It’s the single most important tool in our digital stack."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-secondary rounded-sm overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="professional portrait of male retail CEO in modern office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq9gzw3nkpn4NnU440QbOTBULXTn9pgM9LG9Oyb7rwGtPLZpsZSheZScqel-UdgrebiGMgaams3fjE3d2aJ3OXaDx32g44q65_b-vqVCTPiBS2JuKzghe8nDScl8W0WaaDMP1lLoihkZZ8VATPoRoiRvS_bN9QAc-sBjMvAvO7qaJnmE2hgGljnHr5EbAnmfAd_vRXnVXOWP_fC5LsTKgN-h_zt0ethMWijYSXDhYiP_X6L364beIrz5DuhMPx7w8hX2lzs683D9J9" style="">
+</div>
+<div>
+<div class="font-unbounded font-black text-xs" style="">Marcus Thorne</div>
+<div class="font-mono text-[8px] uppercase tracking-widest" style="">Founder, Atelier Modern</div>
+</div>
+</div>
+</div>
+<div class="min-w-[400px] bg-paper p-8 -rotate-1 shadow-xl">
+<p class="font-fraunces italic text-2xl mb-6" style="">"The color science is where WEAVE truly wins. It understands how silk reflects light differently than wool."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-tertiary rounded-sm overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="editorial headshot of a young woman with experimental makeup and hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt851DydfW6xgeaQuw0Y4MR0Qo_hEuu4bXsSb4Wsdh5hqAihm-NpbTjZNvhjEjkBaIcjt7S3b50xObtkSi5-DDc45K82VFNOgH6i0BmeKo29VinJTqJXTBn5FGuloW_uYRQzvB8i0JLBaZ0tHLM3oPUwWoY5GBGE6DmCdIa16iz18t0rY5ZFojAwK5CPzREphmXk_VAYZvI8t-X39f3ag52byfZIVnbSr3XdPez4WqZryRVQcbhQx7d4QadRPz26a9lzg50FsnnQW1" style="">
+</div>
+<div>
+<div class="font-unbounded font-black text-xs" style="">Sasha J.</div>
+<div class="font-mono text-[8px] uppercase tracking-widest" style="">Digital Stylist</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="bg-rust py-32 px-8 text-center relative overflow-hidden">
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-paper/5 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-24 -right-24 w-96 h-96 bg-paper/5 rounded-full blur-3xl"></div>
+<div class="relative z-10 max-w-4xl mx-auto space-y-12">
+<h2 class="text-7xl lg:text-9xl font-fraunces font-black text-paper leading-none tracking-tighter" style="">
+                    Stop guessing. <br>
+<span class="italic opacity-80" style="">Start wearing.</span>
+</h2>
+<div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+<button class="bg-paper text-rust px-12 py-6 font-unbounded font-black text-xl hover:scale-105 hover:shadow-[10px_10px_0px_#1A1208] transition-all" style="">
+                        ENTER THE STUDIO
+                    </button>
+<p class="text-paper/80 font-fraunces italic text-xl" style="">Join 50k+ curators exploring the future of style.</p>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-paper border-t border-ink/10 py-16 px-8">
+<div class="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
+<div class="col-span-2">
+<div class="text-4xl font-unbounded font-black tracking-tighter mb-6" style="">WEAVE</div>
+<p class="font-fraunces italic text-xl max-w-sm opacity-60" style="">A digital playground for physical garments. Powered by the intersection of fashion and neural architecture.</p>
+</div>
+<div class="flex flex-col space-y-4">
+<h5 class="font-mono text-[10px] uppercase font-bold tracking-widest opacity-40" style="">System</h5>
+<a class="font-unbounded text-xs font-black hover:text-rust transition-colors" href="#" style="">STUDIO</a>
+<a class="font-unbounded text-xs font-black hover:text-rust transition-colors" href="#" style="">API ACCESS</a>
+<a class="font-unbounded text-xs font-black hover:text-rust transition-colors" href="#" style="">RESEARCH</a>
+</div>
+<div class="flex flex-col space-y-4">
+<h5 class="font-mono text-[10px] uppercase font-bold tracking-widest opacity-40" style="">Network</h5>
+<a class="font-unbounded text-xs font-black hover:text-rust transition-colors" href="#" style="">INSTAGRAM</a>
+<a class="font-unbounded text-xs font-black hover:text-rust transition-colors" href="#" style="">TWITTER (X)</a>
+<a class="font-unbounded text-xs font-black hover:text-rust transition-colors" href="#" style="">DISCORD</a>
+</div>
+</div>
+<div class="container mx-auto mt-24 pt-8 border-t border-ink/5 flex justify-between items-center">
+<span class="font-mono text-[10px] opacity-40" style="">© 2024 WEAVE TECHNOLOGY GROUP. ALL RIGHTS RESERVED.</span>
+<span class="font-mono text-[10px] opacity-40" style="">STABLE-FASHION-01-V4.2</span>
+</div>
+</footer>
+<script>
+        // Custom Cursor Logic
+        const cursor = document.querySelector('.custom-cursor');
+        const ring = document.querySelector('.cursor-ring');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            // Lag for the ring
+            setTimeout(() => {
+                ring.style.left = e.clientX + 'px';
+                ring.style.top = e.clientY + 'px';
+            }, 50);
+        });
+
+        document.addEventListener('mousedown', () => {
+            ring.style.width = '24px';
+            ring.style.height = '24px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            ring.style.width = '32px';
+            ring.style.height = '32px';
+        });
+
+        // 3D Tilt Logic
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+            });
+        });
+    </script>
+</body></html>

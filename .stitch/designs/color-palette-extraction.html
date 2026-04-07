@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&amp;family=Space+Grotesk:wght@300..700&amp;family=Unbounded:wght@200..900&amp;family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed": "#281800",
+                        "tertiary": "#7c5300",
+                        "surface-container-high": "#eee8d9",
+                        "inverse-primary": "#ffb4a3",
+                        "surface-container-highest": "#e8e2d3",
+                        "on-surface-variant": "#58413c",
+                        "secondary-container": "#d4e899",
+                        "outline-variant": "#e0bfb8",
+                        "on-primary-fixed-variant": "#891e05",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffba43",
+                        "tertiary-container": "#9c6a00",
+                        "surface-dim": "#dfdacb",
+                        "surface-container-low": "#f9f3e4",
+                        "background": "#fff9ea",
+                        "primary-fixed": "#ffdad2",
+                        "primary-fixed-dim": "#ffb4a3",
+                        "outline": "#8c716b",
+                        "on-background": "#1d1c13",
+                        "on-tertiary-fixed-variant": "#614000",
+                        "tertiary-fixed": "#ffddaf",
+                        "surface-container": "#f3edde",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#586928",
+                        "on-secondary-fixed-variant": "#3d4c0e",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#fff9ea",
+                        "on-secondary-fixed": "#161f00",
+                        "on-surface": "#1d1c13",
+                        "primary-container": "#c84b2f",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#f6f0e1",
+                        "surface-variant": "#e8e2d3",
+                        "primary": "#a63319",
+                        "on-primary-fixed": "#3d0600",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#333027",
+                        "secondary-fixed-dim": "#bbcf82",
+                        "secondary-fixed": "#d7eb9c",
+                        "on-primary-container": "#fffbff",
+                        "surface-tint": "#aa361c",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#fff9ea",
+                        "on-tertiary-container": "#fffaf9",
+                        "secondary": "#546524"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Fraunces", "serif"],
+                        "body": ["Fraunces", "serif"],
+                        "label": ["Space Grotesk", "sans-serif"],
+                        "mono": ["Space Mono", "monospace"],
+                        "brutal": ["Unbounded", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>.film-grain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCZnvCUEhHLvXet7H-f4PjGLUDJ2WXmOU6cWtHbA4-CnIqFCSxyqnisHqQX8G-blk_r1MPza98dAZwBFMJOf5kAU1nxceIBPGSpF3hC7ehlw3Ep_xnJQGfQZwaiyk_D-HFDfyK0vNhjexg9meHKYAU40BWfoVgTQnvzBbxgZawZskXeptc4Acv0eWdcv15avo3T00chkncmb7Y5FvZI78aRkEOgYr255bvpwCeflJR6iOYAUMIkZ41Cn7dHgnYmq0GnnT-cbgDrWOCX)
+    }
+.ink-bleed-border {
+    border-image: url("data:image/svg+xml,%3Csvg width='100' height='10' viewBox='0 0 100 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 Q 2.5 0 5 5 T 10 5 T 15 5 T 20 5 T 25 5 T 30 5 T 35 5 T 40 5 T 45 5 T 50 5 T 55 5 T 60 5 T 65 5 T 70 5 T 75 5 T 80 5 T 85 5 T 90 5 T 95 5 T 100 5' fill='none' stroke='%231A1208' stroke-width='2'/%3E%3C/svg%3E") 30 stretch
+    }
+.marquee {
+    overflow: hidden;
+    white-space: nowrap
+    }
+.marquee-content {
+    display: inline-block;
+    animation: marquee 20s linear infinite
+    }
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+        } 100% {
+        transform: translateX(-50%);
+        }
+    }
+.stagger-rotate {
+    transform: rotate(-1.5deg)
+    }
+.body-silhouette {
+    filter: drop-shadow(2px 2px 0 rgba(26, 18, 8, 0.1))
+    }</style>
+</head>
+<body class="bg-[#F5EFE0] text-[#1A1208] min-h-screen font-body selection:bg-primary-container selection:text-on-primary-container">
+<div class="film-grain"></div>
+<!-- Top Navigation / Brand Anchor -->
+<header class="bg-[#F5EFE0] dark:bg-[#1A1208] border-b border-[#1A1208]/10 dark:border-[#F5EFE0]/10 flex justify-between items-center px-6 py-4 w-full sticky top-0 z-50">
+<div class="text-3xl font-black tracking-tighter text-[#1A1208] dark:text-[#F5EFE0] font-headline italic">THE CURATOR</div>
+<div class="hidden md:flex gap-8 items-center">
+<span class="text-[#C84B2F] font-bold font-mono uppercase text-xs tracking-widest">Process</span>
+<span class="text-[#1A1208]/60 dark:text-[#F5EFE0]/60 font-mono uppercase text-xs tracking-widest hover:opacity-80 transition-opacity cursor-pointer">Style</span>
+<span class="text-[#1A1208]/60 dark:text-[#F5EFE0]/60 font-mono uppercase text-xs tracking-widest hover:opacity-80 transition-opacity cursor-pointer">Identity</span>
+</div>
+<div class="material-symbols-outlined text-[#1A1208]/60 cursor-pointer hover:opacity-80 transition-opacity" data-icon="help_outline">help_outline</div>
+</header>
+<!-- Marigold Ticker Tape -->
+<div class="bg-tertiary-fixed h-10 border-y border-[#1A1208] flex items-center marquee">
+<div class="marquee-content font-mono font-bold text-xs uppercase tracking-[0.3em] text-on-tertiary-fixed">
+            ANALYZING YOUR PALETTE ✦ SCHP PARSING ✦ LAB COLOR SPACE ✦ ANALYZING YOUR PALETTE ✦ SCHP PARSING ✦ LAB COLOR SPACE ✦ ANALYZING YOUR PALETTE ✦ SCHP PARSING ✦ LAB COLOR SPACE ✦ ANALYZING YOUR PALETTE ✦ SCHP PARSING ✦ LAB COLOR SPACE ✦
+        </div>
+</div>
+<!-- Main Content Canvas -->
+<main class="max-w-6xl mx-auto px-6 pt-16 pb-24 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+<!-- Identity / Onboarding Sidebar (Hidden on mobile) -->
+<aside class="hidden lg:flex lg:col-span-3 flex-col gap-8 sticky top-28">
+<div class="flex flex-col gap-1">
+<div class="text-xl font-black text-[#1A1208] font-brutal uppercase tracking-tight">ONBOARDING</div>
+<div class="text-sm font-serif italic text-[#1A1208]/60">Phase 01: Verification</div>
+</div>
+<nav class="flex flex-col gap-6">
+<div class="flex items-center gap-4 group cursor-pointer text-[#C84B2F] bg-[#C84B2F]/10 px-4 py-3 rounded-sm">
+<span class="material-symbols-outlined" data-icon="auto_fix_high" style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+<span class="font-brutal text-sm font-black uppercase tracking-tight">Process</span>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer text-[#1A1208]/40 hover:translate-x-1 transition-transform px-4 py-3">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+<span class="font-brutal text-sm font-black uppercase tracking-tight">Style</span>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer text-[#1A1208]/40 hover:translate-x-1 transition-transform px-4 py-3">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span class="font-brutal text-sm font-black uppercase tracking-tight">Identity</span>
+</div>
+</nav>
+<div class="mt-12 p-4 border border-[#1A1208]/10 bg-surface-container-low/50">
+<p class="text-[10px] font-mono uppercase tracking-widest text-[#1A1208]/40 mb-2">Technical Specs</p>
+<p class="text-xs font-serif italic text-[#1A1208]/70 leading-relaxed">Self-Correction Human Parsing (SCHP) ensures pixel-perfect tone extraction from noisy backgrounds.</p>
+</div>
+</aside>
+<!-- Primary Canvas -->
+<section class="lg:col-span-9 flex flex-col gap-12">
+<!-- Headline Section -->
+<div class="max-w-2xl">
+<h1 class="text-6xl md:text-7xl font-headline font-black italic tracking-tighter leading-[0.9] text-[#1A1208] mb-6">
+                    Let's find your palette.
+                </h1>
+<p class="text-xl md:text-2xl font-serif italic text-[#1A1208]/80 leading-snug">
+                    A selfie is all we need. SCHP extracts your skin and hair tones from the pixels.
+                </p>
+</div>
+<!-- Central Card (The Scrapbook Card) -->
+<div class="bg-[#E4DCC6] p-1 md:p-1 shadow-[12px_12px_0px_-2px_#1A120810] border border-[#1A1208] relative group">
+<!-- Decorative Tape -->
+<div class="absolute -top-4 -left-6 bg-secondary-container px-6 py-1.5 shadow-sm transform -rotate-3 z-10 border border-on-secondary-container/10">
+<span class="font-mono text-[10px] font-bold uppercase text-on-secondary-container">ATTACHMENT_01.JPG</span>
+</div>
+<div class="bg-white/5 p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-12">
+<!-- Dropzone Area -->
+<div class="flex flex-col gap-6">
+<div class="flex flex-col gap-1">
+<h2 class="font-brutal text-lg font-black uppercase tracking-tight">Upload a full-body photo</h2>
+<p class="font-serif italic text-sm text-[#1A1208]/60">Natural lighting works best · Neutral background</p>
+</div>
+<div class="aspect-[3/4] border-2 border-dashed border-[#1A1208]/30 bg-[#F5EFE0]/50 flex flex-col items-center justify-center p-8 text-center cursor-pointer hover:bg-[#F5EFE0] transition-colors group/drop">
+<svg class="w-24 h-48 mb-6 text-[#1A1208]/20 group-hover/drop:text-[#1A1208]/40 transition-colors" fill="currentColor" viewbox="0 0 100 200">
+<path d="M50 20c-8 0-15 7-15 15s7 15 15 15 15-7 15-15-7-15-15-15zm-15 40c-15 0-25 10-25 25v50c0 5 5 10 10 10h5v45c0 5 5 10 10 10s10-5 10-10v-45h10v45c0 5 5 10 10 10s10-5 10-10v-45h5c5 0 10-5 10-10V85c0-15-10-25-25-25H35z"></path>
+</svg>
+<span class="material-symbols-outlined text-4xl mb-4 text-[#C84B2F]" data-icon="add_circle">add_circle</span>
+<p class="font-mono text-xs uppercase font-bold tracking-widest text-[#1A1208]">Drop image or click to browse</p>
+</div>
+</div>
+<!-- Result State Preview -->
+<div class="flex flex-col gap-10">
+<div class="flex flex-col gap-6 p-6 bg-surface-container-low border border-[#1A1208]/5 stagger-rotate">
+<div class="flex justify-between items-end border-b border-[#1A1208]/10 pb-4">
+<span class="font-brutal text-xs font-black uppercase tracking-tighter">Analysis Results</span>
+<span class="font-mono text-[10px] text-[#C84B2F] font-bold">READY TO MAP</span>
+</div>
+<!-- Skin Tone Swatch -->
+<div class="flex items-center gap-6">
+<div class="w-20 h-20 bg-[#E8C4A0] border border-[#1A1208]/10 shadow-inner"></div>
+<div class="flex flex-col gap-1">
+<span class="font-mono text-[10px] uppercase tracking-widest font-bold text-[#1A1208]/40">Skin Tone</span>
+<span class="font-serif italic font-bold text-lg">Golden Almond</span>
+<span class="font-mono text-xs text-[#C84B2F]">LAB: 78, 12, 24</span>
+</div>
+</div>
+<!-- Hair Tone Swatch -->
+<div class="flex items-center gap-6">
+<div class="w-20 h-20 bg-[#2D1B14] border border-[#1A1208]/10 shadow-inner"></div>
+<div class="flex flex-col gap-1">
+<span class="font-mono text-[10px] uppercase tracking-widest font-bold text-[#1A1208]/40">Hair Tone</span>
+<span class="font-serif italic font-bold text-lg">Espresso Roast</span>
+<span class="font-mono text-xs text-[#C84B2F]">LAB: 14, 04, 02</span>
+</div>
+</div>
+<div class="mt-4 pt-6 border-t border-[#1A1208]/10 flex flex-col gap-2">
+<div class="flex justify-between font-mono text-[10px] uppercase">
+<span>Extraction Confidence</span>
+<span class="text-[#C84B2F]">98.2%</span>
+</div>
+<div class="h-1 bg-[#F5EFE0] overflow-hidden">
+<div class="h-full bg-primary w-[98.2%]"></div>
+</div>
+</div>
+</div>
+<!-- CTA Button -->
+<div class="mt-auto flex flex-col gap-4">
+<button class="w-full bg-[#C84B2F] text-[#F5EFE0] py-6 px-8 flex items-center justify-between group transition-all active:scale-95 duration-200 hover:brightness-110">
+<span class="font-brutal text-lg font-black uppercase tracking-tighter">Continue to Weave</span>
+<span class="material-symbols-outlined text-2xl group-hover:translate-x-2 transition-transform" data-icon="arrow_right_alt">arrow_right_alt</span>
+</button>
+<p class="font-mono text-[10px] text-center uppercase tracking-widest text-[#1A1208]/40">By continuing, you agree to our editorial privacy standards.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Staggered Sections -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-surface-container-high p-6 transform rotate-1">
+<span class="material-symbols-outlined text-[#C84B2F] mb-4" data-icon="science">science</span>
+<h3 class="font-brutal text-xs font-black uppercase mb-2">Science-Led</h3>
+<p class="font-serif italic text-sm leading-relaxed text-[#1A1208]/70">We map 4,096 distinct chroma points to find your exact seasonal harmony.</p>
+</div>
+<div class="bg-surface-container-high p-6 transform -rotate-1">
+<span class="material-symbols-outlined text-[#C84B2F] mb-4" data-icon="shutter_speed">shutter_speed</span>
+<h3 class="font-brutal text-xs font-black uppercase mb-2">Instant Parsing</h3>
+<p class="font-serif italic text-sm leading-relaxed text-[#1A1208]/70">No manual selection required. Our neural engine handles the heavy lifting.</p>
+</div>
+<div class="bg-surface-container-high p-6 transform rotate-2">
+<span class="material-symbols-outlined text-[#C84B2F] mb-4" data-icon="verified_user">verified_user</span>
+<h3 class="font-brutal text-xs font-black uppercase mb-2">Encrypted</h3>
+<p class="font-serif italic text-sm leading-relaxed text-[#1A1208]/70">Your photos are processed locally and never stored on our aesthetic servers.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Background Decorative Elements -->
+<div class="fixed top-1/4 right-0 opacity-5 -z-10 pointer-events-none">
+<span class="text-[20rem] font-headline font-black italic select-none">WEAVE</span>
+</div>
+<!-- Responsive Bottom Nav (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-[#F5EFE0]/90 backdrop-blur-md border-t border-[#1A1208]/10 flex justify-around items-center py-4 z-50">
+<div class="flex flex-col items-center gap-1 text-[#C84B2F]">
+<span class="material-symbols-outlined" data-icon="auto_fix_high" style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+<span class="font-mono text-[8px] uppercase font-bold">Process</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-[#1A1208]/40">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+<span class="font-mono text-[8px] uppercase font-bold">Style</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-[#1A1208]/40">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span class="font-mono text-[8px] uppercase font-bold">Identity</span>
+</div>
+</nav>
+</body></html>

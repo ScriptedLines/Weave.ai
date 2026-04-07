@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WEAVE | Inference Architecture</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Space+Grotesk:wght@300..700&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&amp;family=Unbounded:wght@200..900&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-variant": "#e8e2d3",
+              "secondary-fixed-dim": "#bbcf82",
+              "on-surface-variant": "#58413c",
+              "on-primary-container": "#fffbff",
+              "on-secondary-fixed": "#161f00",
+              "on-error": "#ffffff",
+              "tertiary-container": "#9c6a00",
+              "outline": "#8c716b",
+              "inverse-primary": "#ffb4a3",
+              "surface-tint": "#aa361c",
+              "secondary-fixed": "#d7eb9c",
+              "on-error-container": "#93000a",
+              "error-container": "#ffdad6",
+              "surface": "#fff9ea",
+              "tertiary": "#7c5300",
+              "on-surface": "#1d1c13",
+              "surface-container-high": "#eee8d9",
+              "secondary": "#546524",
+              "background": "#fff9ea",
+              "inverse-on-surface": "#f6f0e1",
+              "inverse-surface": "#333027",
+              "tertiary-fixed": "#ffddaf",
+              "surface-container": "#f3edde",
+              "on-secondary-fixed-variant": "#3d4c0e",
+              "on-tertiary-fixed-variant": "#614000",
+              "surface-container-highest": "#e8e2d3",
+              "outline-variant": "#e0bfb8",
+              "secondary-container": "#d4e899",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#fffaf9",
+              "primary-fixed": "#ffdad2",
+              "error": "#ba1a1a",
+              "surface-container-low": "#f9f3e4",
+              "surface-bright": "#fff9ea",
+              "primary": "#a63319",
+              "on-primary-fixed-variant": "#891e05",
+              "primary-fixed-dim": "#ffb4a3",
+              "on-tertiary-fixed": "#281800",
+              "on-primary-fixed": "#3d0600",
+              "on-background": "#1d1c13",
+              "primary-container": "#c84b2f",
+              "on-primary": "#ffffff",
+              "surface-dim": "#dfdacb",
+              "on-secondary-container": "#586928",
+              "on-tertiary": "#ffffff",
+              "on-secondary": "#ffffff",
+              "tertiary-fixed-dim": "#ffba43"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Newsreader"],
+              "label": ["Space Grotesk"],
+              "mono": ["Space Mono"],
+              "unbounded": ["Unbounded"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .ink-bleed {
+        mask-image: url("data:image/svg+xml,%3Csvg width='100' height='10' viewBox='0 0 100 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 Q 5 0, 10 5 T 20 5 T 30 5 T 40 5 T 50 5 T 60 5 T 70 5 T 80 5 T 90 5 T 100 5' stroke='black' fill='transparent'/%3E%3C/svg%3E");
+      }
+      .grain {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.03;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/svg%3E");
+      }
+      .diagonal-hatch {
+        background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(224, 191, 184, 0.1) 10px, rgba(224, 191, 184, 0.1) 11px);
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen">
+<div class="grain"></div>
+<!-- Sidebar Navigation (Technical Studio Shell) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col pt-20 pb-8 px-4 bg-[#F5EFE0] dark:bg-[#1A1208] h-screen w-64 border-r border-[#1A1208]/10 z-40">
+<div class="mb-12 px-4">
+<h1 class="text-xl font-bold text-[#1A1208] dark:text-[#F5EFE0] font-headline uppercase tracking-widest">Technical Studio</h1>
+<p class="text-[10px] font-mono tracking-widest opacity-50 uppercase mt-1">AI Fashion Architecture</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 text-[#1A1208] dark:text-[#F5EFE0] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 text-[#1A1208] dark:text-[#F5EFE0] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1" href="#">
+<span class="material-symbols-outlined" data-icon="memory">memory</span>
+<span class="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Engine</span>
+</a>
+<a class="flex items-center gap-3 bg-[#C84B2F] text-[#F5EFE0] rounded-sm px-4 py-3 rotate-1 translate-x-1 duration-200 shadow-lg" href="#">
+<span class="material-symbols-outlined" data-icon="Psychology" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Inference</span>
+</a>
+<a class="flex items-center gap-3 text-[#1A1208] dark:text-[#F5EFE0] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Docs</span>
+</a>
+</nav>
+<div class="mt-auto px-4">
+<button class="w-full py-4 bg-primary text-on-primary font-unbounded text-[10px] font-black uppercase tracking-widest rounded-sm hover:scale-[1.02] active:scale-95 transition-all">
+                New Experiment
+            </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 p-12 lg:p-20">
+<!-- Top Bar -->
+<header class="flex justify-between items-center w-full mb-16">
+<div class="space-y-1">
+<span class="font-mono text-xs tracking-[0.3em] uppercase text-primary font-bold">How It's Built // Section 03</span>
+<h2 class="text-6xl font-headline font-black italic tracking-tighter leading-none">Inference</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="font-mono text-[10px] uppercase opacity-40">System Status</p>
+<p class="font-unbounded text-xs font-bold text-secondary italic">READY_FOR_DEPLOY</p>
+</div>
+<span class="material-symbols-outlined text-4xl" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<!-- Editorial Hero Quote -->
+<section class="max-w-4xl mb-24 relative">
+<div class="absolute -top-10 -left-10 w-24 h-24 diagonal-hatch opacity-20 -z-10"></div>
+<p class="text-3xl lg:text-5xl font-headline italic font-light leading-tight text-on-surface">
+                "We designed for the edge. High-fidelity VTON usually demands server-grade GPUs. Our pipeline delivers <span class="text-primary font-black not-italic underline decoration-primary/20 decoration-8 underline-offset-4">photorealism</span> in <span class="bg-secondary-container px-2 -rotate-1 inline-block">2–3 seconds</span> using only <span class="font-bold">4 gigabytes</span> of VRAM."
+            </p>
+</section>
+<!-- Killer Stats Marquee -->
+<div class="w-full overflow-hidden bg-primary text-on-primary py-3 mb-24 -rotate-1 shadow-xl">
+<div class="flex whitespace-nowrap gap-12 font-mono text-sm font-black uppercase tracking-widest animate-marquee">
+<span>4GB VRAM REQUIRED</span>
+<span class="opacity-30">•</span>
+<span>2-3s INFERENCE TIME</span>
+<span class="opacity-30">•</span>
+<span>LOW LATENCY ARCHITECTURE</span>
+<span class="opacity-30">•</span>
+<span>PHOTOREALISTIC TEXTURE MAPPING</span>
+<span class="opacity-30">•</span>
+<span>4GB VRAM REQUIRED</span>
+<span class="opacity-30">•</span>
+<span>2-3s INFERENCE TIME</span>
+<span class="opacity-30">•</span>
+<span>LOW LATENCY ARCHITECTURE</span>
+</div>
+</div>
+<!-- 5-Step Editorial Diagram -->
+<section class="mb-32">
+<div class="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
+<!-- Step 1 -->
+<div class="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:rotate-1">
+<div class="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 rotate-3 z-10 font-bold shadow-sm">STEP 01</div>
+<div class="aspect-[3/4] bg-surface-dim mb-4 overflow-hidden grayscale contrast-125 group-hover:grayscale-0 transition-all">
+<img class="w-full h-full object-cover" data-alt="professional editorial full body fashion photo of a model against a clean studio background with sharp lighting" src="https://lh3.googleusercontent.com/aida/ADBb0ugTag5f7DPZsjpDSl0Uvj9tddQrLo43uxU69NuY5SnzQd9cJB57tV_9BXNflX32Qf-nlIip4YjR_V1FzjVh58Ulx_IDNXVxeDSVzQx-B6FY2chc5nE3ziJyg0_uMEanFu7hzPLPtKRL8WR1AyJGdk-c6u4QhhN33X3OLpFoLOPOLderOuzmSRCfutgJQH9xd6WY7r9vGQNxXGfST1H-plmq2PZgUhu05Fda0ZnckkdXDIEfH-9n6P186SgZLm4c4-3q9xRiKLdmyw"/>
+</div>
+<h3 class="font-unbounded text-xs font-black uppercase mb-2">Segmentation</h3>
+<p class="font-headline italic text-sm opacity-70">MediaPipe processes full-body photo for human parsing.</p>
+</div>
+<!-- Step 2 -->
+<div class="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:-rotate-1 mt-8 md:mt-12">
+<div class="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 -rotate-2 z-10 font-bold shadow-sm">STEP 02</div>
+<div class="aspect-[3/4] bg-surface-dim mb-4 border border-outline-variant/20 flex flex-col items-center justify-center p-4">
+<div class="w-24 h-32 border-2 border-dashed border-primary/40 flex items-center justify-center">
+<span class="font-mono text-[10px] text-primary">192x256</span>
+</div>
+</div>
+<h3 class="font-unbounded text-xs font-black uppercase mb-2">Resize &amp; Pad</h3>
+<p class="font-headline italic text-sm opacity-70">Standardizing input dimensions for neural optimization.</p>
+</div>
+<!-- Step 3 -->
+<div class="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:rotate-2">
+<div class="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 rotate-1 z-10 font-bold shadow-sm">STEP 03</div>
+<div class="aspect-[3/4] bg-surface-dim mb-4 overflow-hidden"><img alt="AFWM Warp Module flow visualization" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/ADBb0uh4qhG-JGWcrAz9inxnUP24uQREMRybwmDTIEhItiVkbGFHxYThGdekSGz4wcH_CZIKcuvlUw60jp-DlZCez_p31BcpMZUkfpXYkUZy-SSk-gkY-OKOWTzFKAhS2Ex_q1cDWNpZT_dJcI0NUTyZeKQxe4b7gG5HdM0XOCZvzCDCPlMgZhVYV__RKT3tNreBkQDsiikuNYbxniVrR88Ph77DbFX5loBHMoSddcUumMAvVzTXxC5OP41LDGaBdJ-Tz-gh4Nj_I-ulAQ"/></div>
+<h3 class="font-unbounded text-xs font-black uppercase mb-2">AFWM Warp</h3>
+<p class="font-headline italic text-sm opacity-70">Appearance Flow Warping Module calculates optical flow.</p>
+</div>
+<!-- Step 4 -->
+<div class="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:-rotate-1 mt-8 md:mt-12">
+<div class="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 -rotate-3 z-10 font-bold shadow-sm">STEP 04</div>
+<div class="aspect-[3/4] bg-surface-dim mb-4 flex items-center justify-center gap-1 p-2"><img alt="ResUnet composite blending visualization" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/ADBb0ugTiFsNYksuvZztZl-opDke98doU2NrNngHUJ1OxFAOKULAKs5Ws7Ni5CNhJ6arstJSurSW21Po3GKR701aGjATw302z4lrphdTlXXLD-AWp9wJsitm9krVhtmEhdZuYwlshsH-foBhsUmVa1JVz2_h9_oe_V7Xi_4rHjWrYYmxOZNcqS38eVIvQLQXf-BIw0YNhFUeEnz1Oc-pTKMjcp-vcQBtV1yKWk-zShY4QkwuX8jjwf3FpV23Xu1mLln7kf30MJ_o45ECtA"/></div>
+<h3 class="font-unbounded text-xs font-black uppercase mb-2">ResUnet</h3>
+<p class="font-headline italic text-sm opacity-70">Composite blending using deep 8-channel input layers.</p>
+</div>
+<!-- Step 5 -->
+<div class="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:rotate-1">
+<div class="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 rotate-2 z-10 font-bold shadow-sm">STEP 05</div>
+<div class="aspect-[3/4] bg-surface-dim mb-4 overflow-hidden group-hover:scale-105 transition-transform">
+<img class="w-full h-full object-cover" data-alt="ultra high definition macro shot of fashion fabric texture with extreme detail and sharp focus" src="https://lh3.googleusercontent.com/aida/ADBb0ugTiFsNYksuvZztZl-opDke98doU2NrNngHUJ1OxFAOKULAKs5Ws7Ni5CNhJ6arstJSurSW21Po3GKR701aGjATw302z4lrphdTlXXLD-AWp9wJsitm9krVhtmEhdZuYwlshsH-foBhsUmVa1JVz2_h9_oe_V7Xi_4rHjWrYYmxOZNcqS38eVIvQLQXf-BIw0YNhFUeEnz1Oc-pTKMjcp-vcQBtV1yKWk-zShY4QkwuX8jjwf3FpV23Xu1mLln7kf30MJ_o45ECtA"/>
+</div>
+<h3 class="font-unbounded text-xs font-black uppercase mb-2">Real-ESRGAN</h3>
+<p class="font-headline italic text-sm opacity-70">4x AI Upscaling for commercial-grade photorealism.</p>
+</div>
+</div>
+<!-- Connection Line SVG (Ink Bleed Style) -->
+<div class="hidden md:block w-full h-1 mt-12 overflow-hidden opacity-20">
+<svg class="w-full h-full stroke-on-surface" preserveaspectratio="none" viewbox="0 0 1000 10">
+<path d="M0 5 Q 50 0, 100 5 T 200 5 T 300 5 T 400 5 T 500 5 T 600 5 T 700 5 T 800 5 T 900 5 T 1000 5" fill="none" stroke-dasharray="8 4" stroke-width="2"></path>
+</svg>
+</div>
+</section>
+<!-- Technical Deep Dive Cards -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+<div class="p-10 bg-surface-container-highest relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-5">
+<span class="material-symbols-outlined text-9xl" data-icon="memory">memory</span>
+</div>
+<div class="relative z-10">
+<h4 class="font-unbounded text-xl font-black uppercase mb-6 flex items-center gap-3">
+<span class="w-8 h-[2px] bg-primary"></span> Memory Efficiency
+                    </h4>
+<p class="font-headline italic text-lg leading-relaxed mb-8 opacity-80">
+                        Traditional Virtual Try-On models require 12GB+ VRAM for stable inference. Through aggressive weight pruning and mixed-precision (FP16) execution, we've compressed the entire stack into 4GB—enabling high-end fashion AI on consumer-grade hardware.
+                    </p>
+<div class="flex gap-4">
+<div class="bg-surface px-4 py-2 border border-outline-variant/30">
+<p class="font-mono text-[10px] uppercase opacity-50">Pruning Rate</p>
+<p class="font-unbounded text-sm font-bold">34.2%</p>
+</div>
+<div class="bg-surface px-4 py-2 border border-outline-variant/30">
+<p class="font-mono text-[10px] uppercase opacity-50">Precision</p>
+<p class="font-unbounded text-sm font-bold">INT8/FP16</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-10 bg-surface-container relative overflow-hidden group">
+<div class="absolute -bottom-10 -right-10 w-40 h-40 bg-secondary/5 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<h4 class="font-unbounded text-xl font-black uppercase mb-6 flex items-center gap-3">
+<span class="w-8 h-[2px] bg-secondary"></span> Latency Benchmarks
+                    </h4>
+<div class="space-y-4">
+<div class="flex justify-between items-center border-b border-on-surface/5 pb-2">
+<span class="font-headline italic">AFWM Warp Phase</span>
+<span class="font-mono text-sm font-bold text-primary">420ms</span>
+</div>
+<div class="flex justify-between items-center border-b border-on-surface/5 pb-2">
+<span class="font-headline italic">Composition Latency</span>
+<span class="font-mono text-sm font-bold text-primary">890ms</span>
+</div>
+<div class="flex justify-between items-center border-b border-on-surface/5 pb-2">
+<span class="font-headline italic">Real-ESRGAN 4x Pass</span>
+<span class="font-mono text-sm font-bold text-primary">1120ms</span>
+</div>
+<div class="pt-4">
+<p class="font-mono text-[10px] uppercase opacity-40 mb-2">Total Average Inference</p>
+<p class="text-4xl font-unbounded font-black italic text-secondary">2.43 SEC</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer / Navigation -->
+<footer class="mt-32 pt-16 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+<div class="max-w-xs">
+<p class="font-unbounded text-[10px] font-black uppercase mb-2">Next Chapter</p>
+<p class="font-headline italic text-2xl leading-tight opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
+                    Model Weights &amp; Distillation Strategies →
+                </p>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full border border-on-surface/10 flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</div>
+<div class="w-12 h-12 rounded-full border border-on-surface/10 flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</div>
+<div class="px-6 py-3 border border-on-surface/10 font-mono text-[10px] uppercase tracking-widest hover:bg-on-surface hover:text-background transition-all cursor-pointer">
+                    Back to Overview
+                </div>
+</div>
+</footer>
+</main>
+<!-- Style Animations & Interactive Overlays (Static CSS) -->
+<style>
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            display: inline-flex;
+            animation: marquee 30s linear infinite;
+        }
+        
+        /* Custom Scrollbar for the Editorial Look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f9f3e4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c84b2f;
+        }
+    </style>
+</body></html>
