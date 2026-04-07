@@ -14,6 +14,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -22,12 +23,13 @@ export default function AuthPage() {
     if (!cursor) return;
 
     const moveHandler = (e: MouseEvent) => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
+      if (cursor) {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+      }
     };
-    const mdHandler = () => cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-    const muHandler = () => cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-
+    const mdHandler = () => { if (cursor) cursor.style.transform = 'translate(-50%, -50%) scale(0.8)'; };
+    const muHandler = () => { if (cursor) cursor.style.transform = 'translate(-50%, -50%) scale(1)'; };
     document.addEventListener('mousemove', moveHandler);
     document.addEventListener('mousedown', mdHandler);
     document.addEventListener('mouseup', muHandler);
@@ -42,6 +44,7 @@ export default function AuthPage() {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setEmailError('');
     setLoading(true);
     try {
       if (isLogin) {
@@ -50,7 +53,13 @@ export default function AuthPage() {
         navigate('/dashboard');
       } else {
         const { error } = await signUp(email, password, name);
-        if (error) throw error;
+        if (error) {
+           if (error.message.toLowerCase().includes('already registered') || error.message.toLowerCase().includes('exists')) {
+              setEmailError('This email is already registered to a Curator account.');
+              throw new Error('Please use a different email or log in.');
+           }
+           throw error;
+        }
         // Store email for resend functionality and display
         localStorage.setItem('weave_signup_email', email);
         navigate('/verify-waiting');
@@ -126,7 +135,12 @@ export default function AuthPage() {
                 )}
                 <div className="flex flex-col gap-1.5">
                   <label className="font-unbounded text-[9px] font-black text-on-surface/60 tracking-wider">EMAIL ADDRESS</label>
-                  <input value={email} onChange={e => setEmail(e.target.value)} className="bg-surface/50 border-b-[1.5px] border-on-surface outline-none py-3 px-1 italic font-fraunces text-lg placeholder:text-on-surface/20 focus:border-primary transition-all" placeholder="CURATOR@WEAVE.STUDIO" type="email" required/>
+                  <input value={email} onChange={e => { setEmail(e.target.value); setEmailError(''); }} className={`bg-surface/50 border-b-[1.5px] ${emailError ? 'border-primary' : 'border-on-surface'} outline-none py-3 px-1 italic font-fraunces text-lg placeholder:text-on-surface/20 focus:border-primary transition-all`} placeholder="CURATOR@WEAVE.STUDIO" type="email" required/>
+                  {emailError && (
+                    <div className="text-primary text-[10px] uppercase font-mono font-bold tracking-widest mt-1">
+                      {emailError}
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="font-unbounded text-[9px] font-black text-on-surface/60 tracking-wider">PASSWORD</label>

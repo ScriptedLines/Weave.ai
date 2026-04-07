@@ -344,7 +344,7 @@ export default function DashboardPage() {
         console.log("✅ Success: Aesthetic profile updated.");
         
         // Fire-and-forget sync to offload mathematical embedding synthesis to the python backend
-        fetch(`http://localhost:8000/sync_embedding/${user.id}`, { method: 'POST' })
+        fetch(`${API_BASE}/sync_embedding/${user.id}`, { method: 'POST' })
             .catch(err => console.error("Background sync failed:", err));
         
     } catch (e: any) {
