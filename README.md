@@ -1,5 +1,5 @@
 # Weave: AI-Driven Fashion Recommendation and Virtual Try-On System
-Visit the website at: https://weave-curator.vercel.app/
+Visit the website at: https://weave-curator.vercel.app/<br>
 Weave is a comprehensive platform designed for personalized fashion recommendations and high-fidelity virtual try-on (VTON). The system leverages high-dimensional vector embeddings, adaptive collaborative filtering, and cloud-based GPU inference to provide an intelligent outfitting experience.
 
 ## System Architecture
