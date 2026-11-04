@@ -38,12 +38,13 @@ TOKEN_CACHE_TTL = int(os.environ.get("TOKEN_CACHE_TTL", "60"))
 EMBEDDING_CACHE_TTL = int(os.environ.get("EMBEDDING_CACHE_TTL", "3600"))
 EMBEDDING_CACHE_SIZE = int(os.environ.get("EMBEDDING_CACHE_SIZE", "256"))
 
+_default_origins = (
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "https://weave-curator.vercel.app"
+)
 _allowed_origins = [
     origin.strip()
-    for origin in os.environ.get(
-        "ALLOWED_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173",
-    ).split(",")
+    for origin in os.environ.get("ALLOWED_ORIGINS", _default_origins).split(",")
     if origin.strip()
 ]
 
@@ -52,9 +53,10 @@ app = FastAPI(title="Weave API", docs_url=None, redoc_url=None, openapi_url=None
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_methods=["*"],
+    allow_headers=["*"],
     max_age=600,
 )
 app.add_middleware(GZipMiddleware, minimum_size=1024)

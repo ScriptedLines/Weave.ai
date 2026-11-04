@@ -31,21 +31,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session: nextSession } }) => {
-      setSession(nextSession)
-      setUser(nextSession?.user ?? null)
-      setLoading(false)
-      warmupModal(nextSession)
-    })
+    let mounted = true
+
+    supabase.auth.getSession()
+      .then(({ data: { session: nextSession } }) => {
+        if (!mounted) return
+        setSession(nextSession)
+        setUser(nextSession?.user ?? null)
+        setLoading(false)
+        warmupModal(nextSession)
+      })
+      .catch(() => {
+        if (mounted) setLoading(false)
+      })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!mounted) return
       setSession(nextSession)
       setUser(nextSession?.user ?? null)
       setLoading(false)
       warmupModal(nextSession)
     })
 
-    return () => subscription.unsubscribe()
+    const safetyTimeout = setTimeout(() => {
+      if (mounted) setLoading(false)
+    }, 3500)
+
+    return () => {
+      mounted = false
+      clearTimeout(safetyTimeout)
+      subscription.unsubscribe()
+    }
   }, [warmupModal])
 
   const signUp = async (email: string, password: string, name: string) => {

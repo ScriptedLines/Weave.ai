@@ -19,5 +19,13 @@ export async function apiFetch(path: string, init: RequestInit = {}): Promise<Re
     headers.set('Content-Type', 'application/json')
   }
 
-  return fetch(`${API_BASE}${path}`, { ...init, headers })
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 60000)
+  const signal = init.signal || controller.signal
+
+  try {
+    return await fetch(`${API_BASE}${path}`, { ...init, headers, signal })
+  } finally {
+    clearTimeout(timeoutId)
+  }
 }
