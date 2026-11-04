@@ -10,9 +10,8 @@
   },
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/|static/|favicon\\.svg|robots\\.txt).*)",
       "destination": "/server.js"
     }
   ]
 }
-
