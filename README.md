@@ -11,9 +11,11 @@
 [![React 19](https://img.shields.io/badge/React_19-Server_Side_Rendering-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![pgvector](https://img.shields.io/badge/pgvector-Semantic_Search-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://github.com/pgvector/pgvector)
 
-<br/>
+</div>
 
-<video src="https://github.com/user-attachments/assets/cb3d4c37-54ef-43f0-a8c3-2e3ed4457b56" autoplay loop muted playsinline width="100%"></video>
+https://github.com/user-attachments/assets/cb3d4c37-54ef-43f0-a8c3-2e3ed4457b56
+
+<div align="center">
 
 <p align="center">
   <b>An end-to-end AI fashion platform unifying generative garment synthesis, CIELAB color science, and 768-dimensional multimodal retrieval into a production microservice architecture.</b>
@@ -169,6 +171,4 @@ modal deploy vton/vton_model.py
 
 ---
 
-## License
 
-This project is licensed under the [MIT License](LICENSE).
