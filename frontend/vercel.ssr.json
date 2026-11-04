@@ -5,10 +5,7 @@
   "buildCommand": "npm run build",
   "functions": {
     "server.js": {
-      "includeFiles": [
-        "dist/client/index.html",
-        "dist/server/**"
-      ]
+      "includeFiles": "dist/**"
     }
   },
   "rewrites": [
