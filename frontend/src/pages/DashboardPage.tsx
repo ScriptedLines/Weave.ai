@@ -1,9 +1,7 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+import { apiFetch } from '../lib/api';
 
 interface FashionItem {
   id: string;
@@ -17,14 +15,13 @@ interface FashionItem {
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [items, setItems] = useState<FashionItem[]>([]);
   const [recommendedIds, setRecommendedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(0); 
+  const [page, setPage] = useState(0);
 
-  // Advanced Filters
   const [gender, setGender] = useState<'male' | 'female' | 'unisex' | ''>('');
   const [neckStyle, setNeckStyle] = useState('');
   const [colorFilter, setColorFilter] = useState('');
@@ -38,9 +35,11 @@ export default function DashboardPage() {
 
   const [likedItems, setLikedItems] = useState<number[]>([]);
   const [dislikedItems, setDislikedItems] = useState<number[]>([]);
+  const likedItemsRef = useRef<number[]>([]);
+  const dislikedItemsRef = useRef<number[]>([]);
 
   useEffect(() => {
-    // Custom Cursor Movement
+
     const cursor = document.getElementById('cursor');
     if (cursor) {
       const moveHandler = (e: MouseEvent) => {
@@ -49,7 +48,6 @@ export default function DashboardPage() {
       };
       document.addEventListener('mousemove', moveHandler);
 
-      // Hover Effect
       const clickables = document.querySelectorAll('a, button, input, select');
       const enterHandler = () => {
         cursor.style.width = '32px';
@@ -80,7 +78,7 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    // Subtle parallax effect on background text
+
     const scrollHandler = () => {
       const scrolled = window.pageYOffset;
       const catalogueText = document.getElementById('bg-catalogue-text');
@@ -92,16 +90,20 @@ export default function DashboardPage() {
     return () => document.removeEventListener('scroll', scrollHandler);
   }, []);
 
-  // Protect Route based on DNA profile
   useEffect(() => {
     if (user?.id) {
       const verifyDNA = async () => {
-        const { data, error } = await supabase.from('profiles').select('skin_lab, hair_lab, liked_clothes, disliked_clothes').eq('user_id', user.id).single();
-        if (error || !data || !data.skin_lab || !data.hair_lab) {
+        const response = await apiFetch('/profile');
+        const data = response.ok ? await response.json() : null;
+        if (!data?.profile?.skin_lab || !data?.profile?.hair_lab) {
           navigate('/onboarding-dna');
         } else {
-          setLikedItems(data.liked_clothes || []);
-          setDislikedItems(data.disliked_clothes || []);
+          const liked = (data.profile.liked_clothes || []).map(Number);
+          const disliked = (data.profile.disliked_clothes || []).map(Number);
+          likedItemsRef.current = liked;
+          dislikedItemsRef.current = disliked;
+          setLikedItems(liked);
+          setDislikedItems(disliked);
         }
       };
       verifyDNA();
@@ -110,7 +112,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user?.id) {
-      // Re-fetch recommendations whenever gender changes, provided no search filters are active
+
       const hasAestheticFilters = neckStyle || colorFilter || occasion || sleeveLength || subCategory || otherDetails;
       if (!hasAestheticFilters) {
         fetchRecommendations();
@@ -122,20 +124,19 @@ export default function DashboardPage() {
     if (!user) return;
     setLoading(true);
     setRecommendedIds([]);
-    setItems([]); // Clear to show skeleton
-    
-    // Pass current gender from sidebar to ensure For You respects the filter
-    const activeGender = gender || 'unisex'; 
-    
+    setItems([]);
+
+    const activeGender = gender;
+    const genderQuery = activeGender ? `?gender=${encodeURIComponent(activeGender)}` : '';
+
     try {
-      console.log(`[CATALOGUE A]: Running Recommendations | Gender: ${activeGender}`);
-      const res = await fetch(`${API_BASE}/recommend/${user.id}?gender=${activeGender}`);
+      const res = await apiFetch(`/recommend${genderQuery}`);
       if (res.ok) {
         const data = await res.json();
-        // data.recommendations is [{id, score}, ...]
+
         const ids = (data.recommendations || []).map((r: any) => r[0]);
         setRecommendedIds(ids);
-        
+
         if (data.weights) {
            setColorScore(data.weights.color?.toFixed(2));
            setSemanticLabel("PERSONALIZED");
@@ -159,30 +160,24 @@ export default function DashboardPage() {
     const ids = allIds || recommendedIds;
     const p = currentPage !== undefined ? currentPage : page;
     const chunk = ids.slice(p * 100, (p + 1) * 100);
-    
+
     if (chunk.length === 0) return;
 
     setLoading(true);
-    console.log("Loading chunk from Supabase:", chunk);
     try {
-      // Normalize chunk to strings for Supabase .in() query if needed
       const normalizedChunk = chunk.map(id => String(id));
-      const { data: dbItems, error } = await supabase
-        .from('fashion_items')
-        .select('*')
-        .in('id', normalizedChunk);
-
-      if (error) throw error;
+      const response = await apiFetch(`/items?ids=${encodeURIComponent(normalizedChunk.join(','))}`);
+      if (!response.ok) throw new Error('Failed to load items');
+      const dbItems: FashionItem[] = await response.json();
 
       if (dbItems && dbItems.length > 0) {
-        console.log("Details fetched from Supabase:", dbItems.length);
+        const itemMap = new Map(dbItems.map(item => [String(item.id), item]));
         const sortedDbItems = chunk
-          .map(id => dbItems.find(item => String(item.id) === String(id)))
+          .map(id => itemMap.get(String(id)))
           .filter(Boolean) as FashionItem[];
-        
+
         setItems(prev => {
             const newList = p === 0 ? sortedDbItems : [...prev, ...sortedDbItems];
-            console.log("Setting items count to:", newList.length);
             return newList;
         });
         setPage(p + 1);
@@ -199,20 +194,12 @@ export default function DashboardPage() {
   };
 
   const fallbackFetch = async () => {
-    console.log("Running fallback fetch...");
     try {
-      const { data, error } = await supabase
-        .from('fashion_items')
-        .select('*')
-        .limit(24);
-      
-      if (error) throw error;
-      if (data) {
-          console.log("Fallback items fetched:", data.length);
-          setItems(data);
-          // Only clear if recommendation failed
-          if (items.length === 0) setRecommendedIds([]); 
-      }
+      const response = await apiFetch('/items?limit=24');
+      if (!response.ok) throw new Error('Failed to load fallback items');
+      const data: FashionItem[] = await response.json();
+      setItems(data);
+      setRecommendedIds([]);
     } catch (err) {
       console.error("Fallback load failed:", err);
     } finally {
@@ -222,9 +209,8 @@ export default function DashboardPage() {
 
   const handleSearch = async () => {
     setLoading(true);
-    setItems([]); // Clear items immediately to trigger skeleton state
-    
-    // Strict Gender SQL Filter
+    setItems([]);
+
     let genderFilter: string[] = [];
     if (gender === 'male') genderFilter = ['male'];
     else if (gender === 'female') genderFilter = ['female'];
@@ -232,7 +218,7 @@ export default function DashboardPage() {
 
     try {
       console.log("Starting curate search with gender profile:", gender);
-      const res = await fetch(`${API_BASE}/text_search`, {
+      const res = await apiFetch('/text_search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -250,7 +236,7 @@ export default function DashboardPage() {
         const data = await res.json();
         const sortedIds = Object.keys(data);
         console.log(`Curate Search returned ${sortedIds.length} items`);
-        
+
         if (sortedIds.length > 0) {
           setRecommendedIds(sortedIds);
           setColorScore("1.0");
@@ -259,8 +245,8 @@ export default function DashboardPage() {
         } else {
           window.alert("No items found matching those specific aesthetics.");
           setLoading(false);
-          // Restore items if empty
-          fetchRecommendations(); 
+
+          fetchRecommendations();
         }
       }
     } catch (err) {
@@ -285,68 +271,58 @@ export default function DashboardPage() {
       window.alert("Please log in to save your preferences.");
       return;
     }
-    
+
     const numericId = Number(itemId);
     console.log(`[AESTHETIC FEEDBACK]: ${liked ? 'Liking' : 'Disliking'} item ${numericId}`);
-    
-    try {
-        // 1. Fetch current preference arrays
-        const { data: profile, error: fetchError } = await supabase
-          .from('profiles')
-          .select('liked_clothes, disliked_clothes')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
 
-        const existingLiked = (profile?.liked_clothes || []).map(Number);
-        const existingDisliked = (profile?.disliked_clothes || []).map(Number);
-        
-        // 2. Prevent duplicates and remove from opposite list if necessary
-        // Also handle toggle (clicking 'like' when already liked removes the like)
-        let newLiked = [...existingLiked];
-        let newDisliked = [...existingDisliked];
-        
+    const previousLiked = [...likedItemsRef.current];
+    const previousDisliked = [...dislikedItemsRef.current];
+
+    try {
+        let newLiked = [...previousLiked];
+        let newDisliked = [...previousDisliked];
+
         if (liked) {
           if (newLiked.includes(numericId)) {
-            newLiked = newLiked.filter(id => id !== numericId); // Toggle off
+            newLiked = newLiked.filter(id => id !== numericId);
           } else {
-            newLiked.push(numericId); // Toggle on
-            newDisliked = newDisliked.filter(id => id !== numericId); // Remove from dislike
+            newLiked.push(numericId);
+            newDisliked = newDisliked.filter(id => id !== numericId);
           }
         } else {
           if (newDisliked.includes(numericId)) {
-            newDisliked = newDisliked.filter(id => id !== numericId); // Toggle off
+            newDisliked = newDisliked.filter(id => id !== numericId);
           } else {
-            newDisliked.push(numericId); // Toggle on
-            newLiked = newLiked.filter(id => id !== numericId); // Remove from like
+            newDisliked.push(numericId);
+            newLiked = newLiked.filter(id => id !== numericId);
           }
         }
 
-        // Optimistic UI Update
+        likedItemsRef.current = newLiked;
+        dislikedItemsRef.current = newDisliked;
         setLikedItems(newLiked);
         setDislikedItems(newDisliked);
 
-        // Map arrays to Postgres strictly-formatted string literals to bypass PostgREST's bigint[] casting failures
-        const pgLiked = `{${newLiked.join(',')}}`;
-        const pgDisliked = `{${newDisliked.join(',')}}`;
+        const updateResponse = await apiFetch('/profile/preferences', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            liked_clothes: newLiked,
+            disliked_clothes: newDisliked,
+          }),
+        });
 
-        // 3. Atomic Update
-        const { error: updateError } = await supabase.from('profiles').update({ 
-          liked_clothes: pgLiked,
-          disliked_clothes: pgDisliked
-        }).eq('user_id', user.id);
-
-        if (updateError) {
-          console.error("Supabase Update Error Details:", updateError);
-          throw updateError;
+        if (!updateResponse.ok) {
+          likedItemsRef.current = previousLiked;
+          dislikedItemsRef.current = previousDisliked;
+          setLikedItems(previousLiked);
+          setDislikedItems(previousDisliked);
+          throw new Error('Preference sync failed.');
         }
-        console.log("✅ Success: Aesthetic profile updated.");
-        
-        // Fire-and-forget sync to offload mathematical embedding synthesis to the python backend
-        fetch(`${API_BASE}/sync_embedding/${user.id}`, { method: 'POST' })
+
+        apiFetch('/sync_embedding', { method: 'POST' })
             .catch(err => console.error("Background sync failed:", err));
-        
+
     } catch (e: any) {
         console.error("❌ Like/Dislike failed:", e);
         window.alert(`Database Sync Failed: ${e.message || 'Check console'}`);
@@ -355,17 +331,15 @@ export default function DashboardPage() {
 
   const renderItems = useMemo(() => {
     if (recommendedIds.length === 0) return items;
-    
-    // Sort items by their rank in recommendedIds
+
+    const itemMap = new Map(items.map(item => [String(item.id), item]));
     const sorted = recommendedIds
-      .map(id => items.find(it => String(it.id) === String(id)))
-      .filter(it => it !== undefined) as any[];
-    
-    // If we have recommended IDs but none matched our current item set, 
-    // it's better to show what we have than a blank screen
+      .map(id => itemMap.get(String(id)))
+      .filter((item): item is FashionItem => item !== undefined);
+
     return sorted.length > 0 ? sorted : items;
   }, [items, recommendedIds]);
-  // HARDCODED CARD AESTHETICS TO MATCH HTML EXACTLY
+
   const aesthetics = [
     {
       outerClass: "card-tilt group bg-surface border-[1.5px] border-on-surface p-2 flex flex-col relative rotate-[-0.5deg]",
@@ -404,10 +378,9 @@ export default function DashboardPage() {
   return (
     <div className="bg-background text-on-background font-body selection:bg-primary-fixed selection:text-on-primary-fixed cursor-none min-h-screen">
       <div className="custom-cursor hidden md:block" id="cursor" style={{width:'12px', height:'12px', backgroundColor:'#a63319', borderRadius:'50%', position:'fixed', pointerEvents:'none', zIndex:9999, transform:'translate(-50%, -50%)', transition:'width 0.2s, height 0.2s'}}></div>
-      
+
       <div className="grain-overlay" style={{position:'fixed', top:0, left:0, width:'100%', height:'100%', pointerEvents:'none', zIndex:50, opacity:0.04, backgroundImage:'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
 
-      {/* Ticker Tape */}
       <div className="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-primary h-6">
         <div className="whitespace-nowrap animate-marquee flex items-center" style={{animation: 'marquee 20s linear infinite'}}>
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-surface px-4">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
@@ -415,7 +388,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Sidebar */}
       <aside className="fixed left-0 top-6 h-[calc(100vh-24px)] w-[280px] bg-surface-container-low z-40 px-8 py-12 flex flex-col shadow-[20px_0_30px_rgba(26,18,8,0.03)] overflow-y-auto" style={{scrollbarWidth:'none'}}>
         <div className="mb-12 cursor-pointer" onClick={() => navigate('/')}>
           <h1 className="font-unbounded font-black text-3xl tracking-tighter flex items-center gap-2">
@@ -446,8 +418,7 @@ export default function DashboardPage() {
         <div className="mt-auto pt-8 border-t border-on-surface/5">
           <h3 className="font-unbounded font-black text-[10px] uppercase tracking-wider text-primary mb-6">Refine Results</h3>
           <div className="space-y-6 pb-12">
-            
-            {/* Gender Hard Filter */}
+
             <div className="space-y-3">
               <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant">Gender Profile</label>
               <div className="flex gap-2">
@@ -465,11 +436,10 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Sub-Category Filter */}
             <div className="space-y-4 pt-4 border-t border-on-surface/5">
               <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Sub-Category</label>
-              <select 
-                value={subCategory} 
+              <select
+                value={subCategory}
                 onChange={(e) => setSubCategory(e.target.value)}
                 className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
               >
@@ -484,21 +454,20 @@ export default function DashboardPage() {
                 <option value="Polos">Polos</option>
                 <option value="Vests">Vests</option>
               </select>
-              <input 
-                value={subCategory} 
+              <input
+                value={subCategory}
                 onChange={(e) => setSubCategory(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30" 
-                placeholder="Or type custom..." 
-                type="text" 
+                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
+                placeholder="Or type custom..."
+                type="text"
               />
             </div>
 
-            {/* Hue / Color Filter */}
             <div className="space-y-4 pt-4 border-t border-on-surface/5">
               <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Hue & Palette</label>
               <div className="flex gap-4 items-center">
                 <div className="relative group/color">
-                  <input 
+                  <input
                     type="color"
                     value={colorFilter.startsWith('#') ? colorFilter : '#a63319'}
                     onChange={(e) => {
@@ -506,8 +475,7 @@ export default function DashboardPage() {
                       const r = parseInt(hex.slice(1, 3), 16);
                       const g = parseInt(hex.slice(3, 5), 16);
                       const b = parseInt(hex.slice(5, 7), 16);
-                      
-                      // Euclidean Distance Anchor Points (Universal Color Palette)
+
                       const anchors = [
                         { name: 'Red', r: 255, g: 0, b: 0 },
                         { name: 'Green', r: 0, g: 255, b: 0 },
@@ -534,8 +502,8 @@ export default function DashboardPage() {
 
                       anchors.forEach(anchor => {
                         const dist = Math.sqrt(
-                          Math.pow(r - anchor.r, 2) + 
-                          Math.pow(g - anchor.g, 2) + 
+                          Math.pow(r - anchor.r, 2) +
+                          Math.pow(g - anchor.g, 2) +
                           Math.pow(b - anchor.b, 2)
                         );
                         if (dist < minDistance) {
@@ -543,7 +511,7 @@ export default function DashboardPage() {
                           bestMatch = anchor.name;
                         }
                       });
-                      
+
                       setColorFilter(bestMatch);
                     }}
                     className="w-16 h-16 rounded-sm cursor-pointer border-2 border-on-surface/20 bg-transparent transition-all hover:scale-105 hover:border-primary shrink-0 p-0 overflow-hidden"
@@ -552,23 +520,22 @@ export default function DashboardPage() {
                   <div className="absolute inset-0 pointer-events-none border border-white/20 mix-blend-overlay"></div>
                 </div>
                 <div className="flex-1 space-y-1">
-                  <input 
-                    value={colorFilter} 
+                  <input
+                    value={colorFilter}
                     onChange={(e) => setColorFilter(e.target.value)}
-                    className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-base focus:outline-none focus:border-primary transition-colors placeholder:opacity-30" 
-                    placeholder="Type name (e.g. Sage)..." 
-                    type="text" 
+                    className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-base focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
+                    placeholder="Type name (e.g. Sage)..."
+                    type="text"
                   />
                   <p className="font-mono text-[8px] uppercase tracking-widest text-on-surface-variant opacity-40">Translates hue to name</p>
                 </div>
               </div>
             </div>
 
-            {/* Neck Style Filter */}
             <div className="space-y-4 pt-4 border-t border-on-surface/5">
               <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Neck Architecture</label>
-              <select 
-                value={neckStyle} 
+              <select
+                value={neckStyle}
                 onChange={(e) => setNeckStyle(e.target.value)}
                 className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
               >
@@ -582,20 +549,19 @@ export default function DashboardPage() {
                 <option value="Boat Neck">Boat Neck</option>
                 <option value="Off-shoulder">Off-shoulder</option>
               </select>
-              <input 
-                value={neckStyle} 
+              <input
+                value={neckStyle}
                 onChange={(e) => setNeckStyle(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30" 
-                placeholder="Or type custom..." 
-                type="text" 
+                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
+                placeholder="Or type custom..."
+                type="text"
               />
             </div>
 
-            {/* Occasion Filter */}
             <div className="space-y-4 pt-4 border-t border-on-surface/5">
               <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Occasion</label>
-              <select 
-                value={occasion} 
+              <select
+                value={occasion}
                 onChange={(e) => setOccasion(e.target.value)}
                 className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
               >
@@ -607,20 +573,19 @@ export default function DashboardPage() {
                 <option value="Sport">Sport</option>
                 <option value="Aesthetic">Aesthetic</option>
               </select>
-              <input 
-                value={occasion} 
+              <input
+                value={occasion}
                 onChange={(e) => setOccasion(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30" 
-                placeholder="Or type custom..." 
-                type="text" 
+                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
+                placeholder="Or type custom..."
+                type="text"
               />
             </div>
 
-            {/* Sleeve Length Filter */}
             <div className="space-y-4 pt-4 border-t border-on-surface/5">
               <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Sleeve Length</label>
-              <select 
-                value={sleeveLength} 
+              <select
+                value={sleeveLength}
                 onChange={(e) => setSleeveLength(e.target.value)}
                 className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
               >
@@ -632,23 +597,22 @@ export default function DashboardPage() {
                 <option value="Cap Sleeve">Cap</option>
                 <option value="3/4 Sleeve">3/4 Length</option>
               </select>
-              <input 
-                value={sleeveLength} 
+              <input
+                value={sleeveLength}
                 onChange={(e) => setSleeveLength(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30" 
-                placeholder="Or type custom..." 
-                type="text" 
+                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
+                placeholder="Or type custom..."
+                type="text"
               />
             </div>
 
-            {/* Additional Details */}
             <div className="space-y-3 pt-4 border-t border-on-surface/5">
               <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Other Details</label>
-              <textarea 
-                value={otherDetails} 
+              <textarea
+                value={otherDetails}
                 onChange={(e) => setOtherDetails(e.target.value)}
-                className="w-full bg-on-surface/5 border border-on-surface/10 p-3 font-fraunces italic text-sm focus:outline-none focus:border-primary transition-colors placeholder:opacity-30 min-h-[100px] resize-none" 
-                placeholder="Any other specific aesthetic details..." 
+                className="w-full bg-on-surface/5 border border-on-surface/10 p-3 font-fraunces italic text-sm focus:outline-none focus:border-primary transition-colors placeholder:opacity-30 min-h-[100px] resize-none"
+                placeholder="Any other specific aesthetic details..."
               />
             </div>
 
@@ -664,9 +628,8 @@ export default function DashboardPage() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="ml-[280px] pt-12 min-h-screen relative overflow-x-hidden">
-        {/* Giant Background Text */}
+
         <div className="absolute top-20 left-10 pointer-events-none select-none overflow-hidden w-full">
           <h2 id="bg-catalogue-text" className="font-unbounded font-black text-[180px] leading-none opacity-[0.03] tracking-tighter text-on-surface" style={{transition: 'transform 0.1s ease-out'}}>CATALOGUE</h2>
         </div>
@@ -689,10 +652,9 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        {/* Product Grid */}
         <section className="px-12 pb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 relative z-10">
           {loading && items.length === 0 ? (
-            // Skeleton Loader
+
             Array.from({length: 8}).map((_, i) => (
               <div key={i} className="animate-pulse flex flex-col space-y-4">
                 <div className="aspect-[3/4] bg-on-surface/5 rounded-sm"></div>
@@ -709,19 +671,18 @@ export default function DashboardPage() {
                 </div>
                 <div className="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
                   <img className="w-full h-full object-cover filter contrast-[1.05] saturate-[0.95]" src={item.image_url || style.imgSrc} alt="product visual" loading="lazy" />
-                  
-                  {/* Hover Overlay */}
+
                   <div className="absolute inset-0 bg-surface-container-low/90 backdrop-blur-sm flex flex-col items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out p-6">
                     <div className="flex gap-6 mb-8">
-                      <button 
-                        onClick={() => item.id && handleLike(item.id, true)} 
+                      <button
+                        onClick={() => item.id && handleLike(item.id, true)}
                         className={`material-symbols-outlined hover:scale-125 transition-all text-3xl ${likedItems.includes(Number(item.id)) ? 'text-[#8cc048]' : 'text-secondary'}`}
                         style={likedItems.includes(Number(item.id)) ? { fontVariationSettings: "'FILL' 1" } : {}}
                       >
                         thumb_up
                       </button>
-                      <button 
-                        onClick={() => item.id && handleLike(item.id, false)} 
+                      <button
+                        onClick={() => item.id && handleLike(item.id, false)}
                         className={`material-symbols-outlined hover:scale-125 transition-all text-3xl ${dislikedItems.includes(Number(item.id)) ? 'text-[#C84B2F]' : 'text-primary'}`}
                         style={dislikedItems.includes(Number(item.id)) ? { fontVariationSettings: "'FILL' 1" } : {}}
                       >
@@ -745,7 +706,6 @@ export default function DashboardPage() {
           })}
         </section>
 
-        {/* Pagination Trigger */}
         {recommendedIds.length > items.length && (
            <div className="flex justify-center pb-24">
              <button onClick={() => loadMore()} disabled={loading} className="group flex items-center gap-4 bg-transparent border border-on-surface px-8 py-4 font-unbounded font-black text-xs uppercase tracking-widest hover:bg-on-surface hover:text-surface transition-all">
@@ -755,7 +715,6 @@ export default function DashboardPage() {
            </div>
         )}
 
-        {/* Floating FAB */}
         <button onClick={() => navigate('/studio')} className="fixed bottom-8 right-8 z-[100] bg-on-background text-surface w-16 h-16 rounded-sm rotate-3 hover:rotate-0 transition-transform flex items-center justify-center shadow-xl group">
           <span className="material-symbols-outlined group-hover:scale-110 transition-transform">add_a_photo</span>
         </button>

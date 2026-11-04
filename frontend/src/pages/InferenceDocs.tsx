@@ -33,32 +33,31 @@ export default function InferenceDocs() {
             animation: marquee 30s linear infinite;
         }
       `}</style>
-      
+
       <div className="grain"></div>
 
-      {/* Sidebar Navigation */}
       <aside className="fixed left-0 top-0 h-full flex flex-col pt-20 pb-8 px-4 bg-[#F5EFE0] w-64 border-r border-[#1A1208]/10 z-40 hidden md:flex">
         <div className="mb-12 px-4 cursor-pointer" onClick={() => navigate('/')}>
           <h1 className="text-xl font-bold text-[#1A1208] font-headline uppercase tracking-widest">Technical Studio</h1>
           <p className="text-[10px] font-mono tracking-widest opacity-50 uppercase mt-1">AI Fashion Architecture</p>
         </div>
         <nav className="flex-1 space-y-2">
-          {/* Pipeline */}
+
           <button onClick={() => navigate('/docs/training')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
             <span className="material-symbols-outlined">account_tree</span>
             <span className="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Pipeline</span>
           </button>
-          {/* Engine */}
+
           <button onClick={() => navigate('/docs/recommendation')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
             <span className="material-symbols-outlined">memory</span>
             <span className="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Engine</span>
           </button>
-          {/* Inference (Active) */}
+
           <button onClick={() => navigate('/docs/inference')} className="w-full flex items-center gap-3 bg-[#C84B2F] text-[#F5EFE0] rounded-sm px-4 py-3 rotate-1 translate-x-1 duration-200 shadow-lg">
             <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>psychology</span>
             <span className="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Inference</span>
           </button>
-          {/* Docs */}
+
           <button onClick={() => navigate('/docs/archive')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
             <span className="material-symbols-outlined">menu_book</span>
             <span className="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Docs</span>
@@ -71,9 +70,8 @@ export default function InferenceDocs() {
         </div>
       </aside>
 
-      {/* Main Canvas */}
       <main className="md:ml-64 p-12 lg:p-20 relative z-10">
-        {/* Top Bar */}
+
         <header className="flex justify-between items-center w-full mb-16">
           <div className="space-y-1">
             <span className="font-mono text-xs tracking-[0.3em] uppercase text-primary font-bold">How It's Built // Section 03</span>
@@ -88,7 +86,6 @@ export default function InferenceDocs() {
           </div>
         </header>
 
-        {/* Editorial Hero Quote */}
         <section className="max-w-4xl mb-24 relative">
           <div className="absolute -top-10 -left-10 w-24 h-24 diagonal-hatch opacity-20 -z-10"></div>
           <p className="text-3xl lg:text-5xl font-headline italic font-light leading-tight text-on-surface">
@@ -96,7 +93,6 @@ export default function InferenceDocs() {
           </p>
         </section>
 
-        {/* Killer Stats Marquee */}
         <div className="w-full overflow-hidden bg-primary text-on-primary py-3 mb-24 -rotate-1 shadow-xl">
           <div className="flex whitespace-nowrap gap-12 font-mono text-sm font-black uppercase tracking-widest animate-marquee">
             <span>4GB VRAM REQUIRED</span><span className="opacity-30">•</span>
@@ -109,10 +105,9 @@ export default function InferenceDocs() {
           </div>
         </div>
 
-        {/* 5-Step Editorial Diagram */}
         <section className="mb-32">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
-            {/* Step 1 */}
+
             <div className="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:rotate-1">
               <div className="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 rotate-3 z-10 font-bold shadow-sm">STEP 01</div>
               <div className="aspect-[3/4] bg-surface-dim mb-4 overflow-hidden grayscale contrast-125 group-hover:grayscale-0 transition-all">
@@ -121,7 +116,7 @@ export default function InferenceDocs() {
               <h3 className="font-unbounded text-xs font-black uppercase mb-2">Segmentation</h3>
               <p className="font-headline italic text-sm opacity-70">MediaPipe processes full-body photo for human parsing.</p>
             </div>
-            {/* Step 2 */}
+
             <div className="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:-rotate-1 mt-8 md:mt-12">
               <div className="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 -rotate-2 z-10 font-bold shadow-sm">STEP 02</div>
               <div className="aspect-[3/4] bg-surface-dim mb-4 border border-outline-variant/20 flex flex-col items-center justify-center p-4">
@@ -132,7 +127,7 @@ export default function InferenceDocs() {
               <h3 className="font-unbounded text-xs font-black uppercase mb-2">Resize &amp; Pad</h3>
               <p className="font-headline italic text-sm opacity-70">Standardizing input dimensions for neural optimization.</p>
             </div>
-            {/* Step 3 */}
+
             <div className="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:rotate-2">
               <div className="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 rotate-1 z-10 font-bold shadow-sm">STEP 03</div>
               <div className="aspect-[3/4] bg-surface-dim mb-4 overflow-hidden">
@@ -141,7 +136,7 @@ export default function InferenceDocs() {
               <h3 className="font-unbounded text-xs font-black uppercase mb-2">AFWM Warp</h3>
               <p className="font-headline italic text-sm opacity-70">Appearance Flow Warping Module calculates optical flow.</p>
             </div>
-            {/* Step 4 */}
+
             <div className="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:-rotate-1 mt-8 md:mt-12">
               <div className="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 -rotate-3 z-10 font-bold shadow-sm">STEP 04</div>
               <div className="aspect-[3/4] bg-surface-dim mb-4 flex items-center justify-center gap-1 p-2 overflow-hidden border border-outline-variant/20">
@@ -150,7 +145,7 @@ export default function InferenceDocs() {
               <h3 className="font-unbounded text-xs font-black uppercase mb-2">ResUnet</h3>
               <p className="font-headline italic text-sm opacity-70">Composite blending using deep 8-channel input layers.</p>
             </div>
-            {/* Step 5 */}
+
             <div className="group relative bg-surface-container-low p-6 transition-all hover:bg-surface-container hover:-translate-y-2 hover:rotate-1">
               <div className="absolute -top-3 -right-3 bg-secondary-container text-on-secondary-container font-unbounded text-[10px] px-2 py-1 rotate-2 z-10 font-bold shadow-sm">STEP 05</div>
               <div className="aspect-[3/4] bg-surface-dim mb-4 overflow-hidden group-hover:scale-105 transition-transform border border-outline-variant/20 shadow-inner">
@@ -160,7 +155,7 @@ export default function InferenceDocs() {
               <p className="font-headline italic text-sm opacity-70">4x AI Upscaling for commercial-grade photorealism.</p>
             </div>
           </div>
-          {/* Connection Line SVG */}
+
           <div className="hidden md:block w-full h-1 mt-12 overflow-hidden opacity-20">
             <svg className="w-full h-full stroke-on-surface" preserveAspectRatio="none" viewBox="0 0 1000 10">
               <path d="M0 5 Q 50 0, 100 5 T 200 5 T 300 5 T 400 5 T 500 5 T 600 5 T 700 5 T 800 5 T 900 5 T 1000 5" fill="none" strokeDasharray="8 4" strokeWidth="2"></path>
@@ -168,7 +163,6 @@ export default function InferenceDocs() {
           </div>
         </section>
 
-        {/* Technical Deep Dive Cards */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="p-10 bg-surface-container-highest relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-5">
@@ -222,7 +216,6 @@ export default function InferenceDocs() {
           </div>
         </section>
 
-        {/* Footer / Navigation */}
         <footer className="mt-32 pt-16 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div className="max-w-xs">
             <p className="font-unbounded text-[10px] font-black uppercase mb-2">Next Chapter</p>

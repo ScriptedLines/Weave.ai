@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { apiFetch } from '../lib/api';
 
 import { useAuth } from '../context/AuthContext';
 
@@ -16,11 +17,19 @@ export default function VerificationWaiting() {
     if (saved) setEmail(saved);
   }, []);
 
-  // Redirect automatically when session is detected (after clicking email link)
   React.useEffect(() => {
     if (user) {
-      console.log("Verification successful! Moving to onboarding...");
-      navigate('/onboarding-dna');
+      apiFetch('/profile/ensure', { method: 'POST' }).then(async () => {
+        const res = await apiFetch('/profile')
+        const data = res.ok ? await res.json() : null
+        if (data?.profile?.is_approved) {
+          navigate(data.profile.skin_lab ? '/dashboard' : '/onboarding-dna', { replace: true })
+        } else {
+          navigate('/pending-approval', { replace: true })
+        }
+      }).catch(() => {
+        navigate('/pending-approval', { replace: true })
+      })
     }
   }, [user, navigate]);
 
@@ -74,7 +83,6 @@ export default function VerificationWaiting() {
       `}</style>
       <div className="film-grain"></div>
 
-      {/* Top Navigation Anchor */}
       <header className="bg-[#F5EFE0] border-b-2 border-dashed border-[#1A1208]/10 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
         <span className="text-2xl font-black tracking-tighter text-[#1A1208] uppercase cursor-pointer" onClick={() => navigate('/')}>WEAVE</span>
         <button className="hover:skew-x-2 transition-transform duration-200">
@@ -82,36 +90,33 @@ export default function VerificationWaiting() {
         </button>
       </header>
 
-      {/* Main Content Canvas */}
       <main className="flex-grow flex items-center justify-center px-4 pt-24 pb-32">
         <div className="relative group">
-          {/* Asymmetric Shadow/Layering */}
+
           <div className="absolute inset-0 bg-[#e8e2d3] translate-x-3 translate-y-3 -z-10 rotate-[0.5deg]"></div>
-          
-          {/* Central Scrapbook Card */}
+
           <div className="max-w-md w-full bg-[#f3edde] p-8 md:p-12 relative overflow-hidden risograph-hatch transition-transform duration-500 hover:rotate-[-0.5deg]">
-            {/* Tape Strip Decorative Element */}
+
             <div className="absolute -top-4 -right-8 w-32 h-10 bg-[#d4e899]/60 rotate-[15deg] flex items-center justify-center px-4 z-10">
               <span className="font-mono text-[10px] tracking-widest text-[#586928] uppercase opacity-70">SCRAPBOOK_04</span>
             </div>
-            
+
             <div className="flex flex-col items-center text-center space-y-8">
-              {/* Stylized Visual */}
+
               <div className="relative w-32 h-32 flex items-center justify-center bg-[#f9f3e4] rounded-xl shadow-sm rotate-[-2deg]">
                 <span className="material-symbols-outlined text-6xl text-[#8c716b] opacity-40">mail</span>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  {/* Hand-drawn style envelope placeholder */}
+
                   <div className="w-20 h-14 border-2 border-[#1d1c13] relative flex items-center justify-center rotate-[3deg]">
                     <div className="absolute top-0 left-0 w-full h-1/2 border-b-2 border-[#1d1c13] rotate-[2deg]"></div>
-                    {/* Bobbing Wax Seal */}
+
                     <div className="w-6 h-6 bg-[#c84b2f] rounded-full flex items-center justify-center shadow-lg transform translate-y-2 translate-x-1 animate-bounce">
                       <span className="material-symbols-outlined text-white text-[14px]" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
                     </div>
                   </div>
                 </div>
               </div>
-              
-              {/* Typography Hierarchy */}
+
               <div className="space-y-4">
                 <h1 className="text-5xl md:text-6xl font-[900] tracking-tighter text-[#1d1c13] leading-none italic">
                   Check your post.
@@ -125,11 +130,10 @@ export default function VerificationWaiting() {
                   </p>
                 )}
               </div>
-              
-              {/* Action Layer */}
+
               <div className="w-full space-y-6 pt-4">
-                {/* CTA with hover wipe effect */}
-                <button 
+
+                <button
                   onClick={handleResend}
                   disabled={loading}
                   className="relative w-full group overflow-hidden bg-[#1d1c13] text-[#fff9ea] py-5 rounded-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-lg disabled:opacity-50"
@@ -139,8 +143,7 @@ export default function VerificationWaiting() {
                   </span>
                   <div className="absolute inset-0 bg-[#a63319] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-out"></div>
                 </button>
-                
-                {/* Secondary Link */}
+
                 <div className="flex flex-col items-center gap-2">
                   <a className="font-mono text-[10px] uppercase tracking-widest text-[#58413c] hover:text-[#a63319] transition-colors underline decoration-1 underline-offset-4" href="/auth">
                     Back to login entrance
@@ -148,8 +151,7 @@ export default function VerificationWaiting() {
                 </div>
               </div>
             </div>
-            
-            {/* Subtle Decorative Ink Mark */}
+
             <div className="absolute bottom-2 right-4 opacity-10 pointer-events-none select-none">
               <span className="material-symbols-outlined text-4xl">fingerprint</span>
             </div>
@@ -157,7 +159,6 @@ export default function VerificationWaiting() {
         </div>
       </main>
 
-      {/* Bottom Marquee (Marigold Tape Strip) */}
       <footer className="fixed bottom-0 left-0 w-full z-50 bg-[#FFB800] py-3 overflow-hidden shadow-[0_-10px_30px_rgba(0,0,0,0.05)] border-t border-[#1d1c13]/5">
         <div className="animate-marquee whitespace-nowrap flex items-center gap-8">
           <span className="font-mono font-bold text-xs tracking-[0.3em] text-[#1A1208] flex items-center">
@@ -178,7 +179,6 @@ export default function VerificationWaiting() {
         </div>
       </footer>
 
-      {/* Image for Context */}
       <div className="fixed top-32 -left-12 w-48 h-64 bg-[#f9f3e4] -rotate-[12deg] shadow-xl border-8 border-white hidden lg:block overflow-hidden">
         <img alt="editorial fashion portrait" className="w-full h-full object-cover grayscale opacity-80 mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdyDHn5HG9drx9UxRvzCqNUSV-gwi4Ihj7caDfs-7YQ9KGd_aAGAV8zCbuGDF1YdBLysub2hcG1f5XC4F0gRfHBy1EwShDItanJhDPABViTKQaZCsf4TTEa3Zu5jebAeXs_CsaMnRtOm0N9ibXq5JzWqWTCYokuB3xjqLA5mWSZ5hYqlFo8CwC1GFqLb7vdlncQ7bmv2XHiDGAcbaGbzXQMJFCkHP6OwQOAHQl8-EdrJcTLZUjiD3DcjWPb3GFBI3ewcWnynx09vpJ"/>
         <div className="absolute bottom-4 left-4 bg-[#d4e899] px-2 py-1 rotate-[3deg]">
@@ -186,7 +186,6 @@ export default function VerificationWaiting() {
         </div>
       </div>
 
-      {/* Decorative Stamp */}
       <div className="fixed top-1/2 -right-16 w-32 h-32 border-4 border-dashed border-[#a63319]/20 rounded-full flex items-center justify-center rotate-12 -translate-y-1/2 opacity-20 pointer-events-none hidden xl:flex">
         <div className="border-2 border-[#a63319]/20 rounded-full w-24 h-24 flex items-center justify-center">
           <span className="font-['Unbounded'] text-[8px] font-black text-[#a63319] uppercase text-center leading-none">Official<br/>Studio<br/>Seal</span>

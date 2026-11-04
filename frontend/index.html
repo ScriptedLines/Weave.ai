@@ -194,10 +194,9 @@
     <div class="grain-overlay"></div>
     <div class="custom-cursor hidden md:block" id="weave-cursor"></div>
     <div class="cursor-ring hidden md:block" id="weave-cursor-ring"></div>
-    <div id="root"></div>
+    <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Global cursor logic
       const cursor = document.getElementById('weave-cursor');
       const ring = document.getElementById('weave-cursor-ring');
       if (cursor && ring) {

@@ -25,7 +25,7 @@ export function Layout({ children, showSideNav = true, activePage = 'home' }: La
 
   return (
     <div className="min-h-screen bg-background text-on-background font-fraunces">
-      {/* Ticker Tape */}
+
       <div className="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-rust h-6">
         <div className="flex whitespace-nowrap animate-marquee items-center h-full">
           <span className="text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-4">{TICKER_TEXT}</span>
@@ -37,7 +37,6 @@ export function Layout({ children, showSideNav = true, activePage = 'home' }: La
         </div>
       </div>
 
-      {/* Top Nav Bar */}
       <header className="fixed top-[24px] left-0 w-full flex justify-between items-center px-8 h-16 bg-paper/90 backdrop-blur-md z-50 border-b border-ink/10" style={{ mixBlendMode: 'multiply' }}>
         <button
           onClick={() => navigate('/')}
@@ -82,7 +81,6 @@ export function Layout({ children, showSideNav = true, activePage = 'home' }: La
         )}
       </header>
 
-      {/* Side Nav */}
       {showSideNav && (
         <aside className="fixed left-0 top-[88px] h-[calc(100vh-88px)] w-20 hidden lg:flex flex-col items-center py-12 z-40 bg-transparent space-y-8">
           {navItems.map((item) => (
@@ -104,7 +102,6 @@ export function Layout({ children, showSideNav = true, activePage = 'home' }: La
         </aside>
       )}
 
-      {/* Main Content */}
       <main className={`pt-[88px] ${showSideNav ? 'lg:pl-20' : ''}`}>
         {children}
       </main>

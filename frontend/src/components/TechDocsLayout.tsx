@@ -7,7 +7,7 @@ interface TechDocsLayoutProps {
 export function TechDocsLayout({ children }: TechDocsLayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  
+
   const navItems = [
     { icon: 'account_tree', label: 'Pipeline', path: '/docs/training' },
     { icon: 'memory', label: 'Inference', path: '/docs/inference' },
@@ -20,7 +20,7 @@ export function TechDocsLayout({ children }: TechDocsLayoutProps) {
   return (
     <div className="bg-background text-on-background font-body min-h-screen overflow-x-hidden selection:bg-primary-container selection:text-white">
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[100]" style={{backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noiseFilter\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"0.65\" numOctaves=\"3\" stitchTiles=\"stitch\"/%3E%3C/filter%3E%3Crect width=\"100%25\" height=\"100%25\" filter=\"url(%23noiseFilter)\"/%3E%3C/svg%3E')"}}></div>
-      
+
       <div className="fixed top-0 right-0 h-full flex items-center pointer-events-none z-0">
         <span className="text-[20vw] font-unbounded font-black text-on-surface/5 tracking-tighter leading-none select-none" style={{writingMode: 'vertical-rl'}}>DOCS</span>
       </div>
@@ -77,7 +77,7 @@ export function TechDocsLayout({ children }: TechDocsLayoutProps) {
           </div>
         </footer>
       </main>
-      
+
       <div className="fixed bottom-0 left-0 right-0 bg-rust py-2 overflow-hidden z-50">
         <div className="flex whitespace-nowrap animate-marquee items-center gap-12">
           <span className="font-mono text-[10px] uppercase font-bold text-paper tracking-widest">LIVE INFERENCE STATUS: NOMINAL</span>

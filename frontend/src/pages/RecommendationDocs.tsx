@@ -5,7 +5,7 @@ export default function RecommendationDocs() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Custom Cursor Simulation
+
     const dot = document.querySelector('.cursor-dot') as HTMLElement;
     if (dot) {
       const moveHandler = (e: MouseEvent) => {
@@ -57,10 +57,8 @@ export default function RecommendationDocs() {
         }
       `}</style>
 
-      {/* Global Grain Overlay */}
       <div className="fixed inset-0 risograph-grain z-[100]"></div>
-      
-      {/* SideNavBar */}
+
       <aside className="fixed left-0 top-0 h-full flex flex-col pt-20 pb-8 px-4 bg-[#F5EFE0] w-64 border-r border-[#1A1208]/10 z-40 transition-all duration-300 hidden md:flex">
         <div className="mb-12 px-4 cursor-pointer" onClick={() => navigate('/')}>
           <h1 className="text-xl font-bold text-[#1A1208] uppercase tracking-tighter">Technical Studio</h1>
@@ -71,7 +69,7 @@ export default function RecommendationDocs() {
             <span className="material-symbols-outlined">account_tree</span>
             <span className="font-label text-xs font-bold uppercase tracking-widest">Pipeline</span>
           </button>
-          {/* ACTIVE TAB: Engine */}
+
           <button onClick={() => navigate('/docs/recommendation')} className="w-full flex items-center gap-3 bg-[#C84B2F] text-[#F5EFE0] rounded-sm px-4 py-3 rotate-1 translate-x-1 duration-200 ease-out-back">
             <span className="material-symbols-outlined">memory</span>
             <span className="font-label text-xs font-bold uppercase tracking-widest">Engine</span>
@@ -92,7 +90,6 @@ export default function RecommendationDocs() {
         </div>
       </aside>
 
-      {/* TopAppBar */}
       <header className="fixed top-0 right-0 left-0 md:left-64 flex justify-between items-center px-6 py-4 backdrop-blur-md bg-[#F5EFE0]/80 border-b border-[#1A1208]/10 z-50">
         <div className="text-2xl font-black uppercase tracking-widest text-[#1A1208] font-headline cursor-pointer" onClick={() => navigate('/')}>WEAVE</div>
         <div className="flex items-center gap-6">
@@ -108,9 +105,8 @@ export default function RecommendationDocs() {
         </div>
       </header>
 
-      {/* Main Content Canvas */}
       <main className="ml-0 md:ml-64 pt-28 pb-20 px-8 md:px-16 max-w-7xl">
-        {/* Hero Section */}
+
         <section className="mb-24 relative">
           <div className="absolute -top-10 -left-10 w-32 h-32 bg-secondary-container/20 rounded-full blur-3xl"></div>
           <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-4 block">How It's Built / Module 02</span>
@@ -125,9 +121,8 @@ export default function RecommendationDocs() {
           </div>
         </section>
 
-        {/* Signal Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-          {/* Signal 1: Color */}
+
           <div className="group relative bg-primary text-on-primary p-8 min-h-[400px] flex flex-col justify-between -rotate-1 hover:rotate-0 transition-all duration-500 ease-out-back cursor-pointer overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-20">
               <span className="material-symbols-outlined text-7xl">palette</span>
@@ -145,13 +140,12 @@ export default function RecommendationDocs() {
                 <span className="font-bold">LOWEST_DELTA</span>
               </div>
             </div>
-            {/* Card Detail Decoration */}
+
             <div className="absolute bottom-4 right-4 w-12 h-12 border border-on-primary/20 flex items-center justify-center">
               <span className="font-mono text-[10px]">L*a*b</span>
             </div>
           </div>
 
-          {/* Signal 2: Content (Semantic) */}
           <div className="group relative bg-secondary text-on-secondary p-8 min-h-[400px] flex flex-col justify-between rotate-1 hover:rotate-0 transition-all duration-500 ease-out-back cursor-pointer overflow-hidden">
             <div className="tape-strip absolute -top-2 left-1/2 -translate-x-1/2 w-24 h-6 -rotate-2 z-10 opacity-60"></div>
             <div className="absolute top-0 right-0 p-4 opacity-20">
@@ -172,7 +166,6 @@ export default function RecommendationDocs() {
             </div>
           </div>
 
-          {/* Signal 3: Collaborative */}
           <div className="group relative bg-[#87CEEB] text-[#1A1208] p-8 min-h-[400px] flex flex-col justify-between -rotate-2 hover:rotate-0 transition-all duration-500 ease-out-back cursor-pointer overflow-hidden shadow-xl">
             <div className="absolute top-0 right-0 p-4 opacity-20">
               <span className="material-symbols-outlined text-7xl">group</span>
@@ -193,7 +186,6 @@ export default function RecommendationDocs() {
           </div>
         </div>
 
-        {/* Formula Section */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <div className="relative p-12 bg-surface-container-high border-2 border-outline/5 rotate-1">
             <div className="absolute -top-4 -right-4 bg-tertiary text-on-tertiary px-4 py-1 font-mono text-[10px] tracking-widest uppercase">Equation 04-B</div>
@@ -237,7 +229,6 @@ export default function RecommendationDocs() {
           </div>
         </section>
 
-        {/* Visual Proof Section */}
         <section className="mt-32">
           <div className="flex justify-between items-end mb-12">
             <h2 className="font-headline text-5xl font-black italic">Ranked Feed Output.</h2>
@@ -246,7 +237,7 @@ export default function RecommendationDocs() {
             </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {/* Product Card 1 */}
+
             <div className="group relative aspect-[3/4] overflow-hidden bg-surface-container-highest flex flex-col hover:-translate-y-2 transition-transform duration-500">
               <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA96CDrYDourjI_7pnnaxfHSyFEv8JarxlDllUBcS5GzSkhCIZcYZserYhp-gHELb1L5_KuinllvfAo0P3zyKSqfzyAvQNSgFOo6VC9RPFEoPdDMgXl6csX59yfOTmSpnzFhhy434IWUDrmdO2cdKb5ejNQvt0blkiPv1K-J01lRTjYvCsFxIuZULKeWaNOCSEq7O1LBM3vBWqtsIN6R2nrN9tHV8sKe6R54TaKLYUBLrpXO-Bdm6EYrg6YKyUfim5_HBWUEvFta8hx" alt="Rust colored chore coat" />
               <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background/90 to-transparent">
@@ -256,7 +247,7 @@ export default function RecommendationDocs() {
                 </div>
               </div>
             </div>
-            {/* Product Card 2 */}
+
             <div className="group relative aspect-[3/4] overflow-hidden bg-surface-container-highest flex flex-col translate-y-8 hover:translate-y-6 transition-transform duration-500">
               <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ_kO3N8qjN4YlMO6g3Tnt_I7FZCY5a2m1valBtMk-W4TzZKliwptC1HFQ6w1iuO9fr2EfwZbzLxe7GIVXPfbCunDnj0bsg1m8eAhfBy9gdnw-QFU3DuUnctDl7-0aKSvNgLdKniyPW43bqdEOtY_s3W7E_ll0irRCZPR3Dll_mMAphEqr1Lm-X2aTuR1yc-tSpp7kEOZBp1qiFzEVRXztJZnQEMbfZ34bHycu-mIjMKGiuI-GZkkTO0JUCUar81HOnZVVThOfUCGw" alt="Olive silk dress" />
               <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background/90 to-transparent">
@@ -266,7 +257,7 @@ export default function RecommendationDocs() {
                 </div>
               </div>
             </div>
-            {/* Product Card 3 */}
+
             <div className="group relative aspect-[3/4] overflow-hidden bg-surface-container-highest flex flex-col hover:-translate-y-2 transition-transform duration-500">
               <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB24pMC6Bui5lHBXTCmYvWrS9q_dHBUFrPwHzBzBvmjfVFYpgJsN4iIo7hZ-Uj9vZNva5QsPEuXqvl4svv0D6Gyfign8iNP2l58VqQCYoXJ1tLDoZoguNzj27Sr43y9Rk38gvfcdlS0SHtK8SBBcGvCbkvSC_V0wD-sItncqKne3Ymxt3oveDjahEfnAZ7CJzgT5vVC3HlmgCJXagw6rA2nQCTl3SSIVIadjz-f0sJx8UHrU6hu8GhPF8HPd_n01GXvfAMYBIGlbPFI" alt="Minimalist leather bag" />
               <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background/90 to-transparent">
@@ -276,7 +267,7 @@ export default function RecommendationDocs() {
                 </div>
               </div>
             </div>
-            {/* Product Card 4 */}
+
             <div className="group relative aspect-[3/4] overflow-hidden bg-surface-container-highest flex flex-col translate-y-12 hover:translate-y-10 transition-transform duration-500">
               <img className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvZag0as1LBRB18v35afvtrUAm7IIb0ocn6_tVcl9dqE4eEiWOSpIW72ubIC9lMUTU8la9_TFkVY3NiXfxWpHVf1xNNQecXz6CbC4QQwaKb0uPau0FiCoG9nyYkKoXvI-xFduHk9QG6efzE49vQFdDIze3vr90wJWwY7lv__cs789o9pTmON-I7U5lCgjiGMCRUEoxLTlBoWNmPbDltsMyN4WpM2ikS63CHBtiT2eWIecbbePLKnVBpFkkWoNNIGQOCtXUHv0nghLJ" alt="Off-white linen trousers" />
               <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background/90 to-transparent">
@@ -289,7 +280,6 @@ export default function RecommendationDocs() {
           </div>
         </section>
 
-        {/* Bottom Marquee */}
         <footer className="mt-40 overflow-hidden border-t border-b border-primary/20 py-4 -mx-8 md:-mx-16">
           <div className="flex whitespace-nowrap animate-marquee">
             <div className="flex items-center gap-8 px-4 font-mono text-[10px] uppercase tracking-[0.5em] text-on-surface/50">

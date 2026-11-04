@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+import { apiFetch } from '../lib/api';
 
 export default function StudioPage() {
   const navigate = useNavigate();
@@ -13,19 +11,19 @@ export default function StudioPage() {
 
   const [personImage, setPersonImage] = useState<File | null>(null);
   const [personImagePreview, setPersonImagePreview] = useState<string | null>(null);
-  
+
   const [clothImage, setClothImage] = useState<File | null>(null);
   const [clothImageUrl, setClothImageUrl] = useState<string | null>(null);
   const [clothName, setClothName] = useState<string>("Vintage Oversized Blazer in 'Ecru'");
 
   const [loading, setLoading] = useState(false);
   const [resultImage, setResultImage] = useState<string | null>(null);
-  
+
   const personInputRef = useRef<HTMLInputElement>(null);
   const clothInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Custom cursor
+
     const cursor = document.querySelector('.custom-cursor') as HTMLElement;
     if (cursor) {
       const moveHandler = (e: MouseEvent) => {
@@ -51,9 +49,9 @@ export default function StudioPage() {
           el.addEventListener('mouseleave', leaveHandler);
         });
       };
-      
+
       bindHover();
-      // Observer to bind hover to dynamically added elements
+
       const observer = new MutationObserver(bindHover);
       observer.observe(document.body, { childList: true, subtree: true });
 
@@ -64,12 +62,12 @@ export default function StudioPage() {
     }
   }, []);
 
-  // Protect Route based on DNA profile
   useEffect(() => {
     if (user?.id) {
       const verifyDNA = async () => {
-        const { data, error } = await supabase.from('profiles').select('skin_lab, hair_lab').eq('user_id', user.id).single();
-        if (error || !data || !data.skin_lab || !data.hair_lab) {
+        const response = await apiFetch('/profile');
+        const data = response.ok ? await response.json() : null;
+        if (!data?.profile?.skin_lab || !data?.profile?.hair_lab) {
           navigate('/onboarding-dna');
         }
       };
@@ -77,15 +75,19 @@ export default function StudioPage() {
     }
   }, [user?.id, navigate]);
 
-  // Fetch garment if cloth_id is passed
   useEffect(() => {
     if (clothId) {
-      supabase.from('fashion_items').select('*').eq('id', clothId).single().then(({ data }) => {
-        if (data) {
-          setClothImageUrl(data.image_url);
-          setClothName(data.name || 'Selected Garment');
-        }
-      });
+      apiFetch(`/items/${encodeURIComponent(clothId)}`)
+        .then(async (response) => {
+          if (!response.ok) return null;
+          return response.json();
+        })
+        .then((data) => {
+          if (data) {
+            setClothImageUrl(data.image_url);
+            setClothName(data.cloth_name || 'Selected Garment');
+          }
+        });
     } else {
       setClothImageUrl("https://lh3.googleusercontent.com/aida-public/AB6AXuClGNMsNbVqgb8cTb1kCavaYa1bpRdPFrPPuIqqrhnZbFWRvd-E-obsie2DnqzrVtxUqZ01iDWS4YQ72-8Dl-hR4ImWmzHl0u6Jez7YA5FuCa4pbBZIWfpE_mP01batEcfjGWZEiBeGLoLWFYdG_liJurnoZMDrpWMvhUrTj9DG_mJjv3F8OvWFW-OgBMvTmR3NN0yIBoBulUXzig7Vz_VP3GxrIB01MumYESJQJYsVotlQtQ_1e2a-KJWFe-tb_nrV6XbBaU_yN4Rx");
     }
@@ -95,7 +97,7 @@ export default function StudioPage() {
     e.preventDefault();
     handlePersonFile(e.dataTransfer.files[0]);
   };
-  
+
   const handlePersonFile = (file?: File) => {
     if (file) {
       setPersonImage(file);
@@ -111,33 +113,24 @@ export default function StudioPage() {
     }
   };
 
-  // Auto-generate when both references are ready
-  // If `clothImageUrl` is a URL (from Supabase/hardcoded), we technically need a File for the backend.
-  // We'll provide a 'generate' button if auto-generation is tricky, but let's just make the "Drop your image" double as the trigger.
   const triggerTryOn = async () => {
     if (!personImage) return alert('Please upload your photo first.');
     setLoading(true);
     setResultImage(null);
     try {
       const formData = new FormData();
-      // Match backend names exactly
+
       formData.append('img', personImage);
-      
-      // If we have a clothId from the URL, use it directly
+
       if (clothId) {
         formData.append('cloth_id', clothId);
       } else if (clothImage) {
-         formData.append('cloth_id', clothName); 
+         formData.append('cloth_id', clothName);
       } else {
         formData.append('cloth_id', 'default_garment');
       }
 
-      // 0. Inject User ID for automated Skin/Hair Profile update
-      if (user?.id) {
-        formData.append('user_id', user.id);
-      }
-
-      const res = await fetch(`${API_BASE}/tryon`, { method: 'POST', body: formData });
+      const res = await apiFetch('/tryon', { method: 'POST', body: formData });
       if (!res.ok) throw new Error('Failed to generate try-on');
       const blob = await res.blob();
       setResultImage(URL.createObjectURL(blob));
@@ -153,7 +146,7 @@ export default function StudioPage() {
     <div className="bg-background text-on-surface selection:bg-primary selection:text-white cursor-none min-h-screen">
       <div className="grain-overlay" style={{pointerEvents: 'none', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 100, opacity: 0.04, backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
       <div className="custom-cursor hidden md:block" style={{width: '12px', height: '12px', background: '#a63319', borderRadius: '50%', position: 'fixed', pointerEvents: 'none', zIndex: 9999, transform: 'translate(-50%, -50%)', transition: 'all 0.15s ease-out'}}></div>
-      
+
       <header className="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-[#C84B2F] h-6">
         <div className="flex whitespace-nowrap" style={{animation: 'marquee 30s linear infinite'}}>
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5EFE0] px-4">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
@@ -199,7 +192,7 @@ export default function StudioPage() {
                 Try-On <span className="text-primary italic font-light">Studio</span>
             </h1>
             <p className="font-fraunces italic text-lg text-on-surface-variant mt-4 max-w-md">
-                Synthesizing textiles and silhouette through generative color science. 
+                Synthesizing textiles and silhouette through generative color science.
             </p>
           </div>
           <div className="flex gap-2 bg-surface-container-high p-1 rounded-sm border border-outline-variant/20">
@@ -217,15 +210,15 @@ export default function StudioPage() {
               <h2 className="font-unbounded font-black text-xs tracking-widest text-[#1A1208] uppercase">01 / Your Photo</h2>
               <span className="font-mono text-[10px] opacity-40">INPUT_BUFFER_RAW</span>
             </div>
-            
-            <div 
-              onDragOver={e => e.preventDefault()} 
+
+            <div
+              onDragOver={e => e.preventDefault()}
               onDrop={handlePersonDrop}
               onClick={() => personInputRef.current?.click()}
               className="relative aspect-[3/4] bg-surface-container-low flex flex-col items-center justify-center p-8 border-2 border-dashed border-outline-variant hover:border-primary transition-colors cursor-pointer group"
             >
               <div className="absolute inset-0 opacity-5 pointer-events-none" style={{backgroundImage: "url('https://www.transparenttextures.com/patterns/pinstriped-suit.png')"}}></div>
-              
+
               {personImagePreview ? (
                 <img src={personImagePreview} alt="Person" className="absolute inset-0 w-full h-full object-cover p-2" />
               ) : (
@@ -247,7 +240,7 @@ export default function StudioPage() {
               <div className="absolute top-4 left-4 font-mono text-[8px] text-primary opacity-60 z-20">GUIDE_LAYER_V02</div>
               <input type="file" ref={personInputRef} className="hidden" accept="image/*" onChange={e => handlePersonFile(e.target.files?.[0])} />
             </div>
-            
+
             <div className="bg-surface-container-highest p-6 relative -rotate-1 shadow-sm">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-8 bg-secondary-container/60 -rotate-2 mix-blend-multiply flex items-center justify-center font-mono text-[8px] tracking-[0.2em] text-on-secondary-container">TAPE_SECURE</div>
               <div className="flex gap-4 items-center">
@@ -273,7 +266,7 @@ export default function StudioPage() {
               <h2 className="font-unbounded font-black text-xs tracking-widest text-[#1A1208] uppercase">02 / Try-On Result</h2>
               <span className="font-mono text-[10px] opacity-40">RENDER_OUTPUT_FINAL</span>
             </div>
-            
+
             <div className="relative aspect-[3/4] bg-surface-container-low overflow-hidden flex flex-col items-center justify-center p-4 border border-outline-variant/50">
               {loading ? (
                 <>

@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+import { apiFetch } from '../lib/api';
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const { signIn, signUp, user } = useAuth();
-  
+
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +17,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Custom cursor logic from HTML
+
     const cursor = document.querySelector('.custom-cursor') as HTMLElement;
     if (!cursor) return;
 
@@ -52,16 +50,16 @@ export default function AuthPage() {
       if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) throw error;
-        navigate('/dashboard');
       } else {
-        // 1. Check if Username/Name is already taken in the profiles table
-        const { data: existingUser } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('username', name)
-          .maybeSingle();
 
-        if (existingUser) {
+        const availabilityResponse = await apiFetch(
+          `/username_available?username=${encodeURIComponent(name)}`
+        );
+        const availability = availabilityResponse.ok
+          ? await availabilityResponse.json()
+          : { available: true };
+
+        if (!availability.available) {
           setNameError('This Curator name is already in the archives. Try another.');
           throw new Error('Name collision detected.');
         }
@@ -69,9 +67,9 @@ export default function AuthPage() {
         const { error } = await signUp(email, password, name);
         if (error) {
            const errMsg = error.message.toLowerCase();
-           // Broaden check for various Supabase error formats
-           if (errMsg.includes('already registered') || 
-               errMsg.includes('exists') || 
+
+           if (errMsg.includes('already registered') ||
+               errMsg.includes('exists') ||
                (error as any).code === 'user_already_exists' ||
                (error as any).status === 422) {
               setEmailError('This email is already registered to a Curator account.');
@@ -79,7 +77,7 @@ export default function AuthPage() {
            }
            throw error;
         }
-        // Store email for resend functionality and display
+
         localStorage.setItem('weave_signup_email', email);
         navigate('/verify-waiting');
       }
@@ -90,13 +88,15 @@ export default function AuthPage() {
     }
   };
 
-  // If user is already authenticated but somehow on auth page, redirect happens by router normally,
-  // but if we are here wait for them to navigate via App flow.
   useEffect(() => {
      if (user) {
          const checkProfile = async () => {
-             const { data, error } = await supabase.from('profiles').select('skin_lab').eq('user_id', user.id).single();
-             if (error || !data || !data.skin_lab) {
+             await apiFetch('/profile/ensure', { method: 'POST' });
+             const response = await apiFetch('/profile');
+             const data = response.ok ? await response.json() : null;
+             if (!data?.profile?.is_approved) {
+                 navigate('/pending-approval');
+             } else if (!data.profile.skin_lab) {
                  navigate('/onboarding-dna');
              } else {
                  navigate('/dashboard');
@@ -110,8 +110,7 @@ export default function AuthPage() {
     <div className="bg-background text-on-background selection:bg-primary/30 min-h-screen overflow-x-hidden font-fraunces cursor-none">
       <div className="grain-overlay" style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 9999, opacity: 0.04, backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
       <div className="custom-cursor hidden md:block" style={{width: '12px', height: '12px', background: '#a63319', borderRadius: '50%', position: 'fixed', pointerEvents: 'none', zIndex: 10000, transform: 'translate(-50%, -50%)'}}></div>
-      
-      {/* Ticker Tape */}
+
       <div className="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-[#C84B2F] h-6">
         <div className="animate-marquee font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5EFE0] flex gap-8 py-1" style={{display: 'inline-block', whiteSpace: 'nowrap', animation: 'marquee 20s linear infinite'}}>
           <span>AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
@@ -120,8 +119,7 @@ export default function AuthPage() {
       </div>
 
       <main className="pt-12 px-6 pb-24 max-w-7xl mx-auto flex flex-col gap-32 items-center">
-        
-        {/* Screen 1: Auth Card Section */}
+
         <section className="min-h-screen flex items-center justify-center w-full relative">
           <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
             <div className="w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px]"></div>
@@ -136,7 +134,7 @@ export default function AuthPage() {
 
               <div className="flex gap-8 items-end border-b border-on-surface/5 pb-2">
                 <button onClick={() => setIsLogin(false)} className={`font-unbounded text-sm font-bold pb-1 transition-colors ${!isLogin ? 'text-primary' : 'text-on-surface/40 hover:text-on-surface'}`} style={!isLogin ? {position: 'relative'} : {}}>
-                  SIGN UP
+                  REQUEST ACCESS
                   {!isLogin && <div style={{position: 'absolute', bottom: '-4px', left: 0, width: '100%', height: '2px', background: '#C84B2F', maskImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'2\' viewBox=\'0 0 100 2\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 1C20 0.5 40 1.5 60 1C80 0.5 100 1\' stroke=\'black\' fill=\'none\'/%3E%3C/svg%3E")'}}></div>}
                 </button>
                 <button onClick={() => setIsLogin(true)} className={`font-unbounded text-sm font-bold pb-1 transition-colors ${isLogin ? 'text-primary' : 'text-on-surface/40 hover:text-on-surface'}`} style={isLogin ? {position: 'relative'} : {}}>
@@ -144,6 +142,17 @@ export default function AuthPage() {
                   {isLogin && <div style={{position: 'absolute', bottom: '-4px', left: 0, width: '100%', height: '2px', background: '#C84B2F', maskImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'2\' viewBox=\'0 0 100 2\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 1C20 0.5 40 1.5 60 1C80 0.5 100 1\' stroke=\'black\' fill=\'none\'/%3E%3C/svg%3E")'}}></div>}
                 </button>
               </div>
+
+              {!isLogin && (
+                <div className="bg-[#f0e8d4] border border-[#c84b2f]/20 p-3.5 rounded-sm">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary font-bold">
+                    Private Archive // By Application
+                  </p>
+                  <p className="font-mono text-[10px] text-on-surface/75 leading-relaxed mt-1">
+                    Weave Studio is invitation-only. Submit your details to request curator access; once approved in our database, your archive will unlock.
+                  </p>
+                </div>
+              )}
 
               <form className="flex flex-col gap-6" onSubmit={handleAuth}>
                 {!isLogin && (
@@ -174,7 +183,7 @@ export default function AuthPage() {
                 {error && <div className="text-error font-mono text-xs">{error}</div>}
 
                 <button disabled={loading} type="submit" className="mt-4 bg-primary text-on-primary font-unbounded text-xs py-5 font-black tracking-widest relative group overflow-hidden transition-all active:scale-95 disabled:opacity-50">
-                  <span className="relative z-10">{loading ? 'PROCESSING...' : (isLogin ? 'ENTER ARCHIVE' : 'CREATE ARCHIVE')}</span>
+                  <span className="relative z-10">{loading ? 'PROCESSING...' : (isLogin ? 'ENTER ARCHIVE' : 'REQUEST ACCESS')}</span>
                   <div className="absolute inset-0 bg-on-background transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
                 </button>
 
@@ -201,7 +210,6 @@ export default function AuthPage() {
           </div>
         </section>
 
-        {/* Aesthetic Filler / Mosaic Footer */}
         <section className="w-full py-24 grid grid-cols-2 md:grid-cols-4 gap-4 opacity-40 grayscale">
           <div className="aspect-square bg-surface-container-high overflow-hidden">
             <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY9sONIa-E5VVeg6J4MG-II9TY6H9KAWxpPpyjb7h2vimb-mE16spVaxaE6J0hZVIuUdvm9vLVws5eQ3bGQOk6kXFYwvfYc_WDu8aPBcQ6FyPwkrgtNyC--NlUVe4KX-kHBOlWYrxvxpjA-tHAJbGAzYDhhCCtQz8kzDh0mP-cto4TKHoBWyetRBKhOHUj9CHFjnLqWKlpWHksMp-4So0aPh-ARjZypvOi--VU8BILn_cFawatrukTbaECd8BsLm4KEdpZAUN_Pr-t" alt="minimalist fashion portrait with warm lighting and paper texture overlay editorial style" className="w-full h-full object-cover" />
@@ -218,7 +226,6 @@ export default function AuthPage() {
         </section>
       </main>
 
-      {/* Side Navigation Shell */}
       <div className="fixed left-0 top-16 h-[calc(100vh-64px)] w-20 flex flex-col items-center py-8 z-40 bg-transparent shadow-[20px_0_30px_rgba(26,18,8,0.06)]">
         <div className="flex flex-col gap-10">
           <button onClick={() => navigate('/dashboard')} className="flex flex-col items-center gap-1 group">

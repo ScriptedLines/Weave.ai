@@ -1,3 +1,20 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "express",
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build",
+  "functions": {
+    "server.js": {
+      "includeFiles": [
+        "dist/client/index.html",
+        "dist/server/**"
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/server.js"
+    }
+  ]
 }

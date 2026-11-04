@@ -41,8 +41,7 @@ export default function TrainingDiagram() {
         }
       `}</style>
       <div className="grain-overlay"></div>
-      
-      {/* TopNavBar */}
+
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#F5EFE0]/80 backdrop-blur-md flex justify-between items-center w-full px-6 py-4 border-b border-[#1A1208]/10">
         <div className="flex items-center gap-8">
           <span className="text-2xl font-black uppercase tracking-widest text-[#1A1208] cursor-pointer" onClick={() => navigate('/')}>WEAVE</span>
@@ -62,14 +61,13 @@ export default function TrainingDiagram() {
         </div>
       </header>
 
-      {/* SideNavBar */}
       <aside className="fixed left-0 top-0 h-full hidden lg:flex flex-col pt-24 pb-8 px-4 bg-[#F5EFE0] w-64 border-r border-[#1A1208]/10 z-40">
         <div className="mb-12 px-4 cursor-pointer" onClick={() => navigate('/')}>
           <h2 className="font-['Newsreader'] font-[900] text-2xl leading-tight">Technical Studio</h2>
           <p className="font-['Newsreader'] italic text-sm opacity-60">AI Fashion Architecture</p>
         </div>
         <nav className="flex-1 space-y-2">
-          {/* Active: Pipeline */}
+
           <button onClick={() => navigate('/docs/training')} className="w-full flex items-center gap-3 bg-[#C84B2F] text-[#F5EFE0] rounded-sm px-4 py-3 rotate-1 translate-x-1 shadow-md">
             <span className="material-symbols-outlined">account_tree</span>
             <span className="font-['Unbounded'] font-[700] text-xs uppercase tracking-tight">Pipeline</span>
@@ -92,9 +90,8 @@ export default function TrainingDiagram() {
         </button>
       </aside>
 
-      {/* Main Canvas */}
       <main className="lg:ml-64 pt-24 pb-20 px-8 md:px-16 max-w-7xl mx-auto">
-        {/* Header Section */}
+
         <section className="mb-20">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="max-w-2xl">
@@ -111,9 +108,8 @@ export default function TrainingDiagram() {
           </div>
         </section>
 
-        {/* The Pipeline Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 relative">
-          {/* STAGE 1 */}
+
           <div className="md:col-span-7 group">
             <div className="relative bg-surface-container-low p-8 sticker-rotate-3 border-b-4 border-primary/20 hover:rotate-0 transition-transform duration-500">
               <div className="absolute -top-4 -left-4 bg-primary text-on-primary px-3 py-1 space-mono text-[10px] z-10">STAGE_01</div>
@@ -128,7 +124,7 @@ export default function TrainingDiagram() {
               </div>
               <div className="space-y-4">
                 <p className="fraunces-body text-2xl">
-                  PBAFWM (45ch) learns cloth warping with DensePose + Pose markers. 
+                  PBAFWM (45ch) learns cloth warping with DensePose + Pose markers.
                 </p>
                 <div className="pt-6 border-t border-on-background/5">
                   <span className="space-mono text-[10px] opacity-40">PARAMETERS</span>
@@ -142,7 +138,6 @@ export default function TrainingDiagram() {
             </div>
           </div>
 
-          {/* STAGE 2 */}
           <div className="md:col-span-5 self-center">
             <div className="relative bg-surface-container p-8 sticker-rotate-2 hover:rotate-0 transition-transform duration-500 shadow-xl">
               <div className="absolute -top-4 -right-4 bg-secondary text-on-secondary px-3 py-1 space-mono text-[10px] z-10">STAGE_02</div>
@@ -151,7 +146,7 @@ export default function TrainingDiagram() {
                 <span className="material-symbols-outlined text-secondary text-4xl">dynamic_form</span>
               </div>
               <p className="fraunces-body text-xl mb-6">
-                End-to-end training of Warp + ResUnetGenerator with 8-channel input. 
+                End-to-end training of Warp + ResUnetGenerator with 8-channel input.
               </p>
               <div className="mb-6 overflow-hidden border border-secondary/20 group">
                 <img className="w-full h-auto object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" src="/static/2.png" alt="PB-E2E Training Results" />
@@ -177,12 +172,10 @@ export default function TrainingDiagram() {
             </div>
           </div>
 
-          {/* Ink Bleed Separator */}
           <div className="md:col-span-12 py-12">
             <div className="ink-bleed-divider bg-on-background h-[2px] w-full opacity-10"></div>
           </div>
 
-          {/* STAGE 3 (Full Width Featured) */}
           <div className="md:col-span-12">
             <div className="grid md:grid-cols-2 gap-0 bg-[#D7E3F5] text-on-surface border border-on-background/10">
               <div className="p-12 border-r border-on-background/10">
@@ -215,7 +208,6 @@ export default function TrainingDiagram() {
           </div>
         </div>
 
-        {/* Footer / Editorial Note */}
         <footer className="mt-32 pt-12 border-t border-on-background/10 grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <span className="space-mono text-[10px] opacity-40 block mb-4">CONTRIBUTORS</span>
@@ -230,7 +222,6 @@ export default function TrainingDiagram() {
         </footer>
       </main>
 
-      {/* Scrolling Marquee Component */}
       <div className="fixed bottom-0 left-0 w-full bg-[#1A1208] py-2 overflow-hidden whitespace-nowrap z-50 pointer-events-none">
         <div className="flex animate-marquee space-x-12">
           <span className="space-mono text-[#ffba43] text-xs">PIPELINE ACTIVE</span>

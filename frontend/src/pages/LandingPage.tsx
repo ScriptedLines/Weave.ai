@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  
+
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -31,7 +31,7 @@ export default function LandingPage() {
     };
 
     const animate = () => {
-      // Smooth Damping (Spring effect)
+
       currentX += (mouseX - currentX) * 0.08;
       currentY += (mouseY - currentY) * 0.08;
 
@@ -42,13 +42,11 @@ export default function LandingPage() {
         const rotateY = -currentX * 25;
         const moveX = currentX * weight;
         const moveY = currentY * weight;
-        
-        // Base tilt + Parallax + Breathing effect
+
         const breath = Math.sin(Date.now() / 2000 + index) * 5;
-        
+
         card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translate3d(${moveX}px, ${moveY + breath}px, ${index * 20}px)`;
-        
-        // Dynamic Sheen Effect
+
         const sheen = card.querySelector('.sheen') as HTMLElement;
         if (sheen) {
           sheen.style.transform = `translateX(${currentX * 100}%) translateY(${currentY * 100}%)`;
@@ -60,7 +58,7 @@ export default function LandingPage() {
 
     const animationId = requestAnimationFrame(animate);
     window.addEventListener('mousemove', handleGlobalMouseMove);
-    
+
     return () => {
       window.removeEventListener('mousemove', handleGlobalMouseMove);
       cancelAnimationFrame(animationId);
@@ -70,7 +68,7 @@ export default function LandingPage() {
   return (
     <>
       <div className="bg-paper text-ink font-fraunces selection:bg-rust selection:text-white overflow-x-hidden cursor-none min-h-screen relative">
-        {/* Top Ticker Tape */}
+
         <div className="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-rust h-6">
           <div className="flex whitespace-nowrap animate-marquee items-center h-full">
             <span className="text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-4">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
@@ -82,7 +80,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* TopAppBar */}
         <header className="fixed top-[24px] left-0 w-full flex justify-between items-center px-8 h-16 bg-paper/90 dark:bg-ink/90 backdrop-blur-md mix-blend-multiply z-50 border-b border-ink/10">
           <div className="text-2xl font-black text-ink dark:text-paper font-unbounded tracking-tighter cursor-pointer" onClick={() => navigate('/')}>WEAVE</div>
           <nav className="hidden md:flex space-x-12">
@@ -98,7 +95,7 @@ export default function LandingPage() {
                 <span className="material-symbols-outlined text-ink dark:text-paper group-hover:text-rust transition-colors" style={{ fontVariationSettings: "'FILL' 1" }}>account_circle</span>
                 <span className="hidden sm:block font-mono text-[10px] uppercase tracking-widest text-ink dark:text-paper group-hover:text-rust transition-colors">Vault</span>
               </button>
-              
+
               {showDropdown && (
                 <div className="absolute right-0 mt-4 w-48 bg-paper border border-ink/10 shadow-2xl py-2 z-[100] flex flex-col rounded-sm animate-in fade-in slide-in-from-top-2">
                   <button onClick={() => navigate('/dashboard')} className="px-6 py-3 text-left font-unbounded text-[10px] font-black uppercase tracking-widest text-ink hover:bg-ink hover:text-paper transition-colors flex justify-between group-items items-center">
@@ -113,7 +110,6 @@ export default function LandingPage() {
           )}
         </header>
 
-        {/* SideNavBar (Now with Semantic Hover Headings) */}
         <aside className="fixed left-0 top-16 h-[calc(100vh-64px)] w-20 hidden lg:flex flex-col items-center py-12 z-40 bg-transparent space-y-12">
           <div className="group relative cursor-pointer" onClick={() => navigate('/docs/training')}>
             <span className="material-symbols-outlined text-rust bg-rust/10 p-3 -rotate-2 scale-110">grid_view</span>
@@ -134,7 +130,7 @@ export default function LandingPage() {
         </aside>
 
         <main className="pt-24">
-          {/* Hero Section */}
+
           <section className="min-h-screen flex flex-col lg:flex-row items-center px-8 lg:px-24 py-16 gap-12 overflow-hidden">
             <div className="w-full lg:w-1/2 flex flex-col space-y-8 z-10">
               <span className="text-rust font-unbounded text-xs font-black tracking-widest uppercase">The Digital Curator</span>
@@ -155,7 +151,7 @@ export default function LandingPage() {
                     SEE HOW IT WORKS
                 </button>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-8 pt-12 border-t border-ink/5">
                 <div>
                   <div className="font-unbounded font-black text-3xl">98%</div>
@@ -173,10 +169,9 @@ export default function LandingPage() {
             </div>
 
             <div className="w-full lg:w-1/2 relative h-[600px] perspective-stage">
-              {/* Parallax Background Elements */}
+
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-rust/10 rounded-full animate-pulse"></div>
 
-              {/* Floating Visual Cards */}
               <div className="absolute top-1/4 left-1/4 w-64 h-80 shadow-2xl tilt-card z-20 transition-all duration-500 ease-out hover:z-50 group">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#E1D5F5] to-[#B8A2D1] p-4 flex flex-col blur-[1px] group-hover:blur-0 transition-all">
                   <div className="h-full bg-white/20 backdrop-blur-sm p-2 relative overflow-hidden">
@@ -211,7 +206,6 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Floating Badges */}
               <div className="absolute top-10 right-10 bg-rust text-paper p-6 rounded-full w-24 h-24 flex items-center justify-center text-center animate-spin-slow select-none cursor-pointer">
                 <span className="font-unbounded text-[8px] font-black leading-tight uppercase">THE WEAVE <br/> PROTOCOL</span>
               </div>
@@ -223,12 +217,11 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* Features Section */}
           <section className="bg-ink text-paper py-32 relative overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5">
               <span className="text-[30vw] font-unbounded font-black">WEAVE</span>
             </div>
-            
+
             <div className="container mx-auto px-8 relative z-10">
               <div className="max-w-3xl mb-24">
                 <h2 className="text-5xl lg:text-7xl font-fraunces italic font-bold text-surface mb-6">Built on serious science.</h2>
@@ -236,7 +229,7 @@ export default function LandingPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-                {/* Card 1 */}
+
                 <div className="group flex flex-col space-y-6">
                   <div className="flex items-baseline justify-between border-b border-rust/30 pb-4">
                     <span className="font-mono text-rust text-sm">01</span>
@@ -252,7 +245,6 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Card 2 */}
                 <div className="group flex flex-col space-y-6">
                   <div className="flex items-baseline justify-between border-b border-olive/30 pb-4">
                     <span className="font-mono text-olive text-sm">02</span>
@@ -268,7 +260,6 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Card 3 */}
                 <div className="group flex flex-col space-y-6">
                   <div className="flex items-baseline justify-between border-b border-sky-blue/30 pb-4">
                     <span className="font-mono text-sky-blue text-sm">03</span>
@@ -284,7 +275,6 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Card 4 */}
                 <div className="group flex flex-col space-y-6">
                   <div className="flex items-baseline justify-between border-b border-marigold/30 pb-4">
                     <span className="font-mono text-marigold text-sm">04</span>
@@ -304,7 +294,6 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* Mid-page Marquee */}
           <div className="bg-marigold py-6 border-y-2 border-ink overflow-hidden">
             <div className="flex whitespace-nowrap animate-marquee-reverse">
               <span className="text-ink font-fraunces text-[22px] font-bold italic px-8">Wear it before you buy ✦ Trained from scratch ✦ 4GB VRAM ✦ Your palette, your rules ✦ Student beats teacher ✦</span>
@@ -313,7 +302,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* How It Works Section */}
           <section className="py-32 bg-paper px-8">
             <div className="container mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
@@ -345,7 +333,7 @@ export default function LandingPage() {
                     <h2 className="text-6xl font-fraunces font-black tracking-tighter">Simple <br/> <span className="italic text-rust">but effective.</span></h2>
                     <p className="text-xl font-fraunces italic opacity-70">Four steps between you and your new aesthetic.</p>
                   </div>
-                  
+
                   <div className="space-y-8">
                     <div className="flex gap-6 items-start">
                       <span className="font-unbounded font-black text-xl text-rust">01.</span>
@@ -354,7 +342,7 @@ export default function LandingPage() {
                         <p className="font-fraunces italic text-ink/60">Take a quick snap or upload a photo. Our engine maps your body topography instantly.</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-6 items-start">
                       <span className="font-unbounded font-black text-xl text-rust">02.</span>
                       <div>
@@ -384,7 +372,6 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* Testimonials */}
           <section className="bg-ink py-24 overflow-hidden border-t-8 border-rust">
             <div className="flex space-x-12 px-8 overflow-x-auto pb-8 scrollbar-hide">
               <div className="min-w-[400px] bg-paper p-8 -rotate-2 shadow-xl">
@@ -399,7 +386,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="min-w-[400px] bg-paper p-8 rotate-1 shadow-xl">
                 <p className="font-fraunces italic text-2xl mb-6">"WEAVE has reduced our return rate by 42%. It’s the single most important tool in our digital stack."</p>
                 <div className="flex items-center gap-4">
@@ -428,11 +415,10 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* Final CTA */}
           <section className="bg-rust py-32 px-8 text-center relative overflow-hidden">
             <div className="absolute -top-24 -left-24 w-64 h-64 bg-paper/5 rounded-full blur-3xl"></div>
             <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-paper/5 rounded-full blur-3xl"></div>
-            
+
             <div className="relative z-10 max-w-4xl mx-auto space-y-12">
               <h2 className="text-7xl lg:text-9xl font-fraunces font-black text-paper leading-none tracking-tighter">
                   Stop guessing. <br/>
@@ -467,7 +453,7 @@ export default function LandingPage() {
               <a href="#" className="font-unbounded text-xs font-black hover:text-rust transition-colors">DISCORD</a>
             </div>
           </div>
-          
+
           <div className="container mx-auto mt-24 pt-8 border-t border-ink/5 flex justify-between items-center">
             <span className="font-mono text-[10px] opacity-40">© 2024 WEAVE TECHNOLOGY GROUP. ALL RIGHTS RESERVED.</span>
             <span className="font-mono text-[10px] opacity-40">STABLE-FASHION-01-V4.2</span>

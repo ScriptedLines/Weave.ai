@@ -33,37 +33,34 @@ export default function TechArchive() {
         }
       `}</style>
 
-      {/* Global Grain Overlay */}
       <div className="fixed inset-0 grain z-[100]"></div>
-      
-      {/* Ghost Watermark */}
+
       <div className="fixed top-0 right-0 h-full flex items-center pointer-events-none z-0">
         <span className="text-[20vw] font-brutal font-black text-surface-variant vertical-text tracking-tighter leading-none select-none opacity-50">DOCS</span>
       </div>
-      
-      {/* Side Navigation */}
+
       <aside className="fixed left-0 top-0 h-full flex flex-col pt-20 pb-8 px-4 bg-[#F5EFE0] w-64 border-r border-[#1A1208]/10 z-40 hidden md:flex">
         <div className="mb-12 px-4 cursor-pointer" onClick={() => navigate('/')}>
           <h2 className="font-headline font-black text-2xl text-[#1A1208] leading-none">Technical Studio</h2>
           <p className="font-headline italic text-sm opacity-60">AI Fashion Architecture</p>
         </div>
         <nav className="flex-1 space-y-2">
-          {/* Pipeline */}
+
           <button onClick={() => navigate('/docs/training')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
             <span className="material-symbols-outlined">account_tree</span>
             <span className="font-brutal text-xs font-bold uppercase tracking-wider">Pipeline</span>
           </button>
-          {/* Engine */}
+
           <button onClick={() => navigate('/docs/recommendation')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
             <span className="material-symbols-outlined">memory</span>
             <span className="font-brutal text-xs font-bold uppercase tracking-wider">Engine</span>
           </button>
-          {/* Inference */}
+
           <button onClick={() => navigate('/docs/inference')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
             <span className="material-symbols-outlined">psychology</span>
             <span className="font-brutal text-xs font-bold uppercase tracking-wider">Inference</span>
           </button>
-          {/* Docs (Active) */}
+
           <button onClick={() => navigate('/docs/archive')} className="w-full flex items-center gap-3 bg-[#C84B2F] text-[#F5EFE0] rounded-sm px-4 py-3 rotate-1 translate-x-1 duration-200 shadow-xl">
             <span className="material-symbols-outlined">menu_book</span>
             <span className="font-brutal text-xs font-bold uppercase tracking-wider">Docs</span>
@@ -75,10 +72,9 @@ export default function TechArchive() {
           </button>
         </div>
       </aside>
-      
-      {/* Main Content Canvas */}
+
       <main className="md:ml-64 relative z-10 p-6 md:p-12 lg:p-20">
-        {/* Top Header Navigation */}
+
         <header className="fixed top-0 left-0 right-0 z-50 md:left-64 bg-[#F5EFE0]/90 backdrop-blur-md border-b border-[#1A1208]/10 flex justify-between items-center px-6 py-4">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <span className="text-2xl font-black uppercase tracking-widest text-[#1A1208] font-headline italic">WEAVE</span>
@@ -97,7 +93,7 @@ export default function TechArchive() {
         </header>
 
         <div className="mt-16">
-          {/* Title Section */}
+
           <section className="max-w-5xl mb-20">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">Volume 04 // Technical Documentation</p>
             <h1 className="font-headline text-7xl md:text-9xl font-black leading-tight tracking-tighter mb-8 italic">
@@ -112,9 +108,8 @@ export default function TechArchive() {
             </div>
           </section>
 
-          {/* Bento Grid / Archive Section */}
           <section className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-32">
-            {/* Feature Card 01 */}
+
             <div className="md:col-span-2 lg:col-span-3 bg-surface-container-low p-8 relative overflow-hidden flex flex-col justify-between min-h-[400px]">
               <div className="absolute top-0 right-0 w-32 h-32 hatch opacity-20"></div>
               <div className="bg-secondary-container text-on-secondary-container px-3 py-1 font-mono text-[10px] uppercase w-fit rotate-[-2deg] mb-8">System: Core</div>
@@ -125,7 +120,7 @@ export default function TechArchive() {
                 <span className="border border-on-surface/10 px-4 py-2 font-mono text-xs uppercase">Diffusion-V4</span>
               </div>
             </div>
-            {/* Technical Chip Grid */}
+
             <div className="md:col-span-2 lg:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div className="bg-surface-container border border-on-surface/5 p-4 flex flex-col justify-between hover:border-primary/40 transition-colors group">
                 <span className="font-mono text-[10px] text-primary/50">01</span>
@@ -172,7 +167,6 @@ export default function TechArchive() {
               </div>
             </div>
 
-            {/* Visual Anchor */}
             <div className="md:col-span-4 lg:col-span-6 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
               <div className="lg:col-span-2 h-[500px] relative">
                 <img alt="abstract technical visualization" className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDihu4ietXh_WD3Ha44p42S__zKWV6NUKfRmWMfw7HqZUbCxSfKEvdE_sWvzcwqQLOydqjaKF2ucxqp_2gmhMGopr8LBT4aMdK98-a-bFePT3obRykkxPzHbJqWgVHXlIk6aEzoTqyXnLOsGV8vfyhw2CTLOG2t_raorxQdjPQd_elTDVFSo1nY-Wgle0vl6jLuYh0gBRdA6mPnpxZZmjHFvq8zsxQQvoNSfBW23b5i0Iy6DTnApEzMmDLLFdL0YaC9TsvR-0McqcCL"/>
@@ -210,7 +204,6 @@ export default function TechArchive() {
             </div>
           </section>
 
-          {/* Editorial Footer */}
           <footer className="border-t border-on-surface/5 pt-20 pb-32 grid grid-cols-1 lg:grid-cols-3 gap-12 relative overflow-hidden">
             <div className="lg:col-span-1">
               <h4 className="font-headline text-2xl font-black italic mb-6">WEAVE Archive</h4>
@@ -257,7 +250,6 @@ export default function TechArchive() {
         </div>
       </main>
 
-      {/* Scrolling Marquee */}
       <div className="fixed bottom-0 left-0 right-0 bg-primary py-2 overflow-hidden z-50 pointer-events-none">
         <div className="flex whitespace-nowrap gap-12 animate-marquee-text">
           <div className="flex gap-12 items-center">
@@ -268,7 +260,7 @@ export default function TechArchive() {
             <span className="font-mono text-[10px] uppercase font-bold text-on-primary tracking-widest">ALL MODELS LOADED // VRAM: 85%</span>
             <span className="w-2 h-2 rounded-full bg-secondary-container"></span>
           </div>
-          {/* Duplicate for infinite scroll */}
+
           <div className="flex gap-12 items-center">
             <span className="font-mono text-[10px] uppercase font-bold text-on-primary tracking-widest">LIVE INFERENCE STATUS: NOMINAL</span>
             <span className="w-2 h-2 rounded-full bg-secondary-container"></span>
