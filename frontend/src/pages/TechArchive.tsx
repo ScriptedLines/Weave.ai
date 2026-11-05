@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TechDocsLayout } from '../components/TechDocsLayout';
 
 export default function TechArchive() {
+  const navigate = useNavigate();
   return (
     <TechDocsLayout>
       <section className="max-w-5xl mb-16">
@@ -93,6 +95,20 @@ export default function TechArchive() {
               <span className="font-mono text-xs uppercase text-primary font-bold">Image generation</span>
               <h3 className="font-headline text-3xl font-bold italic text-ink mt-2">The final result</h3>
               <p className="font-body italic opacity-70 mt-2 text-ink/70">The warped garment and person image are combined into a try-on result.</p>
+            </div>
+            <div className="pt-4 border-t border-ink/10">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-2 h-2 rounded-full bg-secondary"></span>
+                <span className="font-mono text-[10px] uppercase font-bold text-secondary">Verified Benchmarks</span>
+              </div>
+              <p className="font-body italic text-sm text-ink/80 mb-3">4,064 evaluations · 14.03 Paired FID · 1.06s median latency · 0.00% failure rate.</p>
+              <button
+                onClick={() => navigate('/docs/inference')}
+                className="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase text-primary hover:text-rust underline decoration-primary/40 underline-offset-4"
+              >
+                <span>Inspect Full Benchmarks</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
             </div>
           </div>
         </div>

@@ -1,0 +1,4 @@
+query_id,item_id,rank
+query-1,item-b,1
+query-1,item-a,2
+query-1,item-c,3

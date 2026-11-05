@@ -11,7 +11,7 @@ export function TechDocsLayout({ children }: TechDocsLayoutProps) {
 
   const navItems = [
     { icon: 'account_tree', label: 'Training', path: '/docs/training' },
-    { icon: 'memory', label: 'Inference', path: '/docs/inference' },
+    { icon: 'speed', label: 'Inference & Benchmarks', path: '/docs/inference' },
     { icon: 'psychology', label: 'Recommendations', path: '/docs/recommendation' },
     { icon: 'menu_book', label: 'Overview', path: '/docs/archive' }
   ]

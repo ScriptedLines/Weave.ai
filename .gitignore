@@ -51,3 +51,6 @@ tests/
 /htmlcov/
 /test.py
 /BACKEND_CHANGES.md
+/benchmarks/runs/
+/benchmarks/.eval-venv/
+/benchmarks/.uv-cache/

@@ -1,0 +1,199 @@
+{
+  "timestamp_utc": "2026-11-05T21:05:24.299364+00:00",
+  "sequential": true,
+  "model_samples_include_first_observed_call": true,
+  "results": {
+    "catalog_select": {
+      "timing": {
+        "n": 5,
+        "median_ms": 308.37167499703355,
+        "min_ms": 306.1316609964706,
+        "max_ms": 1703.766316997644,
+        "samples_ms": [
+          1703.766316997644,
+          306.6938229967491,
+          717.0269519992871,
+          308.37167499703355,
+          306.1316609964706
+        ]
+      },
+      "successful_checks": [
+        {
+          "rows": 5
+        },
+        {
+          "rows": 5
+        },
+        {
+          "rows": 5
+        },
+        {
+          "rows": 5
+        },
+        {
+          "rows": 5
+        }
+      ],
+      "failures": []
+    },
+    "redis_ping": {
+      "timing": {
+        "n": 5,
+        "median_ms": 101.99410100176465,
+        "min_ms": 73.06594699912239,
+        "max_ms": 741.2152760007302,
+        "samples_ms": [
+          741.2152760007302,
+          73.06594699912239,
+          105.55916000157595,
+          101.86486699967645,
+          101.99410100176465
+        ]
+      },
+      "successful_checks": [
+        {
+          "ping": true
+        },
+        {
+          "ping": true
+        },
+        {
+          "ping": true
+        },
+        {
+          "ping": true
+        },
+        {
+          "ping": true
+        }
+      ],
+      "failures": []
+    },
+    "missing_user_rpc": {
+      "timing": {
+        "n": 5,
+        "median_ms": 306.38673099747393,
+        "min_ms": 305.82281600072747,
+        "max_ms": 311.6290260004462,
+        "samples_ms": [
+          311.6290260004462,
+          306.38673099747393,
+          305.82281600072747,
+          307.72589999833144,
+          305.89480299386196
+        ]
+      },
+      "successful_checks": [
+        {
+          "missing_user_rows": 0
+        },
+        {
+          "missing_user_rows": 0
+        },
+        {
+          "missing_user_rows": 0
+        },
+        {
+          "missing_user_rows": 0
+        },
+        {
+          "missing_user_rows": 0
+        }
+      ],
+      "failures": []
+    },
+    "skin_model": {
+      "timing": {
+        "n": 3,
+        "median_ms": 6895.2517619982245,
+        "min_ms": 6007.973170999321,
+        "max_ms": 18224.106146997656,
+        "samples_ms": [
+          18224.106146997656,
+          6895.2517619982245,
+          6007.973170999321
+        ]
+      },
+      "successful_checks": [
+        {
+          "valid_lab_triples": true
+        },
+        {
+          "valid_lab_triples": true
+        },
+        {
+          "valid_lab_triples": true
+        }
+      ],
+      "failures": []
+    },
+    "text_model": {
+      "timing": {
+        "n": 3,
+        "median_ms": 1416.8858690027264,
+        "min_ms": 1305.2739740014658,
+        "max_ms": 21338.502685001004,
+        "samples_ms": [
+          21338.502685001004,
+          1416.8858690027264,
+          1305.2739740014658
+        ]
+      },
+      "successful_checks": [
+        {
+          "dimensions": 768,
+          "finite": true
+        },
+        {
+          "dimensions": 768,
+          "finite": true
+        },
+        {
+          "dimensions": 768,
+          "finite": true
+        }
+      ],
+      "failures": []
+    },
+    "tryon_model": {
+      "timing": {
+        "n": 3,
+        "median_ms": 3364.50417299784,
+        "min_ms": 2722.337827006413,
+        "max_ms": 31145.59369899507,
+        "samples_ms": [
+          31145.59369899507,
+          3364.50417299784,
+          2722.337827006413
+        ]
+      },
+      "successful_checks": [
+        {
+          "format": "JPEG",
+          "dimensions": [
+            768,
+            1024
+          ],
+          "bytes": 107132
+        },
+        {
+          "format": "JPEG",
+          "dimensions": [
+            768,
+            1024
+          ],
+          "bytes": 107162
+        },
+        {
+          "format": "JPEG",
+          "dimensions": [
+            768,
+            1024
+          ],
+          "bytes": 107121
+        }
+      ],
+      "failures": []
+    }
+  }
+}

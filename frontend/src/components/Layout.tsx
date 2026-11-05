@@ -24,7 +24,7 @@ function Brand() {
 }
 
 function pageTitle(path: string) {
-  return ({ '/': 'Home', '/studio': 'Virtual Try-On', '/dashboard': 'Discover', '/onboarding-dna': 'Color Profile', '/account': 'Profile', '/auth': 'Sign in', '/verify-waiting': 'Verify email', '/pending-approval': 'Approval', '/docs/archive': 'Overview', '/docs/training': 'Training', '/docs/inference': 'Inference', '/docs/recommendation': 'Recommendations' } as Record<string, string>)[path] ?? 'Weave'
+  return ({ '/': 'Home', '/studio': 'Virtual Try-On', '/dashboard': 'Discover', '/onboarding-dna': 'Color Profile', '/account': 'Profile', '/auth': 'Sign in', '/verify-waiting': 'Verify email', '/pending-approval': 'Approval', '/docs/archive': 'Overview', '/docs/training': 'Training', '/docs/inference': 'Inference & Benchmarks', '/docs/recommendation': 'Recommendations' } as Record<string, string>)[path] ?? 'Weave'
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
