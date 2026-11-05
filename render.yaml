@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: weave-ai
+    name: Weave.ai
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
