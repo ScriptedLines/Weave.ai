@@ -8,24 +8,19 @@ try:
 except ImportError:
     from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
-# Inception weights ported to Pytorch from
-# http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz
-FID_WEIGHTS_URL = 'https://github.com/mseitzer/pytorch-fid/releases/download/fid_weights/pt_inception-2015-12-05-6726825d.pth'  # noqa: E501
+FID_WEIGHTS_URL = 'https://github.com/mseitzer/pytorch-fid/releases/download/fid_weights/pt_inception-2015-12-05-6726825d.pth'
 
 
 class InceptionV3(nn.Module):
     """Pretrained InceptionV3 network returning feature maps"""
 
-    # Index of default block of inception to return,
-    # corresponds to output of final average pooling
     DEFAULT_BLOCK_INDEX = 3
 
-    # Maps feature dimensionality to their output blocks indices
     BLOCK_INDEX_BY_DIM = {
-        64: 0,  # First max pooling features
-        192: 1,  # Second max pooling featurs
-        768: 2,  # Pre-aux classifier features
-        2048: 3,  # Final average pooling features
+        64: 0,
+        192: 1,
+        768: 2,
+        2048: 3,
     }
 
     def __init__(
@@ -82,7 +77,6 @@ class InceptionV3(nn.Module):
         else:
             inception = _inception_v3(weights='DEFAULT')
 
-        # Block 0: input to maxpool1
         block0 = [
             inception.Conv2d_1a_3x3,
             inception.Conv2d_2a_3x3,
@@ -91,7 +85,6 @@ class InceptionV3(nn.Module):
         ]
         self.blocks.append(nn.Sequential(*block0))
 
-        # Block 1: maxpool1 to maxpool2
         if self.last_needed_block >= 1:
             block1 = [
                 inception.Conv2d_3b_1x1,
@@ -100,7 +93,6 @@ class InceptionV3(nn.Module):
             ]
             self.blocks.append(nn.Sequential(*block1))
 
-        # Block 2: maxpool2 to aux classifier
         if self.last_needed_block >= 2:
             block2 = [
                 inception.Mixed_5b,
@@ -114,7 +106,6 @@ class InceptionV3(nn.Module):
             ]
             self.blocks.append(nn.Sequential(*block2))
 
-        # Block 3: aux classifier to final avgpool
         if self.last_needed_block >= 3:
             block3 = [
                 inception.Mixed_7a,
@@ -148,7 +139,7 @@ class InceptionV3(nn.Module):
             x = F.interpolate(x, size=(299, 299), mode='bilinear', align_corners=False)
 
         if self.normalize_input:
-            x = 2 * x - 1  # Scale from range (0, 1) to range (-1, 1)
+            x = 2 * x - 1
 
         for idx, block in enumerate(self.blocks):
             x = block(x)
@@ -166,16 +157,11 @@ def _inception_v3(*args, **kwargs):
     try:
         version = tuple(map(int, torchvision.__version__.split('.')[:2]))
     except ValueError:
-        # Just a caution against weird version strings
         version = (0,)
 
-    # Skips default weight inititialization if supported by torchvision
-    # version. See https://github.com/mseitzer/pytorch-fid/issues/28.
     if version >= (0, 6):
         kwargs['init_weights'] = False
 
-    # Backwards compatibility: `weights` argument was handled by `pretrained`
-    # argument prior to version 0.13.
     if version < (0, 13) and 'weights' in kwargs:
         if kwargs['weights'] == 'DEFAULT':
             kwargs['pretrained'] = True
@@ -233,8 +219,6 @@ class FIDInceptionA(torchvision.models.inception.InceptionA):
         branch3x3dbl = self.branch3x3dbl_2(branch3x3dbl)
         branch3x3dbl = self.branch3x3dbl_3(branch3x3dbl)
 
-        # Patch: Tensorflow's average pool does not use the padded zero's in
-        # its average calculation
         branch_pool = F.avg_pool2d(x, kernel_size=3, stride=1, padding=1, count_include_pad=False)
         branch_pool = self.branch_pool(branch_pool)
 
@@ -261,8 +245,6 @@ class FIDInceptionC(torchvision.models.inception.InceptionC):
         branch7x7dbl = self.branch7x7dbl_4(branch7x7dbl)
         branch7x7dbl = self.branch7x7dbl_5(branch7x7dbl)
 
-        # Patch: Tensorflow's average pool does not use the padded zero's in
-        # its average calculation
         branch_pool = F.avg_pool2d(x, kernel_size=3, stride=1, padding=1, count_include_pad=False)
         branch_pool = self.branch_pool(branch_pool)
 
@@ -294,8 +276,6 @@ class FIDInceptionE_1(torchvision.models.inception.InceptionE):
         ]
         branch3x3dbl = torch.cat(branch3x3dbl, 1)
 
-        # Patch: Tensorflow's average pool does not use the padded zero's in
-        # its average calculation
         branch_pool = F.avg_pool2d(x, kernel_size=3, stride=1, padding=1, count_include_pad=False)
         branch_pool = self.branch_pool(branch_pool)
 
@@ -327,10 +307,6 @@ class FIDInceptionE_2(torchvision.models.inception.InceptionE):
         ]
         branch3x3dbl = torch.cat(branch3x3dbl, 1)
 
-        # Patch: The FID Inception model uses max pooling instead of average
-        # pooling. This is likely an error in this specific Inception
-        # implementation, as other Inception models use average pooling here
-        # (which matches the description in the paper).
         branch_pool = F.max_pool2d(x, kernel_size=3, stride=1, padding=1)
         branch_pool = self.branch_pool(branch_pool)
 

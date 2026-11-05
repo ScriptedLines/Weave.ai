@@ -133,8 +133,6 @@ def get_activations(files, model, batch_size=50, dims=2048, device='cpu', num_wo
         with torch.no_grad():
             pred = model(batch)[0]
 
-        # If model output is not scalar, apply global spatial average pooling.
-        # This happens if you choose a dimensionality not equal 2048.
         if pred.size(2) != 1 or pred.size(3) != 1:
             pred = adaptive_avg_pool2d(pred, output_size=(1, 1))
 
@@ -180,7 +178,6 @@ def calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
 
     diff = mu1 - mu2
 
-    # Product might be almost singular
     covmean, _ = linalg.sqrtm(sigma1.dot(sigma2), disp=False)
     if not np.isfinite(covmean).all():
         msg = (
@@ -190,7 +187,6 @@ def calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
         offset = np.eye(sigma1.shape[0]) * eps
         covmean = linalg.sqrtm((sigma1 + offset).dot(sigma2 + offset))
 
-    # Numerical error might give slight imaginary component
     if np.iscomplexobj(covmean):
         if not np.allclose(np.diagonal(covmean).imag, 0, atol=1e-3):
             m = np.max(np.abs(covmean.imag))
@@ -269,9 +265,6 @@ def main():
         try:
             num_cpus = len(os.sched_getaffinity(0))
         except AttributeError:
-            # os.sched_getaffinity is not available under Windows, use
-            # os.cpu_count instead (which may not return the *available* number
-            # of CPUs).
             num_cpus = os.cpu_count()
 
         num_workers = min(num_cpus, 8) if num_cpus is not None else 0

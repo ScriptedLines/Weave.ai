@@ -10,25 +10,21 @@ from models.extractors.res_fpn import FeatureEncoder, RefinePyramid
 
 
 def apply_offset(offset):
-    # Offset(B x 2 x H x W)
     sizes = list(offset.size()[2:])
     grid_list = torch.meshgrid([torch.arange(size, device=offset.device) for size in sizes])
-    grid_list = reversed(grid_list)  # Two cordinates grid tensor
+    grid_list = reversed(grid_list)
 
-    # Apply offset
     grid_list = [
         grid.float().unsqueeze(0) + offset[:, dim, ...] for dim, grid in enumerate(grid_list)
-    ]  # 2 tensor (B x H x W): [0: size - 1]
+    ]
 
-    # Normalize
     grid_list = [
         grid / ((size - 1.0) / 2.0) - 1.0 for grid, size in zip(grid_list, reversed(sizes))
-    ]  # 2 tensor (B x H x W): [-1, 1]
+    ]
 
     return torch.stack(grid_list, dim=-1)
 
 
-# backbone
 class EqualLR:
     def __init__(self, name):
         self.name = name
@@ -101,12 +97,7 @@ class ModulatedConv2d(nn.Module):
         self.weight = nn.Parameter(torch.Tensor(fout, fin, kernel_size, kernel_size))
         self.bias = nn.Parameter(torch.Tensor(1, fout, 1, 1))
 
-        # TODO: Add PixelNorm
         self.mlp_class_std = EqualLinear(latent_dim, fin)
-        # if normalize_mlp:
-        #     self.mlp_class_std = nn.Sequential(EqualLinear(latent_dim, fin), PixelNorm())
-        # else:
-        #     self.mlp_class_std = EqualLinear(latent_dim, fin)
 
         if padding_type == 'reflect':
             self.padding = nn.ReflectionPad2d(padding_size)
@@ -163,12 +154,7 @@ class StyledConvBlock(nn.Module):
             else:
                 padding_layer = nn.ZeroPad2d
 
-        # TODO: Add EqualConv2d
         conv2d = ModulatedConv2d
-        # if modulated_conv:
-        #     conv2d = ModulatedConv2d
-        # else:
-        #     conv2d = EqualConv2d
 
         if modulated_conv:
             self.actvn_gain = sqrt(2)
@@ -253,12 +239,7 @@ class Styled_F_ConvBlock(nn.Module):
             else:
                 padding_layer = nn.ZeroPad2d
 
-        # TODO: Add EqualConv2d
         conv2d = ModulatedConv2d
-        # if modulated_conv:
-        #     conv2d = ModulatedConv2d
-        # else:
-        #     conv2d = EqualConv2d
 
         if modulated_conv:
             self.actvn_gain = sqrt(2)
@@ -305,7 +286,6 @@ class Styled_F_ConvBlock(nn.Module):
             seq1 = [padding_layer(1), conv1]
             self.conv1 = nn.Sequential(*seq1)
 
-        # self.actvn1 = activation
 
     def forward(self, input, latent=None):
         if self.modulated_conv:
@@ -320,7 +300,6 @@ class Styled_F_ConvBlock(nn.Module):
         else:
             out = self.conv1(out)
 
-        # out = self.actvn1(out) * self.actvn_gain
 
         return out
 
@@ -418,7 +397,6 @@ class AFlowNet(nn.Module):
             weight_array = torch.cuda.FloatTensor(weight_array).permute(3, 2, 0, 1)
             self.weight = nn.Parameter(data=weight_array, requires_grad=False)
 
-            # import ipdb; ipdb.set_trace()
 
             B = x_conds[len(x_warps) - 1].shape[0]
 
@@ -591,7 +569,6 @@ class StyleAFWM(BaseModel):
     def forward(self, cond_input, image_input, image_edge=None, phase='train'):
         assert phase in ['train', 'test'], f'ERROR: phase can only be train or test, not {phase}'
 
-        # TODO: Refactor to nn.Sequential
         cond_pyramids = self.cond_FPN(self.cond_features(cond_input))
         image_pyramids = self.image_FPN(self.image_features(image_input))
 

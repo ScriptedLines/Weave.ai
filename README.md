@@ -145,6 +145,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
+# Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env before starting.
 # Start backend server
 uvicorn backend:app --host 127.0.0.1 --port 8000 --reload
 ```
@@ -160,6 +161,14 @@ npm run dev
 ```bash
 modal deploy vton/vton_model.py
 ```
+
+### Configuration
+
+The backend requires `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. Set `REDIS_URL` to use Redis; otherwise the backend uses its in-memory cache. Deployment-specific settings `MODAL_APP_NAME`, `ALLOWED_ORIGINS`, `ALLOWED_ORIGIN_REGEX`, `LOG_LEVEL`, and `PORT` are optional.
+
+The frontend uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Set `VITE_API_BASE_URL` if the API is not available through the default `/api` path.
+
+Application limits, cache lifetimes, and concurrency defaults are defined in `backend_settings.py`. Change them there if needed; the former environment variable overrides for these values are no longer read.
 
 ---
 

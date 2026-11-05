@@ -12,28 +12,13 @@ class DMVTONPipeline(BaseVTONPipeline):
     DM-VTON inference pipeline
     """
 
-    # def __init__(self, align_corners=True, checkpoints=None):
-    #     super().__init__()
-    #     self.align_corners = align_corners
-    #     self.warp_model = AFWM(3, align_corners)
-    #     self.gen_model = MobileNetV2_unet(7, 4)
 
-    #     if checkpoints is not None:
-    #         self._load_pretrained(checkpoints)
 
-    # def _load_pretrained(self, checkpoints):
-    #     if checkpoints.get('warp') is not None:
-    #         warp_ckpt = get_ckpt(checkpoints['warp'])
-    #         load_ckpt(self.warp_model, warp_ckpt)
-    #     if checkpoints.get('gen') is not None:
-    #         gen_ckpt = get_ckpt(checkpoints['gen'])
-    #         load_ckpt(self.gen_model, gen_ckpt)
 
     def forward(self,warp_model,gen_model, person, clothes, clothes_edge, phase="test"):
         clothes_edge = (clothes_edge > 0.5).float()
         clothes = clothes * clothes_edge
 
-        # Warp
         flow_out = warp_model(person, clothes, phase=phase)
         (
             warped_cloth,
@@ -47,7 +32,6 @@ class DMVTONPipeline(BaseVTONPipeline):
             align_corners=True,
         )
 
-        # Gen
         gen_inputs = torch.cat([person, warped_cloth, warped_edge], 1)
         gen_outputs = gen_model(gen_inputs)
         p_rendered, m_composite = torch.split(gen_outputs, [3, 1], 1)

@@ -31,9 +31,6 @@ class ResidualBlock(nn.Module):
         return out
 
 
-# Defines the submodule with skip connection.
-# X -------------------identity---------------------- X
-#   |-- downsampling -- |submodule| -- upsampling --|
 class ResUnetSkipConnectionBlock(nn.Module):
     def __init__(
         self,
@@ -53,7 +50,6 @@ class ResUnetSkipConnectionBlock(nn.Module):
         if input_nc is None:
             input_nc = outer_nc
         downconv = nn.Conv2d(input_nc, inner_nc, kernel_size=3, stride=2, padding=1, bias=use_bias)
-        # add two resblock
         res_downconv = [ResidualBlock(inner_nc, norm_layer), ResidualBlock(inner_nc, norm_layer)]
         res_upconv = [ResidualBlock(outer_nc, norm_layer), ResidualBlock(outer_nc, norm_layer)]
 
@@ -114,7 +110,6 @@ class ResUnetGenerator(BaseModel):
     ):
         super().__init__()
 
-        # construct unet structure
         unet_block = ResUnetSkipConnectionBlock(
             ngf * 8, ngf * 8, input_nc=None, submodule=None, norm_layer=norm_layer, innermost=True
         )

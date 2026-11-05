@@ -8,7 +8,6 @@ class TrainOptions(BaseOptions):
     def _add_args(self) -> None:
         super()._add_args()
 
-        # For logging
         self.parser.add_argument(
             '--print_step',
             type=int,
@@ -25,7 +24,6 @@ class TrainOptions(BaseOptions):
             help='frequency of saving checkpoints at the end of epochs',
         )
 
-        # For training
         self.parser.add_argument(
             '--resume', nargs='?', const=True, default=False, help='resume training'
         )
@@ -60,7 +58,6 @@ class TrainOptions(BaseOptions):
         )
         self.parser.add_argument('--lr', type=float, default=0.00005, help='initial learning rate')
 
-        # Checkpoints
         self.parser.add_argument(
             '--pb_warp_checkpoint',
             type=str,

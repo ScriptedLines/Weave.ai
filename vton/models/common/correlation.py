@@ -248,7 +248,6 @@ def cupy_kernel(strFunction, objVariables):
 
         if objMatch is None:
             break
-        # end
 
         intArg = int(objMatch.group(2))
 
@@ -256,14 +255,12 @@ def cupy_kernel(strFunction, objVariables):
         intSizes = objVariables[strTensor].size()
 
         strKernel = strKernel.replace(objMatch.group(), str(intSizes[intArg]))
-    # end
 
     while True:
         objMatch = re.search(r'(VALUE_)([0-4])(\()([^\)]+)(\))', strKernel)
 
         if objMatch is None:
             break
-        # end
 
         intArgs = int(objMatch.group(2))
         strArgs = objMatch.group(4).split(',')
@@ -282,12 +279,10 @@ def cupy_kernel(strFunction, objVariables):
         strKernel = strKernel.replace(
             objMatch.group(0), strTensor + '[' + str.join('+', strIndex) + ']'
         )
-    # end
 
     return strKernel
 
 
-# end
 
 
 @cupy.memoize(for_each_device=True)
@@ -295,7 +290,6 @@ def cupy_launch(strFunction, strKernel):
     return cupy.cuda.compile_with_cache(strKernel).get_function(strFunction)
 
 
-# end
 
 
 class _FunctionCorrelation(torch.autograd.Function):
@@ -378,11 +372,9 @@ class _FunctionCorrelation(torch.autograd.Function):
         elif not first.is_cuda:
             raise NotImplementedError()
 
-        # end
 
         return output
 
-    # end
 
     @staticmethod
     def backward(self, gradOutput):
@@ -431,8 +423,6 @@ class _FunctionCorrelation(torch.autograd.Function):
                             None,
                         ],
                     )
-                # end
-            # end
 
             if gradSecond is not None:
                 for intSample in range(first.shape[0]):
@@ -463,39 +453,27 @@ class _FunctionCorrelation(torch.autograd.Function):
                             gradSecond.data_ptr(),
                         ],
                     )
-                # end
-            # end
 
         elif not first.is_cuda:
             raise NotImplementedError()
 
-        # end
 
         return gradFirst, gradSecond, None
 
-    # end
 
 
-# end
 
 
 def FunctionCorrelation(tenFirst, tenSecond, intStride):
     return _FunctionCorrelation.apply(tenFirst, tenSecond, intStride)
 
 
-# end
 
 
 class ModuleCorrelation(torch.nn.Module):
     def __init__(self):
         super().__init__()
 
-    # end
 
     def forward(self, tenFirst, tenSecond, intStride):
         return _FunctionCorrelation.apply(tenFirst, tenSecond, intStride)
-
-    # end
-
-
-# end

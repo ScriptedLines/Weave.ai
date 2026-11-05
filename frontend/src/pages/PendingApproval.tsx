@@ -67,54 +67,55 @@ export default function PendingApproval() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-6 py-16">
-      <div className="w-full max-w-xl border-[1.5px] border-on-surface bg-surface p-8 md:p-12 relative">
-        <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+    <>
+      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-6 py-16 selection:bg-rust selection:text-white">
+        <div className="w-full max-w-xl border border-ink/20 bg-paper-light p-8 md:p-12 relative shadow-xl rounded-sm">
+          <div className="absolute top-0 left-0 w-full h-1 bg-rust"></div>
 
-        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary mb-5">
-          ACCESS REQUEST // PENDING
-        </p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-rust font-bold mb-5">
+            ACCESS REQUEST // PENDING
+          </p>
 
-        <h1 className="font-headline text-4xl md:text-5xl text-ink leading-tight mb-6">
-          Your access request is awaiting approval.
-        </h1>
+          <h1 className="font-headline text-4xl md:text-5xl text-ink leading-tight mb-6">
+            Your access request is awaiting approval.
+          </h1>
 
-        <p className="font-mono text-xs leading-relaxed text-on-surface/65 max-w-md mb-8">
-          Weave Studio is an invitation-only archive. Once a curator reviews and approves your account in the database,
-          your studio key will unlock automatically.
-        </p>
+          <p className="font-mono text-xs leading-relaxed text-ink/70 max-w-md mb-8">
+            Your account is awaiting approval. Once approved, you can continue to your color profile and recommendations.
+          </p>
 
-        <div className="border-t border-on-surface/10 py-5 mb-8 space-y-2">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface/40">Signed in as</p>
-          <p className="font-mono text-sm text-ink">{user?.email || 'Unknown account'}</p>
+          <div className="border-t border-ink/10 py-5 mb-8 space-y-2">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/40">Signed in as</p>
+            <p className="font-mono text-sm text-ink font-bold">{user?.email || 'Unknown account'}</p>
+          </div>
+
+          {error && (
+            <p className="font-mono text-[11px] text-rust mb-5">{error}</p>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              onClick={checkApproval}
+              disabled={checking}
+              className="bg-rust text-paper font-mono text-[10px] uppercase tracking-[0.2em] px-6 py-3 hover:bg-ink transition-colors disabled:opacity-50 rounded-sm shadow-sm"
+            >
+              {checking ? 'CHECKING...' : 'CHECK APPROVAL STATUS'}
+            </button>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="border border-ink/20 text-ink font-mono text-[10px] uppercase tracking-[0.2em] px-6 py-3 hover:border-rust hover:text-rust transition-colors rounded-sm"
+            >
+              SIGN OUT
+            </button>
+          </div>
+
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-ink/40 mt-8">
+            This page refreshes automatically every 15 seconds.
+          </p>
         </div>
-
-        {error && (
-          <p className="font-mono text-[11px] text-primary mb-5">{error}</p>
-        )}
-
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            type="button"
-            onClick={checkApproval}
-            disabled={checking}
-            className="bg-primary text-on-primary font-mono text-[10px] uppercase tracking-[0.2em] px-6 py-3 hover:bg-rust transition-colors disabled:opacity-50"
-          >
-            {checking ? 'CHECKING...' : 'CHECK APPROVAL STATUS'}
-          </button>
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="border border-on-surface/20 text-ink font-mono text-[10px] uppercase tracking-[0.2em] px-6 py-3 hover:border-primary hover:text-primary transition-colors"
-          >
-            SIGN OUT
-          </button>
-        </div>
-
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-on-surface/35 mt-8">
-          This page refreshes automatically every 15 seconds.
-        </p>
       </div>
-    </div>
+    </>
   )
 }

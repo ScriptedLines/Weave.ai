@@ -32,6 +32,7 @@ vton/test/
 *.png
 *.webp
 !frontend/public/static/**/*
+!frontend/public/weave-mark.png
 !vton/b.jpg
 
 upload_cloudinary.py
@@ -43,3 +44,10 @@ vton/opt/test_opt.py
 .agents/
 .stitch/
 skills-lock.json
+
+tests/
+/.pytest_cache/
+/.coverage
+/htmlcov/
+/test.py
+/BACKEND_CHANGES.md

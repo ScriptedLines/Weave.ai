@@ -188,4 +188,4 @@ class RMGNGenerator(BaseModel):
         inp_attr_list = self.get_inp_attr(inp)
         ref_attr_list = self.get_ref_attr(ref)
         out, out_L1, out_L2, M_list = self.get_gen(inp_attr_list, ref_attr_list)
-        return out  # , out_L1, out_L2, M_list
+        return out

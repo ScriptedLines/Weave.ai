@@ -87,8 +87,6 @@ def select_loss(loss):
 
 
 def calc_tokenized_size(image_shape, token_size):
-    # image_shape : (C, H, W)
-    # token_size  : (H_t, W_t)
     if image_shape[1] % token_size[0] != 0:
         raise ValueError(
             "Token width %d does not divide image width %d" % (token_size[0], image_shape[1])
@@ -99,41 +97,25 @@ def calc_tokenized_size(image_shape, token_size):
             "Token height %d does not divide image height %d" % (token_size[1], image_shape[2])
         )
 
-    # result : (N_h, N_w)
     return (image_shape[1] // token_size[0], image_shape[2] // token_size[1])
 
 
 def img_to_tokens(image_batch, token_size):
-    # image_batch : (N, C, H, W)
-    # token_size  : (H_t, W_t)
 
-    # result : (N, C, N_h, H_t, W)
     result = image_batch.view((*image_batch.shape[:2], -1, token_size[0], image_batch.shape[3]))
 
-    # result : (N, C, N_h, H_t, W       )
-    #       -> (N, C, N_h, H_t, N_w, W_t)
     result = result.view((*result.shape[:4], -1, token_size[1]))
 
-    # result : (N, C, N_h, H_t, N_w, W_t)
-    #       -> (N, N_h, N_w, C, H_t, W_t)
     result = result.permute((0, 2, 4, 1, 3, 5))
 
     return result
 
 
 def img_from_tokens(tokens):
-    # tokens : (N, N_h, N_w, C, H_t, W_t)
-    # result : (N, C, N_h, H_t, N_w, W_t)
     result = tokens.permute((0, 3, 1, 4, 2, 5))
 
-    # result : (N, C, N_h, H_t, N_w, W_t)
-    #       -> (N, C, N_h, H_t, N_w * W_t)
-    #        = (N, C, N_h, H_t, W)
     result = result.reshape((*result.shape[:4], -1))
 
-    # result : (N, C, N_h, H_t, W)
-    #       -> (N, C, N_h * H_t, W)
-    #        = (N, C, H, W)
     result = result.reshape((*result.shape[:2], -1, result.shape[4]))
 
     return result
@@ -173,15 +155,12 @@ class TransformerBlock(nn.Module):
             self.re_alpha = 1
 
     def forward(self, x):
-        # x: (L, N, features)
 
-        # Step 1: Multi-Head Self Attention
         y1 = self.norm1(x)
         y1, _atten_weights = self.atten(y1, y1, y1)
 
         y = x + self.re_alpha * y1
 
-        # Step 2: PositionWise Feed Forward Network
         y2 = self.norm2(y)
         y2 = self.ffn(y2)
 
@@ -207,20 +186,16 @@ class TransformerEncoder(nn.Module):
         )
 
     def forward(self, x):
-        # x : (N, L, features)
 
-        # y : (L, N, features)
         y = x.permute((1, 0, 2))
         y = self.encoder(y)
 
-        # result : (N, L, features)
         result = y.permute((1, 0, 2))
 
         return result
 
 
 class FourierEmbedding(nn.Module):
-    # arXiv: 2011.13775
 
     def __init__(self, features, height, width, **kwargs):
         super().__init__(**kwargs)
@@ -229,12 +204,9 @@ class FourierEmbedding(nn.Module):
         self._width = width
 
     def forward(self, y, x):
-        # x : (N, L)
-        # y : (N, L)
         x_norm = 2 * x / (self._width - 1) - 1
         y_norm = 2 * y / (self._height - 1) - 1
 
-        # z : (N, L, 2)
         z = torch.cat((x_norm.unsqueeze(2), y_norm.unsqueeze(2)), dim=2)
 
         return torch.sin(self.projector(z))
@@ -260,19 +232,12 @@ class ViTInput(nn.Module):
         self.output = nn.Linear(embed_features + input_features, features)
 
     def forward(self, x):
-        # x     : (N, L, input_features)
-        # embed : (1, height * width, embed_features)
-        #       = (1, L, embed_features)
         embed = self.embed(self.y_const, self.x_const)
 
-        # embed : (1, L, embed_features)
-        #      -> (N, L, embed_features)
         embed = embed.expand((x.shape[0], *embed.shape[1:]))
 
-        # result : (N, L, embed_features + input_features)
         result = torch.cat([embed, x], dim=2)
 
-        # (N, L, features)
         return self.output(result)
 
 
@@ -309,29 +274,18 @@ class PixelWiseViT(nn.Module):
         self.trans_output = nn.Linear(features, image_shape[0])
 
     def forward(self, x):
-        # x : (N, C, H, W)
 
-        # itokens : (N, C, H * W)
         itokens = x.view(*x.shape[:2], -1)
 
-        # itokens : (N, C,     H * W)
-        #        -> (N, H * W, C    )
-        #         = (N, L,     C)
         itokens = itokens.permute((0, 2, 1))
 
-        # y : (N, L, features)
         y = self.trans_input(itokens)
         y = self.encoder(y)
 
-        # otokens : (N, L, C)
         otokens = self.trans_output(y)
 
-        # otokens : (N, L, C)
-        #        -> (N, C, L)
-        #         = (N, C, H * W)
         otokens = otokens.permute((0, 2, 1))
 
-        # result : (N, C, H, W)
         result = otokens.view(*otokens.shape[:2], *self.image_shape[1:])
 
         return result

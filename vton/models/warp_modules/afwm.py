@@ -4,25 +4,22 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from models.base_model import BaseModel
-from models.common.correlation import FunctionCorrelation  # Custom cost volume layer
+from models.common.correlation import FunctionCorrelation
 from models.extractors.res_fpn import FeatureEncoder, RefinePyramid
 
 
 def apply_offset(offset):
-    # Offset(B x 2 x H x W)
     sizes = list(offset.size()[2:])
     grid_list = torch.meshgrid([torch.arange(size, device=offset.device) for size in sizes])
-    grid_list = reversed(grid_list)  # Two cordinates grid tensor
+    grid_list = reversed(grid_list)
 
-    # Apply offset
     grid_list = [
         grid.float().unsqueeze(0) + offset[:, dim, ...] for dim, grid in enumerate(grid_list)
-    ]  # 2 tensor (B x H x W): [0: size - 1]
+    ]
 
-    # Normalize
     grid_list = [
         grid / ((size - 1.0) / 2.0) - 1.0 for grid, size in zip(grid_list, reversed(sizes))
-    ]  # 2 tensor (B x H x W): [-1, 1]
+    ]
 
     return torch.stack(grid_list, dim=-1)
 
@@ -209,7 +206,6 @@ class AFlowNet(nn.Module):
                 x_cond = x_conds[len(x_warps) - 1 - i]
 
                 if last_flow is not None and warp_feature:
-                    # with style_dt[3]:
                     x_warp_after = F.grid_sample(
                         x_warp,
                         last_flow.detach().permute(0, 2, 3, 1),
@@ -220,7 +216,6 @@ class AFlowNet(nn.Module):
                 else:
                     x_warp_after = x_warp
 
-                # with style_dt[0]:
                 tenCorrelation = FunctionCorrelation(
                     tenFirst=x_warp_after, tenSecond=x_cond, intStride=1
                 )
@@ -229,11 +224,9 @@ class AFlowNet(nn.Module):
                 )
                 flow = self.netMain[i](tenCorrelation)
 
-                # with style_dt[5]:
                 flow = apply_offset(flow)
 
                 if last_flow is not None:
-                    # with style_dt[3]:
                     flow = F.grid_sample(
                         last_flow,
                         flow,
@@ -246,7 +239,6 @@ class AFlowNet(nn.Module):
 
                 last_flow = flow
 
-                # with style_dt[3]:
                 x_warp = F.grid_sample(
                     x_warp,
                     flow.permute(0, 2, 3, 1),
@@ -257,13 +249,10 @@ class AFlowNet(nn.Module):
 
                 concat = torch.cat([x_warp, x_cond], 1)
 
-                # with style_dt[4]:
                 flow = self.netRefine[i](concat)
 
-                # with style_dt[5]:
                 flow = apply_offset(flow)
 
-                # with style_dt[3]:
                 flow = F.grid_sample(
                     last_flow,
                     flow,
@@ -274,7 +263,6 @@ class AFlowNet(nn.Module):
 
                 last_flow = F.interpolate(flow, scale_factor=2, mode='bilinear')
 
-            # with style_dt[3]:
             x_warp = F.grid_sample(
                 x,
                 last_flow.permute(0, 2, 3, 1),
@@ -300,7 +288,6 @@ class AFWM(BaseModel):
     def forward(self, cond_input, image_input, image_edge=None, phase='train'):
         assert phase in ['train', 'test'], f'ERROR: phase can only be train or test, not {phase}'
 
-        # TODO: Refactor to nn.Sequential
         cond_pyramids = self.cond_FPN(self.cond_features(cond_input))
         image_pyramids = self.image_FPN(self.image_features(image_input))
 

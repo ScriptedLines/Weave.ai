@@ -17,12 +17,10 @@ def spatial_average(in_tens, keepdim=True):
     return in_tens.mean([2, 3], keepdim=keepdim)
 
 
-def upsample(in_tens, out_HW=(64, 64)):  # assumes scale factor is same for H and W
-    # in_H, in_W = in_tens.shape[2], in_tens.shape[3]
+def upsample(in_tens, out_HW=(64, 64)):
     return nn.Upsample(size=out_HW, mode='bilinear', align_corners=False)(in_tens)
 
 
-# Learned perceptual metric
 class LPIPS(nn.Module):
     def __init__(
         self,
@@ -84,7 +82,7 @@ class LPIPS(nn.Module):
         self.pnet_tune = pnet_tune
         self.pnet_rand = pnet_rand
         self.spatial = spatial
-        self.lpips = lpips  # false means baseline of just averaging all layers
+        self.lpips = lpips
         self.version = version
         self.scaling_layer = ScalingLayer()
 
@@ -108,7 +106,7 @@ class LPIPS(nn.Module):
             self.lin3 = NetLinLayer(self.chns[3], use_dropout=use_dropout)
             self.lin4 = NetLinLayer(self.chns[4], use_dropout=use_dropout)
             self.lins = [self.lin0, self.lin1, self.lin2, self.lin3, self.lin4]
-            if self.pnet_type == 'squeeze':  # 7 layers for squeezenet
+            if self.pnet_type == 'squeeze':
                 self.lin5 = NetLinLayer(self.chns[5], use_dropout=use_dropout)
                 self.lin6 = NetLinLayer(self.chns[6], use_dropout=use_dropout)
                 self.lins += [self.lin5, self.lin6]
@@ -135,11 +133,10 @@ class LPIPS(nn.Module):
             self.eval()
 
     def forward(self, in0, in1, retPerLayer=False, normalize=False):
-        if normalize:  # turn on this flag if input is [0,1] so it can be adjusted to [-1, +1]
+        if normalize:
             in0 = 2 * in0 - 1
             in1 = 2 * in1 - 1
 
-        # v0.0 - original release had a bug, where input was not scaled
         in0_input, in1_input = (
             (self.scaling_layer(in0), self.scaling_layer(in1))
             if self.version == '0.1'
@@ -226,9 +223,6 @@ def calculate_lpips_given_paths(paths, device, backbone='vgg', version='0.1'):
         if not os.path.exists(os.path.join(paths[1], f)):
             raise FileNotFoundError(f'{os.path.join(paths[1], f)} does not exist')
 
-        # Load images
-        # img0 = im2tensor(load_image(os.path.join(paths[0], f))).to(device) # RGB image from [-1,1]
-        # img1 = im2tensor(load_image(os.path.join(paths[1], f))).to(device)
         img0 = (
             np.array(Image.open(os.path.join(paths[0], f))).transpose(2, 0, 1).astype(np.float32)
             / 255
@@ -240,7 +234,6 @@ def calculate_lpips_given_paths(paths, device, backbone='vgg', version='0.1'):
         img0 = torch.from_numpy(img0).unsqueeze(0).to(device)
         img1 = torch.from_numpy(img1).unsqueeze(0).to(device)
 
-        # Compute distance
         lpips_avg += loss_fn(img0, img1).item()
 
     lpips_avg /= len(files)

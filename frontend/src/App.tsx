@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { Layout } from './components/Layout'
 
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
@@ -9,6 +10,7 @@ import PendingApproval from './pages/PendingApproval';
 import OnboardingDNA from './pages/OnboardingDNA';
 import DashboardPage from './pages/DashboardPage';
 import StudioPage from './pages/StudioPage';
+import AccountPage from './pages/AccountPage';
 import TechArchive from './pages/TechArchive';
 import TrainingDiagram from './pages/TrainingDiagram'
 import RecommendationDocs from './pages/RecommendationDocs'
@@ -16,11 +18,13 @@ import InferenceDocs from './pages/InferenceDocs'
 
 export function AppRoutes() {
   return (
+    <Layout>
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/verify-waiting" element={<VerificationWaiting />} />
       <Route path="/pending-approval" element={<PendingApproval />} />
+      <Route path="/account" element={<AccountPage />} />
       <Route path="/onboarding-dna" element={<ProtectedRoute><OnboardingDNA /></ProtectedRoute>} />
 
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
@@ -33,6 +37,7 @@ export function AppRoutes() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Layout>
   )
 }
 

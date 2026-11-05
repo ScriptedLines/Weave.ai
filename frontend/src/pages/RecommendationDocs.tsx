@@ -1,113 +1,10 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { TechDocsLayout } from '../components/TechDocsLayout';
 
 export default function RecommendationDocs() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-
-    const dot = document.querySelector('.cursor-dot') as HTMLElement;
-    if (dot) {
-      const moveHandler = (e: MouseEvent) => {
-        dot.style.left = e.clientX + 'px';
-        dot.style.top = e.clientY + 'px';
-      };
-      document.addEventListener('mousemove', moveHandler);
-      return () => document.removeEventListener('mousemove', moveHandler);
-    }
-  }, []);
-
   return (
-    <div className="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden" style={{ cursor: 'none' }}>
-      <style>{`
-        .risograph-grain {
-          background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuA4paJuQXAK_UWJl2y7RuFnXbJfI8Run0weMMPaDlWiNS6y5O_TWuyuN0-8wo7TvTgXrn140pIi2ak5eWrvvBqsl_Ksn9_aWF7JkR2ox75Pcie-8hQHGLKTvy7oOrNbEofqZPOmqYW1xM_JTReeKHhk9jLvlqVTmfcQLODYRozpoQlDTwIzu_1QBhB9W59s6dGVJbQBGz8G4FQ0vyWes_lRj7p0JNSZ9L-5pNUhGemaeXuBKo1NSuimZHSN_U6xbedVwJD9zfJOZynW);
-          opacity: 0.04;
-          pointer-events: none
-        }
-        .ink-bleed-underline {
-          background: linear-gradient(90deg, transparent 0%, #1A1208 50%, transparent 100%);
-          height: 1px;
-          width: 100%;
-          opacity: 0.2
-        }
-        .stamp-clip {
-          clip-path: polygon(0% 5%, 5% 0%, 95% 0%, 100% 5%, 100% 95%, 95% 100%, 5% 100%, 0% 95%, 0% 75%, 2% 70%, 2% 30%, 0% 25%)
-        }
-        .tape-strip {
-          background-color: #d4e899;
-          box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05)
-        }
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 30s linear infinite;
-        }
-        .cursor-dot {
-          width: 8px;
-          height: 8px;
-          background-color: #a63319;
-          border-radius: 50%;
-          position: fixed;
-          pointer-events: none;
-          z-index: 9999;
-          transform: translate(-50%, -50%);
-        }
-      `}</style>
-
-      <div className="fixed inset-0 risograph-grain z-[100]"></div>
-
-      <aside className="fixed left-0 top-0 h-full flex flex-col pt-20 pb-8 px-4 bg-[#F5EFE0] w-64 border-r border-[#1A1208]/10 z-40 transition-all duration-300 hidden md:flex">
-        <div className="mb-12 px-4 cursor-pointer" onClick={() => navigate('/')}>
-          <h1 className="text-xl font-bold text-[#1A1208] uppercase tracking-tighter">Technical Studio</h1>
-          <p className="font-body italic text-sm opacity-60">AI Fashion Architecture</p>
-        </div>
-        <nav className="flex-1 space-y-2">
-          <button onClick={() => navigate('/docs/training')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
-            <span className="material-symbols-outlined">account_tree</span>
-            <span className="font-label text-xs font-bold uppercase tracking-widest">Pipeline</span>
-          </button>
-
-          <button onClick={() => navigate('/docs/recommendation')} className="w-full flex items-center gap-3 bg-[#C84B2F] text-[#F5EFE0] rounded-sm px-4 py-3 rotate-1 translate-x-1 duration-200 ease-out-back">
-            <span className="material-symbols-outlined">memory</span>
-            <span className="font-label text-xs font-bold uppercase tracking-widest">Engine</span>
-          </button>
-          <button onClick={() => navigate('/docs/inference')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
-            <span className="material-symbols-outlined">psychology</span>
-            <span className="font-label text-xs font-bold uppercase tracking-widest">Inference</span>
-          </button>
-          <button onClick={() => navigate('/docs/archive')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
-            <span className="material-symbols-outlined">menu_book</span>
-            <span className="font-label text-xs font-bold uppercase tracking-widest">Docs</span>
-          </button>
-        </nav>
-        <div className="mt-auto px-4">
-          <button onClick={() => navigate('/studio')} className="w-full bg-primary text-on-primary font-label text-[10px] uppercase py-3 tracking-widest hover:scale-105 transition-transform">
-            New Experiment
-          </button>
-        </div>
-      </aside>
-
-      <header className="fixed top-0 right-0 left-0 md:left-64 flex justify-between items-center px-6 py-4 backdrop-blur-md bg-[#F5EFE0]/80 border-b border-[#1A1208]/10 z-50">
-        <div className="text-2xl font-black uppercase tracking-widest text-[#1A1208] font-headline cursor-pointer" onClick={() => navigate('/')}>WEAVE</div>
-        <div className="flex items-center gap-6">
-          <div className="hidden md:flex items-center gap-8 font-label text-[10px] tracking-[0.2em] font-bold">
-            <span className="text-[#1A1208]/60 hover:text-[#C84B2F] transition-colors cursor-pointer">INFRASTRUCTURE</span>
-            <span className="text-[#C84B2F] cursor-pointer">THE ENGINE</span>
-            <span className="text-[#1A1208]/60 hover:text-[#C84B2F] transition-colors cursor-pointer">METRICS</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-[#1A1208] cursor-pointer">settings</span>
-            <span onClick={() => navigate('/dashboard')} className="material-symbols-outlined text-[#1A1208] cursor-pointer">account_circle</span>
-          </div>
-        </div>
-      </header>
-
-      <main className="ml-0 md:ml-64 pt-28 pb-20 px-8 md:px-16 max-w-7xl">
-
-        <section className="mb-24 relative">
+    <TechDocsLayout>
+      <section className="mb-20 relative">
           <div className="absolute -top-10 -left-10 w-32 h-32 bg-secondary-container/20 rounded-full blur-3xl"></div>
           <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-4 block">How It's Built / Module 02</span>
           <h1 className="font-headline font-black text-6xl md:text-8xl text-on-surface tracking-tighter leading-[0.9] mb-6">
@@ -280,19 +177,6 @@ export default function RecommendationDocs() {
           </div>
         </section>
 
-        <footer className="mt-40 overflow-hidden border-t border-b border-primary/20 py-4 -mx-8 md:-mx-16">
-          <div className="flex whitespace-nowrap animate-marquee">
-            <div className="flex items-center gap-8 px-4 font-mono text-[10px] uppercase tracking-[0.5em] text-on-surface/50">
-              <span>Processing Real-Time Preference Clusters</span><span className="text-primary">●</span>
-              <span>SigLIP Inference Active</span><span className="text-primary">●</span>
-              <span>99.9% Uptime on Vector DB</span><span className="text-primary">●</span>
-              <span>Processing Real-Time Preference Clusters</span><span className="text-primary">●</span>
-              <span>SigLIP Inference Active</span><span className="text-primary">●</span>
-            </div>
-          </div>
-        </footer>
-      </main>
-      <div className="cursor-dot hidden md:block"></div>
-    </div>
+    </TechDocsLayout>
   );
 }

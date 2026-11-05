@@ -8,7 +8,7 @@ from pathlib import Path
 
 class Profile(contextlib.ContextDecorator):
     """
-    YOLOv5 Profile class. 
+    YOLOv5 Profile class.
     Usage: 'with Profile():' or '@Profile()' decorator
     """
 
@@ -22,21 +22,21 @@ class Profile(contextlib.ContextDecorator):
         return self
 
     def __exit__(self, type, value, traceback):
-        self.dt = self.time() - self.start  # delta-time
-        self.t += self.dt  # accumulate dt
+        self.dt = self.time() - self.start
+        self.t += self.dt
 
     def time(self):
         if self.cuda:
             torch.cuda.synchronize(self.device)
         return time.time()
-    
+
 
 class AverageMeter:
     """
     Computes and stores the average and current value
     Source: https://github.dev/PaddlePaddle/PaddleOCR/ppocr/utils/utility.py
     """
-    
+
     def __init__(self):
         self.reset()
 
@@ -56,7 +56,6 @@ class AverageMeter:
 
 
 def yaml_save(file='data.yaml', data={}):
-    # Single-line safe yaml saving
     with open(file, 'w') as f:
         yaml.safe_dump({k: str(v) if isinstance(v, Path) else v for k, v in data.items()}, f, sort_keys=False)
 
@@ -99,5 +98,3 @@ def print_log(log_path, content, to_print=True):
 
     if to_print:
         print(content)
-
-    

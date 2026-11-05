@@ -1,88 +1,13 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { TechDocsLayout } from '../components/TechDocsLayout';
 
 export default function InferenceDocs() {
-  const navigate = useNavigate();
-
   return (
-    <div className="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen">
-      <style>{`
-        .ink-bleed {
-          mask-image: url("data:image/svg+xml,%3Csvg width='100' height='10' viewBox='0 0 100 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 Q 5 0, 10 5 T 20 5 T 30 5 T 40 5 T 50 5 T 60 5 T 70 5 T 80 5 T 90 5 T 100 5' stroke='black' fill='transparent'/%3E%3C/svg%3E");
-        }
-        .grain {
-          position: fixed;
-          top: 0; left: 0; width: 100%; height: 100%;
-          pointer-events: none;
-          z-index: 9999;
-          opacity: 0.03;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-        .diagonal-hatch {
-          background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(224, 191, 184, 0.1) 10px, rgba(224, 191, 184, 0.1) 11px);
-        }
-        .material-symbols-outlined {
-          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-            display: inline-flex;
-            animation: marquee 30s linear infinite;
-        }
-      `}</style>
-
-      <div className="grain"></div>
-
-      <aside className="fixed left-0 top-0 h-full flex flex-col pt-20 pb-8 px-4 bg-[#F5EFE0] w-64 border-r border-[#1A1208]/10 z-40 hidden md:flex">
-        <div className="mb-12 px-4 cursor-pointer" onClick={() => navigate('/')}>
-          <h1 className="text-xl font-bold text-[#1A1208] font-headline uppercase tracking-widest">Technical Studio</h1>
-          <p className="text-[10px] font-mono tracking-widest opacity-50 uppercase mt-1">AI Fashion Architecture</p>
-        </div>
-        <nav className="flex-1 space-y-2">
-
-          <button onClick={() => navigate('/docs/training')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
-            <span className="material-symbols-outlined">account_tree</span>
-            <span className="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Pipeline</span>
-          </button>
-
-          <button onClick={() => navigate('/docs/recommendation')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
-            <span className="material-symbols-outlined">memory</span>
-            <span className="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Engine</span>
-          </button>
-
-          <button onClick={() => navigate('/docs/inference')} className="w-full flex items-center gap-3 bg-[#C84B2F] text-[#F5EFE0] rounded-sm px-4 py-3 rotate-1 translate-x-1 duration-200 shadow-lg">
-            <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>psychology</span>
-            <span className="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Inference</span>
-          </button>
-
-          <button onClick={() => navigate('/docs/archive')} className="w-full flex items-center gap-3 text-[#1A1208] px-4 py-3 opacity-70 hover:bg-[#1A1208]/5 transition-transform hover:-rotate-1">
-            <span className="material-symbols-outlined">menu_book</span>
-            <span className="font-unbounded text-[10px] font-bold uppercase tracking-tighter">Docs</span>
-          </button>
-        </nav>
-        <div className="mt-auto px-4">
-          <button onClick={() => navigate('/studio')} className="w-full py-4 bg-primary text-on-primary font-unbounded text-[10px] font-black uppercase tracking-widest rounded-sm hover:scale-[1.02] active:scale-95 transition-all">
-            New Experiment
-          </button>
-        </div>
-      </aside>
-
-      <main className="md:ml-64 p-12 lg:p-20 relative z-10">
-
-        <header className="flex justify-between items-center w-full mb-16">
+    <TechDocsLayout>
+      <header className="flex justify-between items-center w-full mb-16">
           <div className="space-y-1">
             <span className="font-mono text-xs tracking-[0.3em] uppercase text-primary font-bold">How It's Built // Section 03</span>
             <h2 className="text-6xl font-headline font-black italic tracking-tighter leading-none text-[#1A1208]">Inference</h2>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="text-right">
-              <p className="font-mono text-[10px] uppercase opacity-40">System Status</p>
-              <p className="font-unbounded text-xs font-bold text-secondary italic">READY_FOR_DEPLOY</p>
-            </div>
-            <span onClick={() => navigate('/dashboard')} className="material-symbols-outlined text-4xl cursor-pointer">account_circle</span>
           </div>
         </header>
 
@@ -216,26 +141,14 @@ export default function InferenceDocs() {
           </div>
         </section>
 
-        <footer className="mt-32 pt-16 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-          <div className="max-w-xs">
-            <p className="font-unbounded text-[10px] font-black uppercase mb-2">Next Chapter</p>
-            <p className="font-headline italic text-2xl leading-tight opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
-              Model Weights &amp; Distillation Strategies
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full border border-on-surface/10 flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all cursor-pointer">
-              <span className="material-symbols-outlined">share</span>
-            </div>
-            <div className="w-12 h-12 rounded-full border border-on-surface/10 flex items-center justify-center hover:bg-primary hover:text-on-primary transition-all cursor-pointer">
-              <span className="material-symbols-outlined">download</span>
-            </div>
-            <div className="px-6 py-3 border border-on-surface/10 font-mono text-[10px] uppercase tracking-widest hover:bg-on-surface hover:text-background transition-all cursor-pointer">
-              Back to Overview
-            </div>
-          </div>
-        </footer>
-      </main>
-    </div>
+      <footer className="mt-20 pt-16 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+        <div className="max-w-xs">
+          <p className="font-unbounded text-[10px] font-black uppercase mb-2">Next Chapter</p>
+          <p className="font-headline italic text-2xl leading-tight opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
+            Model Weights &amp; Distillation Strategies
+          </p>
+        </div>
+      </footer>
+    </TechDocsLayout>
   );
 }

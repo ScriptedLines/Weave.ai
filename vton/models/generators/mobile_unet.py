@@ -30,25 +30,20 @@ class InvertedResidual(nn.Module):
 
         if expand_ratio == 1:
             self.conv = nn.Sequential(
-                # dw
                 nn.Conv2d(hidden_dim, hidden_dim, 3, stride, 1, groups=hidden_dim, bias=False),
                 nn.BatchNorm2d(hidden_dim),
                 nn.ReLU6(inplace=True),
-                # pw-linear
                 nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
                 nn.BatchNorm2d(oup),
             )
         else:
             self.conv = nn.Sequential(
-                # pw
                 nn.Conv2d(inp, hidden_dim, 1, 1, 0, bias=False),
                 nn.BatchNorm2d(hidden_dim),
                 nn.ReLU6(inplace=True),
-                # dw
                 nn.Conv2d(hidden_dim, hidden_dim, 3, stride, 1, groups=hidden_dim, bias=False),
                 nn.BatchNorm2d(hidden_dim),
                 nn.ReLU6(inplace=True),
-                # pw-linear
                 nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
                 nn.BatchNorm2d(oup),
             )
@@ -67,7 +62,6 @@ class MobileNetV2(nn.Module):
         input_channel = 32
         last_channel = 512
         interverted_residual_setting = [
-            # t, c, n, s
             [1, 16, 1, 1],
             [6, 24, 1, 2],
             [6, 32, 1, 2],
@@ -77,10 +71,8 @@ class MobileNetV2(nn.Module):
             [6, 320, 1, 1],
         ]
 
-        # building first layer
         self.features = [conv_bn(input_c, input_channel, 2)]
 
-        # building inverted residual blocks
         for t, c, n, s in interverted_residual_setting:
             output_channel = c
             for i in range(n):
@@ -90,10 +82,8 @@ class MobileNetV2(nn.Module):
                     self.features.append(block(input_channel, output_channel, 1, expand_ratio=t))
                 input_channel = output_channel
 
-        # building last several layers
         self.features.append(conv_1x1_bn(input_channel, last_channel))
 
-        # make it nn.Sequential
         self.features = nn.Sequential(*self.features)
 
         self._initialize_weights()

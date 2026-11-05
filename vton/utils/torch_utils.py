@@ -3,37 +3,17 @@ import os
 import torch
 
 
-# def select_device(device='', batch_size=0):
-#     # device = None or 'cpu' or 0 or '0' or '0,1,2,3'
-#     device = str(device).strip().lower().replace('cuda:', '').replace('none', '')  # to string, 'cuda:0' to '0'
-#     cpu = device == 'cpu'
-#     if cpu:
-#         os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # force torch.cuda.is_available() = False
-#     elif device:  # non-cpu device requested
-#         os.environ['CUDA_VISIBLE_DEVICES'] = device  # set environment variable - must be before assert is_available()
-#         assert torch.cuda.is_available() and torch.cuda.device_count() >= len(device.replace(',', '')), \
-#             f"Invalid CUDA '--device {device}' requested, use '--device cpu' or pass valid CUDA device(s)"
 
-#     if not cpu and torch.cuda.is_available():  # prefer GPU if available
-#         devices = device.split(',') if device else '0'  # range(torch.cuda.device_count())  # i.e. 0,1,6,7
-#         n = len(devices)  # device count
-#         if n > 1 and batch_size > 0:  # check batch_size is divisible by device_count
-#             assert batch_size % n == 0, f'batch-size {batch_size} not multiple of GPU count {n}'
-#         arg = 'cuda:0'
-#     else:  # revert to CPU
-#         arg = 'cpu'
 
-#     return torch.device(arg)
 
 
 def select_device(device='', batch_size=0):
     cpu = device == 'cpu'
-    if not cpu and torch.cuda.is_available():  # prefer GPU if available
+    if not cpu and torch.cuda.is_available():
         arg = f'cuda:{device}'
-    else:  # revert to CPU
+    else:
         arg = 'cpu'
 
-    # return torch.device(arg)
     return arg
 
 
@@ -55,7 +35,7 @@ def smart_optimizer(model, name='Adam', lr=0.001, momentum=0.9):
     params = [p for p in model.parameters()]
 
     if name == 'Adam':
-        optimizer = torch.optim.Adam(params, lr=lr, betas=(momentum, 0.999))  # adjust beta1 to momentum
+        optimizer = torch.optim.Adam(params, lr=lr, betas=(momentum, 0.999))
     elif name == 'AdamW':
         optimizer = torch.optim.AdamW(params, lr=lr, betas=(momentum, 0.999), weight_decay=0.0)
     elif name == 'RMSProp':
@@ -69,14 +49,12 @@ def smart_optimizer(model, name='Adam', lr=0.001, momentum=0.9):
 
 
 def smart_resume(ckpt, optimizer, ckpt_path, epoch_num):
-    # Resume training from a partially trained checkpoint
     best_fid = float('inf')
     start_epoch = ckpt.get('epoch') + 1 if  ckpt.get('epoch') else 1
     if ckpt.get('optimizer') is not None:
-        optimizer.load_state_dict(ckpt['optimizer'])  # optimizer
+        optimizer.load_state_dict(ckpt['optimizer'])
         if ckpt.get('best_fid') is not None:
             best_fid = ckpt['best_fid']
     print(f'Resume training from {ckpt_path} from epoch {start_epoch} to {epoch_num} total epochs')
 
     return start_epoch, best_fid
-

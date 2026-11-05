@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
+import { useStudioFilters } from '../components/Layout';
 
 interface FashionItem {
   id: string;
@@ -20,6 +21,7 @@ export default function DashboardPage() {
   const [recommendedIds, setRecommendedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState('');
   const [page, setPage] = useState(0);
 
   const [gender, setGender] = useState<'male' | 'female' | 'unisex' | ''>('');
@@ -29,6 +31,35 @@ export default function DashboardPage() {
   const [sleeveLength, setSleeveLength] = useState('');
   const [subCategory, setSubCategory] = useState('');
   const [otherDetails, setOtherDetails] = useState('');
+  const { filterOpen: filterDrawerOpen, setFilterOpen: setFilterDrawerOpen } = useStudioFilters();
+  const filterPanelRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!filterDrawerOpen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    filterPanelRef.current?.querySelector<HTMLElement>('button')?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setFilterDrawerOpen(false); return; }
+      if (event.key !== 'Tab') return;
+      const items = filterPanelRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])');
+      if (!items?.length) return;
+      const first = items[0], last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [filterDrawerOpen]);
+
+  const activeFilterCount = useMemo(() => {
+    return [gender, neckStyle, colorFilter, occasion, sleeveLength, subCategory, otherDetails].filter(Boolean).length;
+  }, [gender, neckStyle, colorFilter, occasion, sleeveLength, subCategory, otherDetails]);
 
   const [colorScore, setColorScore] = useState('0.82');
   const [semanticLabel, setSemanticLabel] = useState('Match');
@@ -122,6 +153,7 @@ export default function DashboardPage() {
 
   const fetchRecommendations = async () => {
     if (!user) return;
+    setNotice('');
     setLoading(true);
     setRecommendedIds([]);
     setItems([]);
@@ -208,6 +240,7 @@ export default function DashboardPage() {
   };
 
   const handleSearch = async () => {
+    setNotice('');
     setLoading(true);
     setItems([]);
 
@@ -232,6 +265,7 @@ export default function DashboardPage() {
         })
       });
 
+      if (!res.ok) throw new Error('Search unavailable');
       if (res.ok) {
         const data = await res.json();
         const sortedIds = Object.keys(data);
@@ -243,14 +277,14 @@ export default function DashboardPage() {
           setSemanticLabel("AI Filtered");
           await loadMore(sortedIds, 0);
         } else {
-          window.alert("No items found matching those specific aesthetics.");
+          setNotice('No items matched those filters. Try changing your selection.');
+          setRecommendedIds([]);
           setLoading(false);
-
-          fetchRecommendations();
         }
       }
     } catch (err) {
       console.error("Filter search failed:", err);
+      setNotice('Search is unavailable right now. Please try again.');
       setLoading(false);
     }
   };
@@ -268,7 +302,7 @@ export default function DashboardPage() {
 
   const handleLike = async (itemId: string | number, liked: boolean) => {
     if (!user) {
-      window.alert("Please log in to save your preferences.");
+      setNotice('Please sign in to save your preferences.');
       return;
     }
 
@@ -325,7 +359,11 @@ export default function DashboardPage() {
 
     } catch (e: any) {
         console.error("❌ Like/Dislike failed:", e);
-        window.alert(`Database Sync Failed: ${e.message || 'Check console'}`);
+        likedItemsRef.current = previousLiked;
+        dislikedItemsRef.current = previousDisliked;
+        setLikedItems(previousLiked);
+        setDislikedItems(previousDisliked);
+        setNotice('Could not save your preference. Please try again.');
     }
   };
 
@@ -344,315 +382,309 @@ export default function DashboardPage() {
     {
       outerClass: "card-tilt group bg-surface border-[1.5px] border-on-surface p-2 flex flex-col relative rotate-[-0.5deg]",
       badgeClass: "absolute top-4 right-4 z-20 bg-surface-container px-2 py-0.5 border border-on-surface/10 -rotate-2",
-      imgSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuBlxOLyptUfarymgZMAu4vgoVAxGmxwl6Ppr1tkOOUWUEMSV62jNgwYXPhWW2ltGaSDmDTF8GOyfZ566rz-NxgK_sXqaueBAjs0LYCrXh_nQfOs5bagRzaGwPyfCnXCzcDWrkwH3FxYrRbkmBi4hYIe3jxVPt6c1Z8CFc01saMl8f7R-lbVO1ogbgPZp30liuhNIVqO4wQmVImp_SLGVs-fw7WcW5lzRN9_hkIK3Kcht0CXPOpWyMuOXRsIE-7Hd-E6Wjshlct7vKho",
-      brandFallback: "L'Artiste Studios",
-      priceFallback: "$420.00",
-      nameFallback: "Wool Structured Overcoat"
     },
     {
       outerClass: "card-tilt group bg-surface border-[1.5px] border-on-surface p-2 flex flex-col relative rotate-[1.2deg] mt-8",
       badgeClass: "absolute top-4 right-4 z-20 bg-surface-container px-2 py-0.5 border border-on-surface/10 rotate-3",
-      imgSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuCjoDqIzTvoskX1wLnBniMNPJ1PnJUHGpVJOY_tS2MT7Af5amtmz_IZYQm3WIcfoC2UnQSftV_sp16AfZUj9zp7dP5Wp1pqUxeXuskleKf_sD5cQZ9h3l7eil-BMtG2JiqQT3Q8jSpGVXINJg163d8osQrSIrOuVjBu0Cg6YnO3dJeN1mSQ_uzJYmWlS0e3mJ5WplQwjIsqDlG-dm21b1ZNnWwzGxOSCqp_IBnmK67Mmct7jxj632SQtaTatMyXO8v8R1NxsIZu7sud",
-      brandFallback: "Raw Canvas",
-      priceFallback: "$185.00",
-      nameFallback: "Deconstructed Denim"
     },
     {
       outerClass: "card-tilt group bg-surface border-[1.5px] border-on-surface p-2 flex flex-col relative rotate-[-1.5deg]",
       badgeClass: "absolute top-4 right-4 z-20 bg-surface-container px-2 py-0.5 border border-on-surface/10 -rotate-1",
-      imgSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuCrtgVrdeqTT7PHtOlXLqwwBUzaWzJDYQgN3gUXsObqpK1djih09TvPv0AKRXf8E74EUPoo2vpA2fuAb_pHqrs-J_Hz3tsGv5SLjK1l57GX5atlC3f8ywxGt6l9qoAkjyO9gkD1S85x0Rwe4hv8IQyEt-V4v6gJxYmmQjwH1g7gnyT9gljlE6hSSHt0A_iMsrZ-bQurW6Yss_ZfFOIwxlR2DTVsNLhfGJbuWVi7JSUGEgsKJjVwtNnPrki-nSVovV3idlZ8Rm2uhALH",
-      brandFallback: "Atelier Mono",
-      priceFallback: "$210.00",
-      nameFallback: "Textured Moss Knit"
     },
     {
       outerClass: "card-tilt group bg-surface border-[1.5px] border-on-surface p-2 flex flex-col relative rotate-[0.8deg] mt-12",
       badgeClass: "absolute top-4 right-4 z-20 bg-surface-container px-2 py-0.5 border border-on-surface/10",
-      imgSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuANR6tLmSgPg1OzlOLcfIPiyLeqaWOSa9QjnwsXvkVr6MrAR1JNrcXkWwafBEFoBUnUSd5cuQDNEMaTbIbK35lI5xY5qPcOVMAYndnYv3h0L4VC5kwiV5MLpLXaNy7YhIN1FM5GOz5BRNMKqrEHK1ToGKZi25cd8VVHT3i9-v9l5Hv2BS8aO5ByRkw3g2c56HfD6DhHXMN_VqEw80GfRVtna_WWVM94iyN-qEVIIymnxnSAzvls4hhlctzTylipos1dNMNPTf1TxbNS",
-      brandFallback: "Vault 03",
-      priceFallback: "$890.00",
-      nameFallback: "Matte Leather Biker"
     }
   ];
 
   return (
-    <div className="bg-background text-on-background font-body selection:bg-primary-fixed selection:text-on-primary-fixed cursor-none min-h-screen">
-      <div className="custom-cursor hidden md:block" id="cursor" style={{width:'12px', height:'12px', backgroundColor:'#a63319', borderRadius:'50%', position:'fixed', pointerEvents:'none', zIndex:9999, transform:'translate(-50%, -50%)', transition:'width 0.2s, height 0.2s'}}></div>
-
-      <div className="grain-overlay" style={{position:'fixed', top:0, left:0, width:'100%', height:'100%', pointerEvents:'none', zIndex:50, opacity:0.04, backgroundImage:'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
-
-      <div className="fixed top-0 left-0 w-full z-[60] flex items-center overflow-hidden bg-primary h-6">
-        <div className="whitespace-nowrap animate-marquee flex items-center" style={{animation: 'marquee 20s linear infinite'}}>
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-surface px-4">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-surface px-4">AI VIRTUAL TRY-ON ✦ COLOR SCIENCE ✦ RESUNET + AFWM + REAL-ESRGAN ✦ SIGLIP SEMANTIC SEARCH ✦ SCHP SKIN PARSING ✦</span>
-        </div>
+    <>
+      <div className="absolute top-24 left-10 pointer-events-none select-none overflow-hidden w-full z-0">
+        <h2 id="bg-catalogue-text" className="font-unbounded font-black text-[140px] md:text-[180px] leading-none opacity-[0.03] tracking-tighter text-on-surface" style={{transition: 'transform 0.1s ease-out'}}>
+          DISCOVER
+        </h2>
       </div>
 
-      <aside className="fixed left-0 top-6 h-[calc(100vh-24px)] w-[280px] bg-surface-container-low z-40 px-8 py-12 flex flex-col shadow-[20px_0_30px_rgba(26,18,8,0.03)] overflow-y-auto" style={{scrollbarWidth:'none'}}>
-        <div className="mb-12 cursor-pointer" onClick={() => navigate('/')}>
-          <h1 className="font-unbounded font-black text-3xl tracking-tighter flex items-center gap-2">
-            WEAVE <span className="text-primary text-xl">✦</span>
-          </h1>
-          <p className="font-fraunces italic text-xs text-on-surface-variant opacity-60 mt-1 uppercase tracking-widest">Editorial Scrapbook</p>
-        </div>
+      {filterDrawerOpen && (
+        <div
+          className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-50 transition-opacity"
+          onClick={() => setFilterDrawerOpen(false)}
+        />
+      )}
 
-        <nav className="space-y-6 mb-12">
-          <button onClick={() => navigate('/')} className="flex items-center gap-4 group w-full">
-            <span className="material-symbols-outlined text-on-surface opacity-40 group-hover:opacity-100 transition-opacity">grid_view</span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-on-surface opacity-60 group-hover:opacity-100 transition-opacity">Home</span>
-          </button>
-          <button onClick={() => navigate('/studio')} className="flex items-center gap-4 group w-full">
-            <span className="material-symbols-outlined text-on-surface opacity-40 group-hover:opacity-100 transition-opacity">auto_fix_high</span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-on-surface opacity-60 group-hover:opacity-100 transition-opacity">Studio</span>
-          </button>
-          <button className="flex items-center gap-4 group text-primary w-full">
-            <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>shelves</span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] font-bold border-b border-primary/40 pb-0.5">Vault</span>
-          </button>
-          <button onClick={() => navigate('/docs/archive')} className="flex items-center gap-4 group w-full">
-            <span className="material-symbols-outlined text-on-surface opacity-40 group-hover:opacity-100 transition-opacity">settings</span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-on-surface opacity-60 group-hover:opacity-100 transition-opacity">Settings</span>
-          </button>
-        </nav>
-
-        <div className="mt-auto pt-8 border-t border-on-surface/5">
-          <h3 className="font-unbounded font-black text-[10px] uppercase tracking-wider text-primary mb-6">Refine Results</h3>
-          <div className="space-y-6 pb-12">
-
-            <div className="space-y-3">
-              <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant">Gender Profile</label>
-              <div className="flex gap-2">
-                {(['male', 'female', 'unisex'] as const).map((g) => (
-                  <button
-                    key={g}
-                    onClick={() => setGender(gender === g ? '' : g)}
-                    className={`flex-1 py-2 font-mono text-[9px] uppercase tracking-widest border transition-all ${
-                      gender === g ? 'bg-on-surface text-surface border-on-surface' : 'border-on-surface/10 text-on-surface/40 hover:border-on-surface/30'
-                    }`}
-                  >
-                    {g}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-on-surface/5">
-              <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Sub-Category</label>
-              <select
-                value={subCategory}
-                onChange={(e) => setSubCategory(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
+      <aside
+        id="catalogue-filters"
+        ref={filterPanelRef}
+        role="dialog"
+        aria-modal={filterDrawerOpen ? true : undefined}
+        aria-label="Refine results"
+        aria-hidden={!filterDrawerOpen}
+        inert={!filterDrawerOpen}
+        className={`fixed top-16 left-0 h-[calc(100vh-64px)] w-full sm:w-[380px] bg-paper border-r border-ink/10 shadow-2xl z-[60] flex flex-col transition-transform duration-300 ease-in-out ${
+          filterDrawerOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="p-6 border-b border-ink/10 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-rust">tune</span>
+            <h3 className="font-unbounded font-black text-xs uppercase tracking-wider text-ink">
+              Filters
+            </h3>
+          </div>
+          <div className="flex items-center gap-3">
+            {activeFilterCount > 0 && (
+              <button
+                onClick={() => {
+                  setGender('');
+                  setSubCategory('');
+                  setColorFilter('');
+                  setNeckStyle('');
+                  setOccasion('');
+                  setSleeveLength('');
+                  setOtherDetails('');
+                  fetchRecommendations();
+                }}
+                className="font-mono text-[9px] uppercase tracking-widest text-rust hover:underline"
               >
-                <option value="">Select Category</option>
-                <option value="T-shirts">T-shirts</option>
-                <option value="Blouses">Blouses</option>
-                <option value="Shirts">Shirts</option>
-                <option value="Hoodies">Hoodies</option>
-                <option value="Sweatshirts">Sweatshirts</option>
-                <option value="Tanks">Tanks</option>
-                <option value="Sweaters">Sweaters</option>
-                <option value="Polos">Polos</option>
-                <option value="Vests">Vests</option>
-              </select>
-              <input
-                value={subCategory}
-                onChange={(e) => setSubCategory(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
-                placeholder="Or type custom..."
-                type="text"
-              />
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-on-surface/5">
-              <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Hue & Palette</label>
-              <div className="flex gap-4 items-center">
-                <div className="relative group/color">
-                  <input
-                    type="color"
-                    value={colorFilter.startsWith('#') ? colorFilter : '#a63319'}
-                    onChange={(e) => {
-                      const hex = e.target.value;
-                      const r = parseInt(hex.slice(1, 3), 16);
-                      const g = parseInt(hex.slice(3, 5), 16);
-                      const b = parseInt(hex.slice(5, 7), 16);
-
-                      const anchors = [
-                        { name: 'Red', r: 255, g: 0, b: 0 },
-                        { name: 'Green', r: 0, g: 255, b: 0 },
-                        { name: 'Blue', r: 0, g: 0, b: 255 },
-                        { name: 'Yellow', r: 255, g: 255, b: 0 },
-                        { name: 'Cyan', r: 0, g: 255, b: 255 },
-                        { name: 'Pink', r: 255, g: 0, b: 255 },
-                        { name: 'Orange', r: 255, g: 165, b: 0 },
-                        { name: 'Purple', r: 128, g: 0, b: 128 },
-                        { name: 'Brown', r: 139, g: 69, b: 19 },
-                        { name: 'White', r: 255, g: 255, b: 255 },
-                        { name: 'Black', r: 0, g: 0, b: 0 },
-                        { name: 'Grey', r: 128, g: 128, b: 128 },
-                        { name: 'Teal', r: 0, g: 128, b: 128 },
-                        { name: 'Maroon', r: 128, g: 0, b: 0 },
-                        { name: 'Navy', r: 0, g: 0, b: 128 },
-                        { name: 'Gold', r: 255, g: 215, b: 0 },
-                        { name: 'Sage', r: 156, g: 175, b: 136 },
-                        { name: 'Beige', r: 245, g: 245, b: 220 }
-                      ];
-
-                      let bestMatch = anchors[0].name;
-                      let minDistance = Infinity;
-
-                      anchors.forEach(anchor => {
-                        const dist = Math.sqrt(
-                          Math.pow(r - anchor.r, 2) +
-                          Math.pow(g - anchor.g, 2) +
-                          Math.pow(b - anchor.b, 2)
-                        );
-                        if (dist < minDistance) {
-                          minDistance = dist;
-                          bestMatch = anchor.name;
-                        }
-                      });
-
-                      setColorFilter(bestMatch);
-                    }}
-                    className="w-16 h-16 rounded-sm cursor-pointer border-2 border-on-surface/20 bg-transparent transition-all hover:scale-105 hover:border-primary shrink-0 p-0 overflow-hidden"
-                    title="Choose visual hue"
-                  />
-                  <div className="absolute inset-0 pointer-events-none border border-white/20 mix-blend-overlay"></div>
-                </div>
-                <div className="flex-1 space-y-1">
-                  <input
-                    value={colorFilter}
-                    onChange={(e) => setColorFilter(e.target.value)}
-                    className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-base focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
-                    placeholder="Type name (e.g. Sage)..."
-                    type="text"
-                  />
-                  <p className="font-mono text-[8px] uppercase tracking-widest text-on-surface-variant opacity-40">Translates hue to name</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-on-surface/5">
-              <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Neck Architecture</label>
-              <select
-                value={neckStyle}
-                onChange={(e) => setNeckStyle(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
-              >
-                <option value="">Select Neck Style</option>
-                <option value="V-Neck">V-Neck</option>
-                <option value="Turtleneck">Turtleneck</option>
-                <option value="Crew Neck">Crew Neck</option>
-                <option value="Scoop Neck">Scoop Neck</option>
-                <option value="Hooded">Hooded</option>
-                <option value="Collared">Collared</option>
-                <option value="Boat Neck">Boat Neck</option>
-                <option value="Off-shoulder">Off-shoulder</option>
-              </select>
-              <input
-                value={neckStyle}
-                onChange={(e) => setNeckStyle(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
-                placeholder="Or type custom..."
-                type="text"
-              />
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-on-surface/5">
-              <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Occasion</label>
-              <select
-                value={occasion}
-                onChange={(e) => setOccasion(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
-              >
-                <option value="">Select Occasion</option>
-                <option value="Formal">Formal</option>
-                <option value="Informal">Informal</option>
-                <option value="Partywear">Partywear</option>
-                <option value="Casual">Casual</option>
-                <option value="Sport">Sport</option>
-                <option value="Aesthetic">Aesthetic</option>
-              </select>
-              <input
-                value={occasion}
-                onChange={(e) => setOccasion(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
-                placeholder="Or type custom..."
-                type="text"
-              />
-            </div>
-
-            <div className="space-y-4 pt-4 border-t border-on-surface/5">
-              <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Sleeve Length</label>
-              <select
-                value={sleeveLength}
-                onChange={(e) => setSleeveLength(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
-              >
-                <option value="">Select Sleeve</option>
-                <option value="Short Sleeve">Short</option>
-                <option value="Long Sleeve">Long</option>
-                <option value="Sleeveless">Sleeveless</option>
-                <option value="Half Sleeve">Half</option>
-                <option value="Cap Sleeve">Cap</option>
-                <option value="3/4 Sleeve">3/4 Length</option>
-              </select>
-              <input
-                value={sleeveLength}
-                onChange={(e) => setSleeveLength(e.target.value)}
-                className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
-                placeholder="Or type custom..."
-                type="text"
-              />
-            </div>
-
-            <div className="space-y-3 pt-4 border-t border-on-surface/5">
-              <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Other Details</label>
-              <textarea
-                value={otherDetails}
-                onChange={(e) => setOtherDetails(e.target.value)}
-                className="w-full bg-on-surface/5 border border-on-surface/10 p-3 font-fraunces italic text-sm focus:outline-none focus:border-primary transition-colors placeholder:opacity-30 min-h-[100px] resize-none"
-                placeholder="Any other specific aesthetic details..."
-              />
-            </div>
-
-            <button onClick={handleCatalogueDiscovery} className="w-full bg-primary text-surface py-4 font-unbounded font-black text-[10px] uppercase tracking-widest relative overflow-hidden group mt-4">
-              <span className="relative z-10">Curate Selection</span>
-              <div className="absolute inset-0 bg-on-background translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                Reset All
+              </button>
+            )}
+            <button
+              onClick={() => setFilterDrawerOpen(false)}
+              aria-label="Close filters"
+              className="w-8 h-8 flex items-center justify-center rounded-sm hover:bg-ink/5 text-ink/60 hover:text-ink transition-colors"
+            >
+              <span className="material-symbols-outlined text-xl">close</span>
             </button>
           </div>
-          <div className="mt-8 flex items-center gap-2">
-            <span className="material-symbols-outlined text-secondary text-sm">bolt</span>
-            <span className="font-fraunces italic text-[10px] text-secondary opacity-80">Powered by SigLIP semantic search</span>
+        </div>
+
+        <div className="p-6 space-y-6 overflow-y-auto flex-1" style={{ scrollbarWidth: 'thin' }}>
+          <div className="space-y-3">
+            <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Gender</label>
+            <div className="flex gap-2">
+              {(['male', 'female', 'unisex'] as const).map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setGender(gender === g ? '' : g)}
+                  className={`flex-1 py-2 font-mono text-[9px] uppercase tracking-widest border rounded-sm transition-all ${
+                    gender === g ? 'bg-on-surface text-surface border-on-surface' : 'border-on-surface/10 text-on-surface/40 hover:border-on-surface/30'
+                  }`}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
           </div>
+
+          <div className="space-y-3 pt-4 border-t border-on-surface/5">
+            <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Category</label>
+            <select
+              value={subCategory}
+              onChange={(e) => setSubCategory(e.target.value)}
+              className="w-full bg-transparent border-b border-on-surface/10 py-1.5 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
+            >
+              <option value="">Select Category</option>
+              <option value="T-shirts">T-shirts</option>
+              <option value="Blouses">Blouses</option>
+              <option value="Shirts">Shirts</option>
+              <option value="Hoodies">Hoodies</option>
+              <option value="Sweatshirts">Sweatshirts</option>
+              <option value="Tanks">Tanks</option>
+              <option value="Sweaters">Sweaters</option>
+              <option value="Polos">Polos</option>
+              <option value="Vests">Vests</option>
+            </select>
+            <input
+              value={subCategory}
+              onChange={(e) => setSubCategory(e.target.value)}
+              className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
+              placeholder="Or type custom category..."
+              type="text"
+            />
+          </div>
+
+          <div className="space-y-3 pt-4 border-t border-on-surface/5">
+            <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Color</label>
+            <div className="flex gap-4 items-center">
+              <div className="relative group/color">
+                <input
+                  type="color"
+                  value={colorFilter.startsWith('#') ? colorFilter : '#a63319'}
+                  onChange={(e) => {
+                    const hex = e.target.value;
+                    const r = parseInt(hex.slice(1, 3), 16);
+                    const g = parseInt(hex.slice(3, 5), 16);
+                    const b = parseInt(hex.slice(5, 7), 16);
+
+                    const anchors = [
+                      { name: 'Red', r: 255, g: 0, b: 0 },
+                      { name: 'Green', r: 0, g: 255, b: 0 },
+                      { name: 'Blue', r: 0, g: 0, b: 255 },
+                      { name: 'Yellow', r: 255, g: 255, b: 0 },
+                      { name: 'Cyan', r: 0, g: 255, b: 255 },
+                      { name: 'Pink', r: 255, g: 0, b: 255 },
+                      { name: 'Orange', r: 255, g: 165, b: 0 },
+                      { name: 'Purple', r: 128, g: 0, b: 128 },
+                      { name: 'Brown', r: 139, g: 69, b: 19 },
+                      { name: 'White', r: 255, g: 255, b: 255 },
+                      { name: 'Black', r: 0, g: 0, b: 0 },
+                      { name: 'Grey', r: 128, g: 128, b: 128 },
+                      { name: 'Teal', r: 0, g: 128, b: 128 },
+                      { name: 'Maroon', r: 128, g: 0, b: 0 },
+                      { name: 'Navy', r: 0, g: 0, b: 128 },
+                      { name: 'Gold', r: 255, g: 215, b: 0 },
+                      { name: 'Sage', r: 156, g: 175, b: 136 },
+                      { name: 'Beige', r: 245, g: 245, b: 220 }
+                    ];
+
+                    let bestMatch = anchors[0].name;
+                    let minDistance = Infinity;
+
+                    anchors.forEach(anchor => {
+                      const dist = Math.sqrt(
+                        Math.pow(r - anchor.r, 2) +
+                        Math.pow(g - anchor.g, 2) +
+                        Math.pow(b - anchor.b, 2)
+                      );
+                      if (dist < minDistance) {
+                        minDistance = dist;
+                        bestMatch = anchor.name;
+                      }
+                    });
+
+                    setColorFilter(bestMatch);
+                  }}
+                  className="w-14 h-14 rounded-sm cursor-pointer border-2 border-on-surface/20 bg-transparent transition-all hover:scale-105 hover:border-primary shrink-0 p-0 overflow-hidden"
+                  title="Choose visual hue"
+                />
+                <div className="absolute inset-0 pointer-events-none border border-white/20 mix-blend-overlay"></div>
+              </div>
+              <div className="flex-1 space-y-1">
+                <input
+                  value={colorFilter}
+                  onChange={(e) => setColorFilter(e.target.value)}
+                  className="w-full bg-transparent border-b border-on-surface/10 py-1 font-fraunces italic text-base focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
+                  placeholder="Type name (e.g. Sage)..."
+                  type="text"
+                />
+                <p className="font-mono text-[8px] uppercase tracking-widest text-on-surface-variant opacity-40">Translates hue to name</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-4 border-t border-on-surface/5">
+            <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Neckline</label>
+            <select
+              value={neckStyle}
+              onChange={(e) => setNeckStyle(e.target.value)}
+              className="w-full bg-transparent border-b border-on-surface/10 py-1.5 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
+            >
+              <option value="">Select Neck Style</option>
+              <option value="V-Neck">V-Neck</option>
+              <option value="Turtleneck">Turtleneck</option>
+              <option value="Crew Neck">Crew Neck</option>
+              <option value="Scoop Neck">Scoop Neck</option>
+              <option value="Hooded">Hooded</option>
+              <option value="Collared">Collared</option>
+              <option value="Boat Neck">Boat Neck</option>
+              <option value="Off-shoulder">Off-shoulder</option>
+            </select>
+            <input
+              value={neckStyle}
+              onChange={(e) => setNeckStyle(e.target.value)}
+              className="w-full bg-transparent border-b border-on-surface/10 py-1 font-mono text-[10px] focus:outline-none focus:border-primary transition-colors placeholder:opacity-30"
+              placeholder="Or type custom..."
+              type="text"
+            />
+          </div>
+
+          <div className="space-y-3 pt-4 border-t border-on-surface/5">
+            <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Occasion</label>
+            <select
+              value={occasion}
+              onChange={(e) => setOccasion(e.target.value)}
+              className="w-full bg-transparent border-b border-on-surface/10 py-1.5 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
+            >
+              <option value="">Select Occasion</option>
+              <option value="Formal">Formal</option>
+              <option value="Informal">Informal</option>
+              <option value="Partywear">Partywear</option>
+              <option value="Casual">Casual</option>
+              <option value="Sport">Sport</option>
+              <option value="Aesthetic">Aesthetic</option>
+            </select>
+          </div>
+
+          <div className="space-y-3 pt-4 border-t border-on-surface/5">
+            <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Sleeve Length</label>
+            <select
+              value={sleeveLength}
+              onChange={(e) => setSleeveLength(e.target.value)}
+              className="w-full bg-transparent border-b border-on-surface/10 py-1.5 font-fraunces italic text-sm focus:outline-none focus:border-primary appearance-none"
+            >
+              <option value="">Select Sleeve</option>
+              <option value="Short Sleeve">Short</option>
+              <option value="Long Sleeve">Long</option>
+              <option value="Sleeveless">Sleeveless</option>
+              <option value="Half Sleeve">Half</option>
+              <option value="Cap Sleeve">Cap</option>
+              <option value="3/4 Sleeve">3/4 Length</option>
+            </select>
+          </div>
+
+          <div className="space-y-3 pt-4 border-t border-on-surface/5">
+            <label className="font-unbounded font-black text-[9px] uppercase tracking-tighter text-on-surface-variant block">Additional details</label>
+            <textarea
+              value={otherDetails}
+              onChange={(e) => setOtherDetails(e.target.value)}
+              className="w-full bg-on-surface/5 border border-on-surface/10 p-3 font-fraunces italic text-sm focus:outline-none focus:border-primary transition-colors placeholder:opacity-30 min-h-[90px] resize-none rounded-sm"
+              placeholder="Describe the style you are looking for"
+            />
+          </div>
+        </div>
+
+        <div className="p-6 border-t border-ink/10 bg-paper">
+          <button
+            onClick={() => {
+              handleCatalogueDiscovery();
+              setFilterDrawerOpen(false);
+            }}
+            className="w-full bg-primary text-surface py-3.5 font-unbounded font-black text-[10px] uppercase tracking-widest relative overflow-hidden group shadow-md rounded-sm"
+          >
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              <span className="material-symbols-outlined text-sm">auto_awesome</span>
+              Apply filters
+            </span>
+            <div className="absolute inset-0 bg-on-background translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+          </button>
         </div>
       </aside>
 
-      <main className="ml-[280px] pt-12 min-h-screen relative overflow-x-hidden">
+      <div className="px-6 md:px-12 py-8 min-h-screen relative z-10">
+        <header className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-ink/10 pb-6">
+          <div className="flex items-center gap-3 overflow-x-auto" style={{scrollbarWidth:'none'}}>
+            <span className="px-6 py-2 bg-on-surface text-surface rounded-full font-mono text-[10px] uppercase tracking-widest whitespace-nowrap shadow-sm">
+              For You
+            </span>
 
-        <div className="absolute top-20 left-10 pointer-events-none select-none overflow-hidden w-full">
-          <h2 id="bg-catalogue-text" className="font-unbounded font-black text-[180px] leading-none opacity-[0.03] tracking-tighter text-on-surface" style={{transition: 'transform 0.1s ease-out'}}>CATALOGUE</h2>
-        </div>
-
-        <header className="px-12 mb-16 relative z-10 flex justify-between items-end">
-          <div className="flex gap-4 overflow-x-auto" style={{scrollbarWidth:'none'}}>
-            <button className="px-6 py-2 bg-on-surface text-surface rounded-full font-mono text-[10px] uppercase tracking-widest whitespace-nowrap">For You</button>
-            <button className="px-6 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-mono text-[10px] uppercase tracking-widest hover:bg-surface-container-highest transition-colors whitespace-nowrap">New Arrivals</button>
-            <button className="px-6 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-mono text-[10px] uppercase tracking-widest hover:bg-surface-container-highest transition-colors whitespace-nowrap">Trending</button>
           </div>
-          <div className="flex gap-2">
-            <div className="px-3 py-1 bg-surface-container-highest border border-on-surface/5 flex items-center gap-2">
+
+          <div className="flex items-center gap-3">
+            <div className="px-3 py-1.5 bg-surface-container-highest border border-on-surface/5 flex items-center gap-2 rounded-sm">
               <span className="font-mono text-[9px] uppercase text-on-surface-variant">Color Score:</span>
               <span className="font-mono text-[9px] font-bold text-primary">{colorScore}</span>
             </div>
-            <div className="px-3 py-1 bg-surface-container-highest border border-on-surface/5 flex items-center gap-2">
+            <div className="px-3 py-1.5 bg-surface-container-highest border border-on-surface/5 flex items-center gap-2 rounded-sm">
               <span className="font-mono text-[9px] uppercase text-on-surface-variant">Semantic:</span>
               <span className="font-mono text-[9px] font-bold text-secondary">{semanticLabel}</span>
             </div>
           </div>
         </header>
 
-        <section className="px-12 pb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 relative z-10">
+        {notice && <p role="status" className="mb-6 border border-rust/30 bg-paper px-4 py-3 font-mono text-xs text-rust">{notice}</p>}
+
+        <section aria-label="Clothing results" aria-busy={loading} className="px-6 sm:px-12 pb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 relative z-10">
           {loading && items.length === 0 ? (
 
             Array.from({length: 8}).map((_, i) => (
@@ -670,12 +702,14 @@ export default function DashboardPage() {
                   <span className="font-unbounded font-black text-[8px] uppercase">WEAVE ✦</span>
                 </div>
                 <div className="aspect-[3/4] overflow-hidden bg-surface-container-high relative">
-                  <img className="w-full h-full object-cover filter contrast-[1.05] saturate-[0.95]" src={item.image_url || style.imgSrc} alt="product visual" loading="lazy" />
+                  {item.image_url ? <img className="w-full h-full object-cover filter contrast-[1.05] saturate-[0.95]" src={item.image_url} alt={item.cloth_name || 'Clothing item'} loading="lazy" /> : <div className="h-full flex items-center justify-center font-mono text-xs text-ink/50">Image unavailable</div>}
 
-                  <div className="absolute inset-0 bg-surface-container-low/90 backdrop-blur-sm flex flex-col items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out p-6">
+                  <div data-catalogue-actions className="absolute inset-0 bg-surface-container-low/90 backdrop-blur-sm flex flex-col items-center justify-center translate-y-full group-hover:translate-y-0 group-focus-within:translate-y-0 transition-transform duration-200 ease-out p-6">
                     <div className="flex gap-6 mb-8">
                       <button
                         onClick={() => item.id && handleLike(item.id, true)}
+                        aria-label={`Like ${item.cloth_name || 'garment'}`}
+                        aria-pressed={likedItems.includes(Number(item.id))}
                         className={`material-symbols-outlined hover:scale-125 transition-all text-3xl ${likedItems.includes(Number(item.id)) ? 'text-[#8cc048]' : 'text-secondary'}`}
                         style={likedItems.includes(Number(item.id)) ? { fontVariationSettings: "'FILL' 1" } : {}}
                       >
@@ -683,6 +717,8 @@ export default function DashboardPage() {
                       </button>
                       <button
                         onClick={() => item.id && handleLike(item.id, false)}
+                        aria-label={`Dislike ${item.cloth_name || 'garment'}`}
+                        aria-pressed={dislikedItems.includes(Number(item.id))}
                         className={`material-symbols-outlined hover:scale-125 transition-all text-3xl ${dislikedItems.includes(Number(item.id)) ? 'text-[#C84B2F]' : 'text-primary'}`}
                         style={dislikedItems.includes(Number(item.id)) ? { fontVariationSettings: "'FILL' 1" } : {}}
                       >
@@ -696,10 +732,10 @@ export default function DashboardPage() {
                 </div>
                 <div className="py-4 px-1 space-y-1">
                   <div className="flex justify-between items-start">
-                    <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-on-surface/60">{item.brand || style.brandFallback}</span>
-                    <span className="font-fraunces font-bold text-primary text-lg">{item.price || style.priceFallback}</span>
+                    <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-on-surface/60">{item.brand || item.category || 'Clothing'}</span>
+                    {item.price && <span className="font-fraunces font-bold text-primary text-lg">{item.price}</span>}
                   </div>
-                  <h4 className="font-fraunces font-bold text-xl text-on-surface ink-underline inline-block">{item.cloth_name || style.nameFallback}</h4>
+                  <h4 className="font-fraunces font-bold text-xl text-on-surface ink-underline inline-block">{item.cloth_name || 'Clothing item'}</h4>
                 </div>
               </div>
             )
@@ -715,10 +751,10 @@ export default function DashboardPage() {
            </div>
         )}
 
-        <button onClick={() => navigate('/studio')} className="fixed bottom-8 right-8 z-[100] bg-on-background text-surface w-16 h-16 rounded-sm rotate-3 hover:rotate-0 transition-transform flex items-center justify-center shadow-xl group">
-          <span className="material-symbols-outlined group-hover:scale-110 transition-transform">add_a_photo</span>
+        <button onClick={() => navigate('/studio')} className="fixed bottom-8 right-8 z-[40] bg-rust text-paper w-14 h-14 rounded-sm rotate-3 hover:rotate-0 transition-transform flex items-center justify-center shadow-xl group active:scale-95" title="Go to Virtual Try-On Studio">
+          <span className="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">add_a_photo</span>
         </button>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

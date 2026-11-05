@@ -40,17 +40,17 @@ def calculate_suitability_score(clothing_lab, skin_lab, hair_lab):
     elif not is_warm and c_b < 0:
         undertone_score = 25
     else:
-        undertone_score = 10  
+        undertone_score = 10
 
     c_hue_vec = np.array([c_a, c_b])
     s_hue_vec = np.array([s_a, s_b])
 
     hue_sim = cosine_similarity(c_hue_vec, s_hue_vec)
-    hue_score = (hue_sim + 1) / 2 * 20  
+    hue_score = (hue_sim + 1) / 2 * 20
 
     lightness_diff = abs(c_L - s_L)
 
-    if contrast > 0.4:  
+    if contrast > 0.4:
         contrast_score = min(20, lightness_diff * 50)
     else:
         if 0.15 < lightness_diff < 0.4:
@@ -67,7 +67,7 @@ def calculate_suitability_score(clothing_lab, skin_lab, hair_lab):
 
     washout_penalty = 0
     if lightness_diff < 0.15:
-        washout_penalty = (0.15 - lightness_diff) * 200 
+        washout_penalty = (0.15 - lightness_diff) * 200
 
     score = (
         undertone_score +
@@ -80,15 +80,17 @@ def calculate_suitability_score(clothing_lab, skin_lab, hair_lab):
     return round(float(np.clip(score, 0, 100)), 2)
 
 def rank_clothes(inventory, skin_lab, hair_lab):
-    """
-    inventory: List of dicts
-    [{'id': ..., 'lab': (L,a,b)}, ...]
-    """
-    results = {}
-    for k,v in inventory.items():
-        score = calculate_suitability_score(
-            v, skin_lab, hair_lab
-        )
-        results[k]=score
-    return dict(sorted(results.items(), key=lambda x: x[1], reverse=True))
-
+    if not inventory:
+        return {}
+    ids = list(inventory)
+    c = np.asarray(list(inventory.values()), dtype=np.float64)
+    c = (c - [0, 128, 128]) / [255, 128, 128]
+    s, h = normalize_lab(skin_lab), normalize_lab(hair_lab)
+    light = np.abs(c[:, 0] - s[0])
+    warm = (c[:, 2] > 0) if s[2] > 0 else (c[:, 2] < 0)
+    hue = (c[:, 1:] @ s[1:]) / (np.linalg.norm(c[:, 1:], axis=1) * np.linalg.norm(s[1:]) + 1e-8)
+    contrast = np.minimum(20, light * 50) if abs(h[0] - s[0]) > .4 else np.where((light > .15) & (light < .4), 20, 10)
+    scores = np.where(warm, 25, 10) + (hue + 1) * 10 + contrast
+    scores += np.maximum(0, 15 - np.abs(np.linalg.norm(c[:, 1:], axis=1) - np.linalg.norm(s[1:])) * 20)
+    scores -= np.where(light < .15, (.15 - light) * 200, 0)
+    return dict(zip(ids, [round(float(v), 2) for v in np.clip(scores, 0, 100)]))
