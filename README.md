@@ -2,182 +2,280 @@
 
 # WEAVE
 
-### Neural Virtual Try-On & Multimodal Fashion Intelligence System
+**Virtual try-on and personalized fashion discovery**
 
-[![Live Application](https://img.shields.io/badge/Live_App-weave--curator.vercel.app-C84B2F?style=for-the-badge&logo=vercel&logoColor=white)](https://weave-curator.vercel.app/)
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![PyTorch](https://img.shields.io/badge/PyTorch-Deep_Learning-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-High_Performance_API-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![React 19](https://img.shields.io/badge/React_19-Server_Side_Rendering-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![pgvector](https://img.shields.io/badge/pgvector-Semantic_Search-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://github.com/pgvector/pgvector)
+[Live application](https://weave-curator.vercel.app/) · [System architecture](#system-architecture) · [How it works](#end-to-end-user-flow) · [Local setup](#local-development)
 
 </div>
 
-https://github.com/user-attachments/assets/cb3d4c37-54ef-43f0-a8c3-2e3ed4457b56
+Weave is a full-stack fashion application that combines a virtual try-on pipeline with color-aware recommendations and semantic clothing search. A React frontend communicates with a FastAPI service; Supabase provides authentication and data storage, Redis caches expensive work, and Modal runs the GPU models.
 
-<div align="center">
+This repository is a portfolio project demonstrating application design across frontend, API, database, and machine-learning inference. The descriptions below distinguish the implementation from deployment-specific dependencies and avoid claiming unverified performance or model quality.
 
-<p align="center">
-  <b>An end-to-end AI fashion platform unifying generative garment synthesis, CIELAB color science, and 768-dimensional multimodal retrieval into a production microservice architecture.</b>
-</p>
+## Features
 
-</div>
+- **Virtual try-on:** upload a photo, choose a catalog garment, generate a JPEG result, and download it. The model currently uses garment images and masks already stored in a Modal volume.
+- **Color profile:** estimate skin and hair colors from a photo and use them as signals in clothing recommendations.
+- **Personalized discovery:** rank garments using color suitability, similarity to the user's clothing preferences, and collaborative signals from similar users.
+- **Semantic search and filters:** describe a garment by color, category, neckline, sleeve, occasion, and additional text; encode the description and search the catalog by vector similarity.
+- **Preference feedback:** like or dislike garments; update the user embedding and invalidate cached recommendations.
+- **Accounts and access:** Supabase email/password authentication, email verification, profile creation, and an approval gate for protected features.
+- **Responsive application shell:** separate site/documentation and Studio navigation, expandable desktop sidebar, mobile navigation, left-side filters, and an account menu.
+- **Operational safeguards:** input limits, rate limiting, health/readiness checks, async database access, bounded caching, and graceful degradation for some recommendation dependencies.
 
----
-
-## The Problem & Motivation
-
-Traditional e-commerce fashion experiences suffer from two critical disconnects:
-1. **The Representation Gap**: Static flat-lay or model-photographed images fail to communicate how silhouettes, fabrics, and collar geometry interact with an individual’s unique body shape and pose.
-2. **The Aesthetic Disconnect**: Conventional recommendation engines rely exclusively on generic text tags or category trees, ignoring objective color science (how garment palettes interact with individual skin undertones) and semantic style subtleties.
-
-**Weave** addresses this with a hybrid generative platform: combining pose-adaptive geometric neural garment warping, human semantic parsing in CIELAB perceptual color space, and dynamic multi-criteria ranking.
-
----
-
-## System Architecture
-
-Weave is designed as a decoupled, latency-optimized microservices pipeline that separates stateless API orchestration from serverless cloud GPU clusters:
+## System architecture
 
 ```mermaid
-flowchart TD
-    subgraph Frontend ["Client Tier"]
-        UI["React 19 + TypeScript<br/>Express SSR & Client Hydration"]
-    end
+flowchart LR
+    Browser["React + TypeScript<br/>Vite / Express SSR"]
+    Auth["Supabase Auth"]
+    API["FastAPI<br/>validation · orchestration · ranking"]
+    Cache["Redis<br/>memory fallback"]
+    DB[("Supabase PostgreSQL<br/>profiles · catalog · pgvector RPCs")]
+    VTON["Modal: VTONRunner<br/>MediaPipe · AFWM · ResUNet · Real-ESRGAN"]
+    Skin["Modal: SkinAnalyzer<br/>SCHP · LAB"]
+    Fashion["Modal: FashionAnalyzer<br/>FashionSigLIP"]
+    Volume[("Modal volume<br/>checkpoints · garments · masks")]
 
-    subgraph Gateway ["Application Gateway"]
-        API["FastAPI Orchestration Service<br/>Auth / RLS / Multi-Objective Ranking"]
-        Cache["In-Memory Cache Layer<br/>Token & Embedding Caching"]
-    end
-
-    subgraph Storage ["Persistent Storage & Vector Search"]
-        DB[("PostgreSQL (Supabase)<br/>Row-Level Security (RLS)")]
-        VEC[("pgvector Index<br/>768-d Fashion Embeddings")]
-    end
-
-    subgraph GPU ["Serverless GPU Compute (Modal Labs)"]
-        VTON["VTON Pipeline<br/>AFWM Warping + ResUNet Inpainting"]
-        ESRGAN["Real-ESRGAN x4<br/>Super-Resolution Restoration"]
-        SCHP["Self-Correction Human Parsing<br/>ResNet-101 (20 Semantic Classes)"]
-        CLIP["FashionSigLIP Encoder<br/>768-d Multimodal Feature Space"]
-    end
-
-    UI <-->|REST API + JWT| API
+    Browser -->|"sign in / session"| Auth
+    Browser -->|"HTTPS + bearer token"| API
+    API -->|"validate user"| Auth
     API --> Cache
-    API <-->|Service Role Client| DB
-    API <-->|HNSW Cosine Query| VEC
-    API <-->|Remote GPU Worker Dispatch| GPU
-    VTON --> ESRGAN
+    API -->|"async service-role client"| DB
+    API --> VTON
+    API --> Skin
+    API --> Fashion
+    VTON --> Volume
+    Skin --> Volume
 ```
 
----
+| Layer | Responsibility | Architectural choice |
+| --- | --- | --- |
+| React / TypeScript | Account flows, Studio, catalog, filters, and documentation | A shared layout keeps navigation consistent; client-side routing allows the Studio and public documentation to have separate navigation. |
+| Express / Vite | Server-render initial HTML, hydrate in the browser, and serve assets | SSR and a static SPA build are both available. Authenticated content still depends on the client session and API calls. |
+| FastAPI | Authenticate requests, enforce approval, validate inputs, coordinate services, and rank recommendations | Async Supabase and Modal calls keep the API responsive while waiting on external services. Model execution is kept outside the web process. |
+| Supabase | Authentication, profile and catalog storage, and vector-search functions | PostgreSQL stores user preferences and precomputed garment features near the data queried by the API. |
+| Redis / memory | Cache results, counters, and recommendation generations | Redis shares cached state between workers; bounded in-process memory provides a fallback when Redis is unavailable. |
+| Modal | Host the try-on, human parsing, and text-embedding models | GPU inference runs independently of the CPU API. Models load when a worker starts and can be reused for subsequent calls. |
 
-## Technical Highlights
+The API uses a **service-role** Supabase client, so authorization is enforced in the API by validating the user's bearer token and checking approval. The service-role key must remain server-side. The included approval migration revokes direct profile-table access from the `anon` and `authenticated` roles; deployed database policies should be reviewed alongside the migration.
 
-### 1. High-Fidelity Generative Virtual Try-On
-The virtual try-on engine synthesizes photorealistic draped garments on user-submitted photos through a three-stage neural pipeline:
-* **Pose & Semantic Parsing**: Uses MediaPipe and Self-Correction Human Parsing (SCHP) to isolate clothing regions while preserving face, hair, and limb segmentations.
-* **Adaptive Feature Warping Module (AFWM)**: Dynamically estimates non-rigid optical flow and deformation grids, warping the 2D garment to map seamlessly onto target torso curves, posture, and arm positions without 3D mesh scanning.
-* **Inpainting & Synthesis (ResUNet)**: A ResUNet generator synthesizes natural creases, lighting highlights, sleeve boundaries, and shadow gradients.
-* **Super-Resolution Upscaling (Real-ESRGAN)**: Enhances the synthesized output through Real-ESRGAN $\times$4 restoration, recovering high-frequency textile textures and fabric weaves before delivery.
+## End-to-end user flow
 
+### 1. Authentication and access
+
+1. The frontend signs in or signs up through Supabase Auth and attaches the session's bearer token to API requests.
+2. FastAPI validates the token using Supabase Auth. Successful claims are cached briefly under a hash of the token.
+3. `POST /profile/ensure` finds or creates the corresponding profile. New profiles default to pending approval.
+4. The frontend routes pending users to the approval screen. Protected endpoints check `profiles.is_approved` before serving Studio features.
+5. Once approved, a user can create a color profile, browse clothing, provide feedback, and use virtual try-on.
+
+The account menu links to a profile page showing the stored username, email, and approval status. The separate color-profile page handles photo analysis.
+
+### 2. Color profile
+
+```text
+Photo → API upload validation → Modal SkinAnalyzer → skin/hair LAB → profiles
 ```
-Garment Image ──► [AFWM Warping] ──┐
-                                   ▼
-User Photo    ──► [Human Parsing] ─► [ResUNet Inpainter] ──► [Real-ESRGAN] ──► Final Try-On
+
+`SkinAnalyzer` uses a 20-class SCHP ResNet-101 human-parsing model. It selects skin and hair regions, erodes the masks to reduce boundary contamination, converts the image to OpenCV LAB, and takes the median color of each region. The service has fallback values when a region contains no pixels. The API stores the two LAB arrays without overwriting unrelated account details and changes the recommendation cache generation.
+
+**Why this approach:** semantic masks make the estimate less dependent on clothing and background pixels; median aggregation is less sensitive to isolated outliers than a simple mean. The estimate remains dependent on lighting, image quality, segmentation, and model limitations; it is not a measurement of a person's identity or an objective judgment of style.
+
+### 3. Catalog, preferences, and recommendations
+
+Garments in `fashion_items` have catalog fields and precomputed features such as `lab_value` and `vector_features`. `recommendation/database_update.py` contains an offline catalog enrichment workflow that uses FashionSigLIP and color extraction to populate features; runtime search does not generate every catalog embedding on demand.
+
+When a user likes or dislikes items, the frontend saves both lists through `POST /profile/preferences` and requests `POST /sync_embedding`. The sync fetches item vectors in chunks, computes the mean liked vector minus half the mean disliked vector, and L2-normalizes the result. Empty interactions clear the stored embedding. Dirty/synced versions avoid unnecessary work; an in-process per-user lock reduces duplicate syncs.
+
+For `GET /recommend`, the API fetches the profile, color inventory, content matches, and similar-user matches concurrently. It then combines three normalized signals:
+
+```text
+score = w_color × color_score + w_content × content_score + w_collab × collaborative_score
+
+w_content = min(0.40, 0.04 × number_of_interacted_items)
+w_collab  = min(0.40, 0.08 × number_of_similar_users)
+w_color   = 1 − w_content − w_collab
 ```
 
----
+- **Color:** a heuristic in `recommendation/skin_recom.py` scores undertone alignment, hue-vector similarity, lightness contrast, chroma, and washout penalty. The inventory calculation is vectorized with NumPy. This is a heuristic, not a learned stylist or a ΔE-only metric.
+- **Content:** the `match_clothes_by_user` database RPC compares the stored user embedding with garment vectors. Similarities are normalized from `[-1, 1]` to `[0, 1]` for ranking.
+- **Collaborative:** the `get_similar_users` RPC returns users and their liked garments. The backend uses their similarities as a collaborative signal and suppresses that signal for garments the current user has already interacted with.
 
-### 2. Tri-Modal Adaptive Recommendation Algorithm
-Rather than static rule-based ranking, Weave implements an adaptive multi-objective scoring function:
+With limited interaction history, the color signal has more weight. If profile or similarity calls fail, the endpoint can return a `degraded` feed using available signals; an inventory failure returns an error. Degraded feeds have a shorter cache lifetime.
 
-$$\text{Score}(u, g) = w_1 \cdot S_{\text{color}}(u, g) + w_2 \cdot S_{\text{semantic}}(u, g) + w_3 \cdot S_{\text{collab}}(u, g)$$
+### 4. Semantic search
 
-Where user taste weights $(w_1, w_2, w_3)$ dynamically self-balance based on historical interactions:
+`POST /text_search` turns the submitted filter fields into a descriptive product-photo prompt. The Modal `FashionAnalyzer` tokenizes it and generates a normalized text embedding using `Marqo/marqo-fashionSigLIP`. The API calls the `match_clothes_by_text` RPC and returns garment IDs with similarity scores. If gender filtering is requested, it fetches a bounded candidate window and filters IDs against the catalog before applying the requested limit.
 
-#### A. Color Science ($S_{\text{color}}$)
-* Extracts the user's skin and hair pigments into **CIELAB color space** (which models human visual perception where Euclidean distance correlates directly to perceived color difference).
-* Computes color harmony scores by calculating $\Delta E^*$ distances between the user's personal color palette and the garment’s extracted dominant hex pigments.
+**Why FashionSigLIP and pgvector:** catalog image vectors and text queries can be compared in the same feature space, while similarity queries run close to the stored catalog. The deployed schema and indexes determine actual performance; no specific latency or index type is guaranteed by this repository.
 
-#### B. Semantic Vector Similarity ($S_{\text{semantic}}$)
-* Garments and textual natural language queries are projected into a unified 768-dimensional space using **`Marqo/marqo-fashionSigLIP`**.
-* Queries execute directly inside PostgreSQL using **`pgvector`** with Cosine Distance indexing, allowing natural language search (e.g., *"relaxed oversized earthy linen jacket for spring evening"*).
+### 5. Virtual try-on
 
-#### C. Implicit Collaborative Filtering ($S_{\text{collab}}$)
-* Dynamically updates user preference vectors based on explicit actions (try-ons, bookmarking, dismissals) to refine catalog sorting in real-time.
+```text
+User photo ──→ MediaPipe person segmentation / crop ─────────────┐
+                                                                ├─→ AFWM warp → ResUNet composite → Real-ESRGAN → JPEG
+Catalog ID ──→ garment name ──→ Modal volume image + mask ──────┘
+```
 
----
+1. The API validates the image's content type, byte size, dimensions, and pixel count, and resolves the catalog ID to a garment name.
+2. `VTONRunner` loads the person segmentation model, AFWM warp model, ResUNet generator, and Real-ESRGAN upscaler when its Modal container starts. The current configuration requests an A10G GPU.
+3. The worker segments and crops the person, resizes inputs to the model's 256 × 192 working size, and loads the matching garment image and mask from the Modal volume.
+4. AFWM predicts a flow field used to warp the garment and its mask. The pipeline processes the warped mask against the person mask and passes the person, warped garment, and mask to the ResUNet generator.
+5. The generator produces rendered pixels and a composition mask; the pipeline blends these with the warped garment. Real-ESRGAN enhances the output, which is encoded as JPEG.
+6. The API verifies that the result is a JPEG before caching and returning it.
 
-### 3. Production Engineering & System Design
+**Why split warping and generation:** warping explicitly aligns the selected garment, while the generator produces the composite around it. The upscaler improves output resolution, but it cannot guarantee accurate fit, fabric behavior, or photorealism. Generated illustrations in the website are examples, not model output.
 
-* **Serverless GPU Orchestration**: Model execution is isolated to remote on-demand GPU containers on Modal. The web API remains lightweight (<130 MB memory footprint), avoiding GPU idle costs while scaling to concurrent traffic.
-* **Dual-Mode Rendering**: Built with React 19 Server-Side Rendering (SSR) through Express for instant first-contentful paint (FCP), paired with a zero-config static SPA fallback.
-* **Database Row-Level Security (RLS)**: PostgreSQL enforces security policies at the database layer. Client tokens are validated against Supabase Auth, preventing unauthorized queries or data exfiltration.
+### Model architecture details
 
----
+| Component | Implementation in this project | Why it is used |
+| --- | --- | --- |
+| MediaPipe segmentation | A multiclass selfie segmentation model provides masks used to isolate and crop the person before try-on. | Separates the person from the background and supplies a mask for composition. |
+| AFWM | Separate person-conditioning and garment feature encoders feed refined feature pyramids. `AFlowNet` uses feature correlation and successive flow refinements across scales; the final flow samples the garment and its mask. | A multiscale flow field can align garment features to the input image without requiring a 3D body mesh. |
+| ResUNet generator | A residual U-Net with skip connections takes seven channels: the person image, warped garment, and warped mask. It emits three rendered image channels and one composition-mask channel. | Skip connections carry spatial information across the network; the learned mask blends generated pixels with the warped garment. |
+| Real-ESRGAN | The worker loads the `RealESRGAN_x4plus` checkpoint and runs its enhancement step on the composite. | Restores output resolution after the low-resolution try-on stage. Added detail is synthesized and should not be treated as ground truth. |
+| SCHP | A 20-class ResNet-101 human parser produces segmentation logits that are mapped back to the original photo size. | Isolates skin and hair regions for color analysis, separate from the try-on segmentation model. |
+| FashionSigLIP | `open_clip` loads `Marqo/marqo-fashionSigLIP`; the worker encodes and normalizes text embeddings, while the offline catalog workflow encodes garment images. | Enables text-to-image similarity in a shared vector space for search and content-based ranking. |
 
-## Tech Stack
+The repository contains model and inference implementations, but not a complete, reproducible training dataset and training run for these checkpoints. The architecture description above is based on the checked-in inference path rather than a claim that every model was trained from scratch in this repository.
 
-| Domain | Technologies |
-| :--- | :--- |
-| **Deep Learning & CV** | PyTorch, torchvision, Real-ESRGAN, MediaPipe, SCHP (ResNet-101), FashionSigLIP, CuPy |
-| **Backend & API** | FastAPI, Python 3.12, Uvicorn, Pydantic, HTTPX, NumPy, OpenCV Headless |
-| **Cloud GPU Infrastructure** | Modal Labs (Serverless NVIDIA T4 / A10G clusters) |
-| **Database & Vector Search** | PostgreSQL, pgvector (768-d embeddings), Supabase (Auth & Database RLS) |
-| **Frontend & UI** | React 19, TypeScript, Vite, Tailwind CSS, Express (SSR), SWR |
+## Performance and reliability decisions
 
----
+- **Async I/O and concurrency:** a lazily initialized async Supabase client and concurrent independent recommendation queries reduce time spent waiting. A process-level semaphore bounds database request concurrency; color ranking runs in a worker thread.
+- **Pagination:** catalog inventory and RPC results are read in pages. An exact count is requested on the first page where available; text search also limits the candidate window. Correct and complete results still depend on deployed PostgREST limits and stable RPC ordering.
+- **Singleflight:** identical in-flight text embeddings, inventory fetches, recommendations, warmups, and try-on requests share one task within an API process. A cancelled waiter does not cancel the shared task; failed tasks can be retried.
+- **Caching:** individual catalog records, inventory, successful auth/approval checks, embeddings, skin analysis, recommendations, and valid try-on output use TTLs appropriate to their role. The memory fallback has byte and entry limits and evicts least-recently-used entries.
+- **Recommendation invalidation:** preference, skin-profile, and embedding updates change a per-user generation included in feed cache keys. Older work may finish for its original caller, but its cached result is not used by the new generation.
+- **Redis recovery:** failed operations fall back to memory with a reconnect delay. Atomic Redis increment-and-expiry counters support rate limits. A healthy Redis miss does not resurrect an old in-memory value.
+- **Graceful failure:** failed warmup dispatches are not marked successful, malformed try-on images are rejected, and a degraded recommendation feed is cached for 30 seconds rather than the normal 10 minutes.
+- **Smaller API image:** the Dockerfile uses Python 3.12 slim, runs as a non-root user, and excludes model datasets and vendored model code from the API image. GPU dependencies live in the Modal image.
 
-## Quickstart (Local Development)
+These mechanisms have boundaries: singleflight and embedding locks are process-local. Memory fallback cannot synchronize rate limits or cache generations between workers, and invalidation during a Redis outage cannot guarantee cross-worker consistency. Token and approval caches also introduce short delays before external changes are observed.
+
+## API overview
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /health` · `GET /ready` | Liveness and dependency readiness |
+| `POST /profile/ensure` · `GET /profile` | Create or read the authenticated user's profile |
+| `GET /username_available` | Check a proposed username |
+| `POST /profile/preferences` · `POST /sync_embedding` | Save likes/dislikes and synchronize the user vector |
+| `GET /items` · `GET /items/{id}` | Retrieve public catalog fields |
+| `POST /skin_color` | Analyze skin and hair colors and update the profile |
+| `GET /recommend` | Return ranked item IDs, weights, and degradation status |
+| `POST /text_search` | Return semantic matches for filter criteria |
+| `POST /tryon` | Return a JPEG for a photo and catalog garment ID |
+| `POST /warmup` | Dispatch model warmup requests; dispatch success does not prove inference is ready |
+
+The running API exposes its generated schema at `/docs`. Most Studio endpoints require an approved user; `/profile` and `/profile/ensure` require authentication but are available before approval.
+
+## Tech stack
+
+| Area | Technologies |
+| --- | --- |
+| Frontend | React 19, TypeScript, React Router, Vite, Express SSR, Tailwind CSS |
+| API | Python 3.12, FastAPI, async Supabase client, NumPy, OpenCV, Pillow |
+| Data | Supabase Auth, PostgreSQL, pgvector, Redis |
+| Inference | Modal, PyTorch, MediaPipe, AFWM, ResUNet, Real-ESRGAN, SCHP, FashionSigLIP |
+| Deployment | Vercel frontend configuration, Docker API image, Modal GPU workers |
+
+## Local development
 
 ### Prerequisites
-* Python 3.12+
-* Node.js v22+
-* Modal CLI (`pip install modal && modal setup`)
 
-### 1. Clone & Setup Backend
+- Python 3.12 and Node.js 22.
+- A Supabase project with the catalog, profiles, pgvector data, and required RPCs described below.
+- Access to the deployed Modal app and its model volume for color analysis, search embeddings, and try-on.
+- Redis is optional for a single local API process.
+
+### Backend
+
 ```bash
-git clone https://github.com/ScriptedLines/Weave.ai.git
-cd Weave.ai
-
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```
 
-# Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env before starting.
-# Start backend server
+Create a root `.env` file:
+
+```dotenv
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_SIDE_SERVICE_ROLE_KEY
+# Optional: omit to use process-local memory caching
+REDIS_URL=redis://localhost:6379
+```
+
+Keep the service-role key private. For local Modal access, authenticate the Modal CLI using your own credentials. The backend needs access to the deployed `vton-service` app; in hosted environments the Modal client can use `MODAL_TOKEN_ID` and `MODAL_TOKEN_SECRET` as server-side secrets.
+
+```bash
 uvicorn backend:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-### 2. Setup Frontend
+Check `http://127.0.0.1:8000/health`, `http://127.0.0.1:8000/ready`, and `http://127.0.0.1:8000/docs`. Readiness checks the configured database and Redis; it does not run GPU inference.
+
+### Frontend
+
+Create `frontend/.env.local`:
+
+```dotenv
+VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
+# Vite can also proxy /api to localhost:8000 if this is omitted
+VITE_API_BASE_URL=http://localhost:8000
+```
+
 ```bash
 cd frontend
 npm ci
-npm run dev
+npm run dev:client
 ```
 
-### 3. Deploy Remote GPU Container
+Open the local URL printed by Vite, normally `http://localhost:5173`. `npm run dev` starts the Express SSR development server instead. `npm run build` builds both client and SSR output; `npm run build:static` builds the static SPA variant.
+
+### Database and model prerequisites
+
+The API expects `profiles` and `fashion_items`, including LAB and vector columns, plus these deployed RPCs:
+
+- `match_clothes_by_text(query_embedding, match_threshold)`
+- `match_clothes_by_user(target_user_id)`
+- `get_similar_users(target_user_id)`
+
+The repository includes an approval migration at `supabase/migrations/20261104000000_add_profile_approval.sql`, **not** the complete database schema or the three RPC definitions. Existing deployments must supply these separately. The live `match_clothes_by_user` function was corrected to return a `bigint` ID matching `fashion_items.id`; that deployment change is not versioned here. Review migration effects and database permissions before applying it to an existing project.
+
+The Modal app is defined in `vton/vton_model.py` and uses the `vton-checkpoints` volume. It expects the referenced model checkpoints as well as matching `/vol/cloth/<name>.jpg` and `/vol/cloth_mask/<name>.jpg` files. Model checkpoints, garment datasets, and some vendored model directories are excluded from Git. A fresh checkout alone is therefore insufficient to redeploy the GPU service; restore those assets first. Once configured, deployment uses:
+
 ```bash
 modal deploy vton/vton_model.py
 ```
 
-### Configuration
+### Configuration and deployment
 
-The backend requires `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. Set `REDIS_URL` to use Redis; otherwise the backend uses its in-memory cache. Deployment-specific settings `MODAL_APP_NAME`, `ALLOWED_ORIGINS`, `ALLOWED_ORIGIN_REGEX`, `LOG_LEVEL`, and `PORT` are optional.
+Application limits and cache defaults live in `backend_settings.py`. Optional backend environment settings include `REDIS_URL`, `MODAL_APP_NAME`, `ALLOWED_ORIGINS`, `ALLOWED_ORIGIN_REGEX`, `LOG_LEVEL`, and the server's `PORT`. The default CORS origins include the project's production Vercel URL and local Vite development origins; configure the actual production origin when deploying elsewhere.
 
-The frontend uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Set `VITE_API_BASE_URL` if the API is not available through the default `/api` path.
+The repository provides an API `Dockerfile` and a local Redis/API `docker-compose.yml`. The frontend has Vercel SSR and static configurations; set the Vercel project root to `frontend` and provide the `VITE_*` values there. The frontend's Supabase key is public; never put the service-role key or Modal credentials in a `VITE_*` variable. Configure Supabase Auth redirect URLs for the deployed `/verify-waiting` route.
 
-Application limits, cache lifetimes, and concurrency defaults are defined in `backend_settings.py`. Change them there if needed; the former environment variable overrides for these values are no longer read.
+## Verification and known limitations
 
----
+- Frontend production client and SSR builds have passed locally. The API optimization regression suite was run locally; local test files are ignored by Git and may not be present in a fresh checkout.
+- Live checks during development exercised catalog reads, Redis counters, Modal model inference, text search, and the corrected `match_clothes_by_user` RPC. A sampled `get_similar_users` call returned no rows, so nonempty collaborative results were not verified in that check.
+- A complete authenticated user journey and Docker image build/runtime were not verified in the recorded environment. Docker daemon access was unavailable.
+- Results can show visual artifacts. Model latency, recommendation quality, fairness, privacy guarantees, and production scale have not been established by a representative benchmark.
+- Custom garment uploads are not supported by the deployed try-on interface; garment images and masks must already exist in the Modal volume.
+- Redis outage fallback is per process, and successful warmup dispatch does not guarantee a worker is ready. Full deployment reproducibility requires versioning the database schema/RPCs and provisioning the model assets.
 
-## Key Achievements & Benchmarks
+## Repository map
 
-* **Sub-Second Semantic Retrieval**: ~25ms vector similarity query latency over thousands of catalog items via indexed `pgvector` embeddings.
-* **High-Precision Warping**: Robust garment-to-body alignment across diverse poses, preventing edge distortion through adaptive optical flow estimation.
-* **Cost-Optimized Architecture**: 100% serverless GPU execution model—$0 idle compute overhead, scaling on-demand.
-
----
-
-
+```text
+backend.py                       FastAPI endpoints, caching, ranking, orchestration
+backend_settings.py              API limits and cache defaults
+recommendation/skin_recom.py     Vectorized LAB-based suitability scoring
+recommendation/database_update.py  Offline catalog feature enrichment
+vton/vton_model.py               Modal model classes and image setup
+vton/pipelines/                  Try-on inference and composition pipeline
+vton/models/                     Warp and generator implementations
+frontend/src/                    React pages, layouts, auth, and API client
+frontend/server.js               Express SSR / SPA fallback
+supabase/migrations/             Profile approval migration
+Dockerfile                       CPU API image
+```
